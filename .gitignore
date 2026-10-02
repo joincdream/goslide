@@ -1,0 +1,38 @@
+# Binaries and build artifacts
+/goslide
+/goslide.exe
+/bin/
+/dist/
+
+# Go artifacts & test coverage
+*.test
+*.out
+*.prof
+coverage.html
+coverage.txt
+vendor/
+
+# Environment and sensitive profiles
+.env
+*.env
+.env.*
+!.env.example
+*.local
+.jira-profile
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.obsidian/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Temporary directories and logs
+tmp/
+*.tmp
+*.log
