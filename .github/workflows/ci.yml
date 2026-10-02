@@ -1,0 +1,43 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Build, Lint & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ "1.22.x", "1.23.x" ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache: true
+
+      - name: Run Linter (via Makefile)
+        run: make lint
+
+      - name: Run Code Complexity Analysis (via Makefile)
+        run: make complexity
+
+      - name: Run Unit Tests with Race Detector
+        run: make test-race
+
+      - name: Build Static Binary (CGO_ENABLED=0)
+        run: make build
+
+      - name: Verify CLI Execution
+        run: |
+          ./bin/goslide --version
+          ./bin/goslide --lang=en --help
+          ./bin/goslide --lang=ko --help

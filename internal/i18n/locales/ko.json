@@ -1,0 +1,14 @@
+{
+  "cli.description": "Goslide는 순수 Go 기반의 초고속 단일 바이너리 마크다운 슬라이드 데크 빌더입니다.",
+  "cli.version": "Goslide 버전 %s",
+  "cli.lang.flag": "CLI 및 프레젠테이션 UI 언어 설정 (auto, en, ko)",
+  "cli.build.desc": "마크다운 소스로부터 프레젠테이션 슬라이드 생성",
+  "cli.serve.desc": "실시간 핫 리로드를 지원하는 로컬 개발 서버 시작",
+  "slide.page_indicator": "%d / %d 페이지",
+  "presenter.elapsed": "경과 시간",
+  "presenter.current": "현재 시각",
+  "presenter.next_slide": "다음 슬라이드",
+  "presenter.notes": "발표자 메모",
+  "annotation.toggle": "판서 모드 전환 (D)",
+  "annotation.clear": "판서 지우기 (C)"
+}

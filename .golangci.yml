@@ -1,0 +1,49 @@
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  disable-all: true
+  enable:
+    # Standard correctness & bugs
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - ineffassign
+
+    # Formatting & style
+    - gofmt
+    - whitespace
+
+    # Complexity management
+    - gocyclo
+    - gocognit
+    - nestif
+    - funlen
+
+linters-settings:
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment # Avoid micro-optimization noise in domain models
+  errcheck:
+    check-type-assertions: true
+    check-blank: false
+  gocyclo:
+    min-complexity: 15
+  gocognit:
+    min-complexity: 20
+  nestif:
+    min-complexity: 4
+  funlen:
+    lines: 80
+    statements: 40
+  gofmt:
+    simplify: true
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

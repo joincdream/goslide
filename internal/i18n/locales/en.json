@@ -1,0 +1,14 @@
+{
+  "cli.description": "Goslide is a blazing-fast, single-binary Markdown presentation deck builder.",
+  "cli.version": "Goslide version %s",
+  "cli.lang.flag": "Set language for CLI and presentation UI (auto, en, ko)",
+  "cli.build.desc": "Build presentation slides from Markdown source",
+  "cli.serve.desc": "Start local development server with live reload",
+  "slide.page_indicator": "Page %d of %d",
+  "presenter.elapsed": "Elapsed Time",
+  "presenter.current": "Current Time",
+  "presenter.next_slide": "Next Slide",
+  "presenter.notes": "Speaker Notes",
+  "annotation.toggle": "Toggle Drawing Mode (D)",
+  "annotation.clear": "Clear Drawings (C)"
+}
