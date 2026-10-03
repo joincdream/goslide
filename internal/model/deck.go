@@ -23,22 +23,22 @@ const (
 
 // Deck represents the entire immutable presentation deck.
 type Deck struct {
-	Title       string           `json:"title"`
-	Author      string           `json:"author"`
-	CreatedAt   time.Time        `json:"created_at"`
-	GlobalAttrs GlobalDirectives `json:"global_attributes"`
-	CustomCSS   string           `json:"custom_css,omitempty"`
-	Slides      []*Slide         `json:"slides"`
+	Title       string           `json:"title" yaml:"title"`
+	Author      string           `json:"author" yaml:"author"`
+	CreatedAt   time.Time        `json:"created_at" yaml:"created_at"`
+	GlobalAttrs GlobalDirectives `json:"global_attributes" yaml:",inline"`
+	CustomCSS   string           `json:"custom_css,omitempty" yaml:"custom_css"`
+	Slides      []*Slide         `json:"slides" yaml:"-"`
 }
 
 // GlobalDirectives holds deck-level global attributes defined in Frontmatter.
 type GlobalDirectives struct {
-	Theme    string     `json:"theme"`
-	Layout   LayoutType `json:"layout"`
-	Size     SizeRatio  `json:"size"`
-	Paginate bool       `json:"paginate"`
-	Header   string     `json:"header,omitempty"`
-	Footer   string     `json:"footer,omitempty"`
+	Theme    string     `json:"theme" yaml:"theme"`
+	Layout   LayoutType `json:"layout" yaml:"layout"`
+	Size     SizeRatio  `json:"size" yaml:"size"`
+	Paginate bool       `json:"paginate" yaml:"paginate"`
+	Header   string     `json:"header,omitempty" yaml:"header"`
+	Footer   string     `json:"footer,omitempty" yaml:"footer"`
 }
 
 // SlideDirectives holds scoped directives applied to a single slide.
