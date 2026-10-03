@@ -182,3 +182,23 @@ func TestManager_ComposeFullCSS_Errors(t *testing.T) {
 		}
 	})
 }
+
+func TestManager_GetCoreJS(t *testing.T) {
+	t.Parallel()
+
+	mgr := theme.NewManager(nil)
+	js, err := mgr.GetCoreJS()
+	if err != nil {
+		t.Fatalf("unexpected error getting core js: %v", err)
+	}
+
+	if !strings.Contains(js, "goslide-deck") {
+		t.Errorf("core js missing goslide-deck identifier")
+	}
+	if !strings.Contains(js, "goslide-canvas") {
+		t.Errorf("core js missing goslide-canvas identifier")
+	}
+	if !strings.Contains(js, "toggleDrawMode") {
+		t.Errorf("core js missing toggleDrawMode function")
+	}
+}

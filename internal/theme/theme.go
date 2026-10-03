@@ -16,6 +16,7 @@ const (
 	DefaultTheme = "default"
 
 	baseCSSPath = "assets/css/base.css"
+	coreJSPath  = "assets/js/goslide-core.js"
 )
 
 // Manager handles retrieving built-in themes and composing presentation stylesheets.
@@ -36,6 +37,15 @@ func (m *Manager) GetBaseCSS() (string, error) {
 	data, err := fs.ReadFile(m.fsys, baseCSSPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read base css: %w", err)
+	}
+	return string(data), nil
+}
+
+// GetCoreJS returns the raw contents of the core presentation runtime script.
+func (m *Manager) GetCoreJS() (string, error) {
+	data, err := fs.ReadFile(m.fsys, coreJSPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read core js: %w", err)
 	}
 	return string(data), nil
 }

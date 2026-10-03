@@ -6,21 +6,39 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
-  padding: 2rem;
-  background-color: #0f172a;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b0f19;
   color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Slide Wrapper & Frame (16:9 aspect ratio preview) */
+/* Presentation Stage: Fullscreen center container */
+.goslide-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 16:9 Deck Frame */
+.goslide-deck {
+  width: 960px;
+  height: 540px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Slide Wrapper & Frame (Legacy/Preview fallback) */
 .slide-wrapper {
   position: relative;
   width: 960px;
@@ -37,7 +55,7 @@ body {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 16:9 Canvas: Strict Fixed Dimension */
+/* 16:9 Slide Canvas: Strict Dimension & Visibility */
 .slide-card {
   width: 960px !important;
   height: 540px !important;
@@ -45,14 +63,60 @@ body {
   max-width: 960px !important;
   min-height: 540px !important;
   max-height: 540px !important;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   overflow: hidden;
   padding: 3rem 4rem;
-  display: flex !important;
+  display: none !important;
   flex-direction: column !important;
   flex-shrink: 0;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
   border-radius: 8px;
+}
+
+.slide-card.active {
+  display: flex !important;
+}
+
+/* 1:1 Transparent Annotation Canvas */
+.goslide-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+body.drawing-mode {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Floating Progress Indicator */
+.goslide-indicator {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.5rem;
+  background-color: rgba(15, 23, 42, 0.75);
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+  user-select: none;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.goslide-indicator.pen-active {
+  background-color: rgba(239, 68, 68, 0.9);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
 }
 
 /* Header & Footer */

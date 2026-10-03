@@ -102,3 +102,47 @@ func TestBuildCommand_ThemeFlags(t *testing.T) {
 	themePathFlag = ""
 	outputPathFlag = ""
 }
+
+func TestBuildCommand_Standalone(t *testing.T) {
+	tempDir := t.TempDir()
+	inputMD := filepath.Join(tempDir, "standalone.md")
+	outputHTML := filepath.Join(tempDir, "standalone.html")
+	imagePath := filepath.Join(tempDir, "icon.png")
+
+	// 1x1 png
+	pngBytes := []byte{
+		0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+		0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+		0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4, 0x89, 0x00, 0x00, 0x00,
+		0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+		0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49,
+		0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+	}
+	if err := os.WriteFile(imagePath, pngBytes, 0600); err != nil {
+		t.Fatalf("failed to write test image: %v", err)
+	}
+
+	mdContent := "# Standalone Slide\n\n![Icon](icon.png)\n"
+	if err := os.WriteFile(inputMD, []byte(mdContent), 0600); err != nil {
+		t.Fatalf("failed to write input md: %v", err)
+	}
+
+	buildCmd.SetArgs([]string{inputMD, "-o", outputHTML, "--standalone"})
+	if err := buildCmd.Execute(); err != nil {
+		t.Fatalf("build command failed with --standalone: %v", err)
+	}
+
+	outBytes, err := os.ReadFile(outputHTML)
+	if err != nil {
+		t.Fatalf("failed to read output HTML: %v", err)
+	}
+
+	outStr := string(outBytes)
+	if !strings.Contains(outStr, "data:image/png;base64,") {
+		t.Errorf("expected base64 data uri in standalone output HTML")
+	}
+
+	// Reset flags
+	standaloneFlag = false
+	outputPathFlag = ""
+}
