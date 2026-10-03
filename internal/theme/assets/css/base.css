@@ -1,0 +1,244 @@
+/* Goslide Base Stylesheet
+ * 16:9 Presentation Layout, Box Model, and Typography Defaults
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+  background-color: #0f172a;
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slide Wrapper & Frame (16:9 aspect ratio preview) */
+.slide-wrapper {
+  position: relative;
+  width: 960px;
+  height: 540px;
+  flex-shrink: 0;
+}
+
+.slide-badge {
+  position: absolute;
+  top: -1.6rem;
+  left: 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* 16:9 Canvas: Strict Fixed Dimension */
+.slide-card {
+  width: 960px !important;
+  height: 540px !important;
+  min-width: 960px !important;
+  max-width: 960px !important;
+  min-height: 540px !important;
+  max-height: 540px !important;
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 4rem;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-shrink: 0;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+}
+
+/* Header & Footer */
+.slide-header {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.slide-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.slide-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
+/* Semantic Layouts */
+.slide-card.cover,
+.slide-card.layout-cover {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem;
+}
+
+.slide-card.cover .slide-body,
+.slide-card.layout-cover .slide-body {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slide-card.cover h1,
+.slide-card.layout-cover h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.slide-card.cover p,
+.slide-card.layout-cover p {
+  font-size: 1.3rem;
+  margin: 0.5rem 0;
+  opacity: 0.85;
+}
+
+.slide-card.section,
+.slide-card.layout-section {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem;
+}
+
+.slide-card.section .slide-body,
+.slide-card.layout-section .slide-body {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slide-card.section h1,
+.slide-card.section h2,
+.slide-card.layout-section h1,
+.slide-card.layout-section h2 {
+  font-size: 2.75rem;
+  margin: 0;
+}
+
+.slide-card.blank,
+.slide-card.layout-blank {
+  padding: 0;
+}
+
+.slide-card.blank .slide-body,
+.slide-card.layout-blank .slide-body {
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Two Columns Layout (Scoped strictly inside slide-body) */
+.slide-body .two-cols {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2.5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.slide-body .two-cols .col-left,
+.slide-body .two-cols .col-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography & Markdown Defaults */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.35rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+ul, ol {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-left: 1.75rem;
+  line-height: 1.6;
+}
+
+li {
+  margin-bottom: 0.4rem;
+}
+
+blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+}
+
+pre {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+th, td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Scoped Classes */
+.slide-card.lead {
+  font-size: 1.25rem;
+}
+
+.slide-card.lead p {
+  line-height: 1.7;
+}

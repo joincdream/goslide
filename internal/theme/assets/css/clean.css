@@ -1,0 +1,138 @@
+/* Goslide Clean Theme
+ * Minimalist White Theme with Inter Font Stack
+ */
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.slide-card {
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+/* Headings */
+.slide-card h1 {
+  color: #000000;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.slide-card h2 {
+  color: #111827;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  color: #374151;
+  font-weight: 600;
+}
+
+/* Links & Accents */
+.slide-card a {
+  color: #111827;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.slide-card strong {
+  color: #000000;
+  font-weight: 700;
+}
+
+/* Header & Footer */
+.slide-card .slide-header {
+  color: #9ca3af;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
+
+.slide-card .slide-footer {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+/* Blockquote */
+.slide-card blockquote {
+  background-color: #fafafa;
+  border-left: 2px solid #111827;
+  color: #4b5563;
+  font-style: italic;
+}
+
+/* Code Blocks & Inline Code */
+.slide-card pre {
+  background-color: #f9fafb;
+  border: 1px solid #f3f4f6;
+  color: #1f2937;
+}
+
+.slide-card :not(pre) > code {
+  background-color: #f3f4f6;
+  color: #111827;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Tables (Minimalist horizontal rules) */
+.slide-card table {
+  border-top: 1px solid #111827;
+  border-bottom: 1px solid #111827;
+}
+
+.slide-card th {
+  color: #111827;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  background: transparent;
+}
+
+.slide-card td {
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+/* Cover & Section Layout Overrides */
+.slide-card.cover h1 {
+  color: #000000;
+  font-size: 3.25rem;
+}
+
+.slide-card.section {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+.slide-card.section h1,
+.slide-card.section h2 {
+  color: #ffffff;
+}
+
+.slide-card.section p {
+  color: #9ca3af;
+}
+
+/* Invert Utility Class */
+.slide-card.invert {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+.slide-card.invert h1,
+.slide-card.invert h2 {
+  color: #ffffff;
+}
+
+.slide-card.invert .slide-header,
+.slide-card.invert .slide-footer {
+  color: #9ca3af;
+}

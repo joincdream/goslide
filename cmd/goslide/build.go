@@ -11,12 +11,19 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/yundream/goslide/internal/model"
 	"github.com/yundream/goslide/internal/parser"
+	"github.com/yundream/goslide/internal/theme"
 )
 
-var outputPathFlag string
+var (
+	outputPathFlag string
+	themeFlag      string
+	themePathFlag  string
+)
 
 func init() {
 	buildCmd.Flags().StringVarP(&outputPathFlag, "output", "o", "", "Output HTML file path (default: <input>.html)")
+	buildCmd.Flags().StringVarP(&themeFlag, "theme", "t", "", "Theme name (default, clean, dark; overrides frontmatter)")
+	buildCmd.Flags().StringVar(&themePathFlag, "theme-path", "", "Path to custom external CSS stylesheet")
 	buildCmd.RunE = runBuild
 }
 
@@ -40,12 +47,23 @@ func runBuild(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to parse markdown: %w", err)
 	}
 
-	if err := renderPreviewHTML(cmd.Context(), deck, outputPath); err != nil {
+	chosenTheme := resolveThemeName(themeFlag, deck.GlobalAttrs.Theme)
+	if err := renderPreviewHTML(cmd.Context(), deck, outputPath, chosenTheme, themePathFlag); err != nil {
 		return fmt.Errorf("failed to write output HTML: %w", err)
 	}
 
-	fmt.Printf("✓ Successfully built %d slides to %s\n", len(deck.Slides), outputPath)
+	fmt.Printf("✓ Successfully built %d slides to %s [theme: %s]\n", len(deck.Slides), outputPath, chosenTheme)
 	return nil
+}
+
+func resolveThemeName(cliTheme, frontmatterTheme string) string {
+	if cliTheme != "" {
+		return cliTheme
+	}
+	if frontmatterTheme != "" {
+		return frontmatterTheme
+	}
+	return theme.DefaultTheme
 }
 
 func resolveOutputPath(inputPath, outputFlag string) string {
@@ -58,9 +76,9 @@ func resolveOutputPath(inputPath, outputFlag string) string {
 }
 
 type previewTemplateData struct {
-	Title     string
-	CustomCSS template.CSS
-	Slides    []slideViewData
+	Title       string
+	ComposedCSS template.CSS
+	Slides      []slideViewData
 }
 
 type slideViewData struct {
@@ -75,24 +93,30 @@ type slideViewData struct {
 	HTMLContent template.HTML
 }
 
-func renderPreviewHTML(_ context.Context, deck *model.Deck, outputPath string) error {
-	data := buildPreviewData(deck)
+func renderPreviewHTML(_ context.Context, deck *model.Deck, outputPath, themeName, themePath string) error {
+	mgr := theme.NewManager(nil)
+	composedCSS, err := mgr.ComposeFullCSS(themeName, themePath, deck.CustomCSS)
+	if err != nil {
+		return fmt.Errorf("failed to compose presentation styles: %w", err)
+	}
+
+	data := buildPreviewData(deck, composedCSS)
 
 	tmpl, err := template.New("preview").Parse(previewHTMLTemplate)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse preview template: %w", err)
 	}
 
 	out, err := os.Create(outputPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create output file: %w", err)
 	}
 	defer func() { _ = out.Close() }()
 
 	return tmpl.Execute(out, data)
 }
 
-func buildPreviewData(deck *model.Deck) previewTemplateData {
+func buildPreviewData(deck *model.Deck, composedCSS string) previewTemplateData {
 	title := deck.Title
 	if title == "" {
 		title = "Goslide Preview"
@@ -114,9 +138,9 @@ func buildPreviewData(deck *model.Deck) previewTemplateData {
 	}
 
 	return previewTemplateData{
-		Title:     title,
-		CustomCSS: template.CSS(deck.CustomCSS), // nolint:gosec
-		Slides:    views,
+		Title:       title,
+		ComposedCSS: template.CSS(composedCSS), // nolint:gosec
+		Slides:      views,
 	}
 }
 
@@ -127,97 +151,14 @@ const previewHTMLTemplate = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ .Title }}</title>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 2rem;
-      background: #181825;
-      color: #cdd6f4;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2.5rem;
-    }
-    .slide-wrapper {
-      position: relative;
-    }
-    .slide-badge {
-      position: absolute;
-      top: -1.5rem;
-      left: 0.5rem;
-      font-size: 0.75rem;
-      color: #a6adc8;
-      font-family: monospace;
-    }
-    .slide-card {
-      width: 960px;
-      height: 540px;
-      background: #ffffff;
-      color: #1e1e2e;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-      border-radius: 8px;
-      overflow: hidden;
-      position: relative;
-      padding: 3rem 4rem;
-      display: flex;
-      flex-direction: column;
-    }
-    .slide-card.cover {
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    .slide-header {
-      font-size: 0.85rem;
-      color: #888;
-      margin-bottom: 1rem;
-    }
-    .slide-body {
-      flex: 1;
-      overflow: hidden;
-    }
-    .slide-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #888;
-      margin-top: 1rem;
-    }
-    .two-cols {
-      display: flex;
-      gap: 2rem;
-      height: 100%;
-    }
-    .col-left, .col-right {
-      flex: 1;
-    }
-    pre {
-      border-radius: 6px;
-      padding: 1rem;
-      overflow-x: auto;
-      font-size: 0.9rem;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1rem 0;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px 12px;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    {{ .CustomCSS }}
+{{ .ComposedCSS }}
   </style>
 </head>
 <body>
   {{ range .Slides }}
   <div class="slide-wrapper">
     <div class="slide-badge">Slide {{ .Index }} [{{ .Layout }}]</div>
-    <div class="slide-card {{ .Layout }} {{ .Classes }}"
+    <div class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}"
          style="{{ if .BgColor }}background-color: {{ .BgColor }};{{ end }}{{ if .Color }}color: {{ .Color }};{{ end }}">
       {{ if .Header }}<div class="slide-header">{{ .Header }}</div>{{ end }}
       <div class="slide-body">

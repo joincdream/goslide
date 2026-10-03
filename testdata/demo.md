@@ -9,8 +9,6 @@ footer: "© 2026 Cloit Corp."
 ---
 
 <!-- _layout: cover -->
-<!-- _backgroundColor: #0f172a -->
-<!-- _color: #f8fafc -->
 
 # Goslide 프레젠테이션 엔진
 ### 고성능 순수 Go 마크다운 슬라이드 빌더
@@ -38,8 +36,6 @@ footer: "© 2026 Cloit Corp."
 
 ---
 
-<!-- _backgroundColor: #1e1e2e -->
-<!-- _color: #cdd6f4 -->
 
 ## 순수 Go 구문 강조 (Chroma)
 

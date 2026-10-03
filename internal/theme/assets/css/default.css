@@ -1,0 +1,134 @@
+/* Goslide Default Theme
+ * Business & Technology Modern Light Theme
+ */
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+}
+
+.slide-card {
+  background-color: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+/* Headings */
+.slide-card h1 {
+  color: #0f172a;
+  letter-spacing: -0.025em;
+}
+
+.slide-card h2 {
+  color: #1e293b;
+  letter-spacing: -0.02em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  color: #334155;
+}
+
+/* Links & Accents */
+.slide-card a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.slide-card strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Header & Footer */
+.slide-card .slide-header {
+  color: #64748b;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.4rem;
+}
+
+.slide-card .slide-footer {
+  color: #64748b;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.4rem;
+}
+
+/* Blockquote */
+.slide-card blockquote {
+  background-color: #f8fafc;
+  border-left: 4px solid #2563eb;
+  color: #475569;
+}
+
+/* Code Blocks & Inline Code */
+.slide-card pre {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+
+.slide-card :not(pre) > code {
+  background-color: #f1f5f9;
+  color: #db2777;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Tables */
+.slide-card table {
+  border: 1px solid #e2e8f0;
+}
+
+.slide-card th {
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.slide-card td {
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.slide-card tr:nth-child(even) td {
+  background-color: #fafbfd;
+}
+
+/* Cover & Section Layout Overrides */
+.slide-card.cover h1 {
+  color: #1d4ed8;
+}
+
+.slide-card.section {
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #1e293b;
+}
+
+.slide-card.section h1,
+.slide-card.section h2 {
+  color: #60a5fa;
+}
+
+.slide-card.section p {
+  color: #94a3b8;
+}
+
+/* Invert Utility Class */
+.slide-card.invert {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+.slide-card.invert h1,
+.slide-card.invert h2 {
+  color: #60a5fa;
+}
+
+.slide-card.invert .slide-header,
+.slide-card.invert .slide-footer {
+  color: #94a3b8;
+  border-color: #1e293b;
+}

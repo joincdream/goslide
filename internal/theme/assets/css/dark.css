@@ -1,0 +1,137 @@
+/* Goslide Dark Theme
+ * One Dark / Catppuccin Mocha Palette
+ */
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  background-color: #11111b;
+  color: #cdd6f4;
+}
+
+.slide-card {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border: 1px solid #313244;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Headings */
+.slide-card h1 {
+  color: #89b4fa;
+  letter-spacing: -0.025em;
+}
+
+.slide-card h2 {
+  color: #b4befe;
+  letter-spacing: -0.02em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  color: #cdd6f4;
+}
+
+/* Links & Accents */
+.slide-card a {
+  color: #89b4fa;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.slide-card strong {
+  color: #f5e0dc;
+  font-weight: 700;
+}
+
+/* Header & Footer */
+.slide-card .slide-header {
+  color: #6c7086;
+  border-bottom: 1px solid #313244;
+  padding-bottom: 0.4rem;
+}
+
+.slide-card .slide-footer {
+  color: #6c7086;
+  border-top: 1px solid #313244;
+  padding-top: 0.4rem;
+}
+
+/* Blockquote */
+.slide-card blockquote {
+  background-color: #181825;
+  border-left: 4px solid #89b4fa;
+  color: #a6adc8;
+}
+
+/* Code Blocks & Inline Code */
+.slide-card pre {
+  background-color: #11111b;
+  border: 1px solid #313244;
+  color: #cdd6f4;
+}
+
+.slide-card :not(pre) > code {
+  background-color: #313244;
+  color: #f38ba8;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Tables */
+.slide-card table {
+  border: 1px solid #313244;
+}
+
+.slide-card th {
+  background-color: #181825;
+  color: #89b4fa;
+  font-weight: 600;
+  border-bottom: 2px solid #45475a;
+}
+
+.slide-card td {
+  border-bottom: 1px solid #313244;
+  color: #bac2de;
+}
+
+.slide-card tr:nth-child(even) td {
+  background-color: #181825;
+}
+
+/* Cover & Section Layout Overrides */
+.slide-card.cover h1 {
+  color: #89b4fa;
+}
+
+.slide-card.section {
+  background-color: #181825;
+  color: #cdd6f4;
+  border-color: #45475a;
+}
+
+.slide-card.section h1,
+.slide-card.section h2 {
+  color: #cba6f7;
+}
+
+.slide-card.section p {
+  color: #a6adc8;
+}
+
+/* Invert Utility Class */
+.slide-card.invert {
+  background-color: #cdd6f4;
+  color: #1e1e2e;
+}
+
+.slide-card.invert h1,
+.slide-card.invert h2 {
+  color: #1e1e2e;
+}
+
+.slide-card.invert .slide-header,
+.slide-card.invert .slide-footer {
+  color: #585b70;
+  border-color: #bac2de;
+}
