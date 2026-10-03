@@ -144,3 +144,60 @@ func TestParser_Parse_Errors(t *testing.T) {
 		}
 	})
 }
+
+func TestParser_Parse_DirectivesAndHighlighting(t *testing.T) {
+	p := NewParser()
+	input := `---
+title: "Directives Demo"
+---
+<!-- _layout: cover -->
+<!-- _backgroundColor: #0f172a -->
+<!-- _color: #ffffff -->
+<!-- note: Cover slide speech -->
+# Title
+
+---
+<!-- _layout: two-cols -->
+Col Left
+<!-- split -->
+Col Right
+
+---
+` + "```go\nfunc add(a, b int) int { return a + b }\n```"
+
+	deck, err := p.Parse(context.Background(), strings.NewReader(input))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(deck.Slides) != 3 {
+		t.Fatalf("expected 3 slides, got %d", len(deck.Slides))
+	}
+
+	// Slide 1 checks
+	s1 := deck.Slides[0]
+	if s1.Layout != model.LayoutCover {
+		t.Errorf("s1 layout mismatch: got %v, want cover", s1.Layout)
+	}
+	if s1.Directives.BackgroundColor != "#0f172a" || s1.Directives.Color != "#ffffff" {
+		t.Errorf("s1 directives mismatch: bg=%q, color=%q", s1.Directives.BackgroundColor, s1.Directives.Color)
+	}
+	if s1.Notes != "Cover slide speech" {
+		t.Errorf("s1 notes mismatch: got %q, want 'Cover slide speech'", s1.Notes)
+	}
+
+	// Slide 2 checks
+	s2 := deck.Slides[1]
+	if s2.Layout != model.LayoutTwoCols {
+		t.Errorf("s2 layout mismatch: got %v, want two-cols", s2.Layout)
+	}
+	if !strings.Contains(s2.HTMLContent, "<div class=\"two-cols\">") {
+		t.Errorf("s2 missing two-cols container: %s", s2.HTMLContent)
+	}
+
+	// Slide 3 checks (Chroma)
+	s3 := deck.Slides[2]
+	if !strings.Contains(s3.HTMLContent, "<span style=") || !strings.Contains(s3.HTMLContent, "func") {
+		t.Errorf("s3 missing Chroma highlighted span: %s", s3.HTMLContent)
+	}
+}
