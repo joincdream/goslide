@@ -108,17 +108,19 @@ body {
 }
 
 .slide-card.section {
-  background-color: #111827;
-  color: #f9fafb;
+  background-color: #ffffff;
+  color: #111827;
 }
 
 .slide-card.section h1,
-.slide-card.section h2 {
-  color: #ffffff;
+.slide-card.section h2,
+.slide-card.section h3 {
+  color: #000000;
 }
 
-.slide-card.section p {
-  color: #9ca3af;
+.slide-card.section p,
+.slide-card.section li {
+  color: #4b5563;
 }
 
 /* Invert Utility Class */
