@@ -1,13 +1,29 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/yundream/goslide/internal/model"
 )
 
+func resetFlags() {
+	outputPathFlag = ""
+	themeFlag = ""
+	themePathFlag = ""
+	standaloneFlag = false
+	quietFlag = false
+	verboseFlag = false
+}
+
 func TestBuildCommand(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
 	tempDir := t.TempDir()
 	inputMD := filepath.Join(tempDir, "sample.md")
 	outputHTML := filepath.Join(tempDir, "sample.html")
@@ -63,6 +79,9 @@ Right Column
 }
 
 func TestBuildCommand_ThemeFlags(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
 	tempDir := t.TempDir()
 	inputMD := filepath.Join(tempDir, "theme_override.md")
 	customCSS := filepath.Join(tempDir, "brand.css")
@@ -96,14 +115,12 @@ func TestBuildCommand_ThemeFlags(t *testing.T) {
 	if !strings.Contains(outStr, ".custom-brand { color: #abcdef; }") {
 		t.Errorf("expected custom css content in output HTML")
 	}
-
-	// Reset flags
-	themeFlag = ""
-	themePathFlag = ""
-	outputPathFlag = ""
 }
 
 func TestBuildCommand_Standalone(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
 	tempDir := t.TempDir()
 	inputMD := filepath.Join(tempDir, "standalone.md")
 	outputHTML := filepath.Join(tempDir, "standalone.html")
@@ -141,8 +158,127 @@ func TestBuildCommand_Standalone(t *testing.T) {
 	if !strings.Contains(outStr, "data:image/png;base64,") {
 		t.Errorf("expected base64 data uri in standalone output HTML")
 	}
+}
 
-	// Reset flags
-	standaloneFlag = false
-	outputPathFlag = ""
+func TestBuildCommand_QuietAndVerbose(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
+	tempDir := t.TempDir()
+	inputMD := filepath.Join(tempDir, "sample.md")
+	outputHTML := filepath.Join(tempDir, "sample.html")
+
+	if err := os.WriteFile(inputMD, []byte("# Simple Slide\n"), 0600); err != nil {
+		t.Fatalf("failed to write input md: %v", err)
+	}
+
+	// 1. Mutually exclusive test: --quiet and --verbose together
+	buildCmd.SetArgs([]string{inputMD, "-o", outputHTML, "-q", "-v"})
+	err := buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error when specifying both -q and -v")
+	}
+	if code := determineExitCode(err); code != model.ExitInvalidUsage {
+		t.Errorf("expected ExitInvalidUsage (%d), got %d", model.ExitInvalidUsage, code)
+	}
+
+	// 2. Quiet mode: capture stdout to verify no success message is printed
+	resetFlags()
+	oldStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	buildCmd.SetArgs([]string{inputMD, "-o", outputHTML, "--quiet"})
+	execErr := buildCmd.Execute()
+
+	_ = w.Close()
+	os.Stdout = oldStdout
+	var buf bytes.Buffer
+	_, _ = io.Copy(&buf, r)
+
+	if execErr != nil {
+		t.Fatalf("buildCmd failed in quiet mode: %v", execErr)
+	}
+	if strings.Contains(buf.String(), "Successfully built") {
+		t.Errorf("quiet mode should suppress success message, got: %s", buf.String())
+	}
+
+	// 3. Verbose mode: verify [verbose] diagnostics are printed
+	resetFlags()
+	r2, w2, _ := os.Pipe()
+	os.Stdout = w2
+
+	buildCmd.SetArgs([]string{inputMD, "-o", outputHTML, "--verbose"})
+	execErr2 := buildCmd.Execute()
+
+	_ = w2.Close()
+	os.Stdout = oldStdout
+	var buf2 bytes.Buffer
+	_, _ = io.Copy(&buf2, r2)
+
+	if execErr2 != nil {
+		t.Fatalf("buildCmd failed in verbose mode: %v", execErr2)
+	}
+	if !strings.Contains(buf2.String(), "[verbose]") {
+		t.Errorf("verbose mode should print [verbose] lines, got: %s", buf2.String())
+	}
+}
+
+func TestBuildCommand_ExitCodes(t *testing.T) {
+	defer resetFlags()
+
+	tempDir := t.TempDir()
+
+	// 1. Missing input file: ExitFileNotFound (3)
+	resetFlags()
+	buildCmd.SetArgs([]string{filepath.Join(tempDir, "non_existent.md")})
+	err := buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error for non-existent file")
+	}
+	if code := determineExitCode(err); code != model.ExitFileNotFound {
+		t.Errorf("expected ExitFileNotFound (%d), got %d (err: %v)", model.ExitFileNotFound, code, err)
+	}
+
+	// 2. Missing custom CSS file: ExitFileNotFound (3)
+	resetFlags()
+	validMD := filepath.Join(tempDir, "valid.md")
+	if writeErr := os.WriteFile(validMD, []byte("# Valid Slide\n"), 0600); writeErr != nil {
+		t.Fatalf("failed to write valid md: %v", writeErr)
+	}
+	buildCmd.SetArgs([]string{validMD, "--theme-path", filepath.Join(tempDir, "missing.css")})
+	err = buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error for non-existent theme-path CSS")
+	}
+	if code := determineExitCode(err); code != model.ExitFileNotFound {
+		t.Errorf("expected ExitFileNotFound (%d) for missing CSS, got %d (err: %v)", model.ExitFileNotFound, code, err)
+	}
+
+	// 3. Invalid YAML frontmatter: ExitParseError (4)
+	resetFlags()
+	invalidFmMD := filepath.Join(tempDir, "bad_frontmatter.md")
+	badFM := "---\ntitle: [invalid: yaml: syntax:\n---\n# Bad FM\n"
+	if writeErr := os.WriteFile(invalidFmMD, []byte(badFM), 0600); writeErr != nil {
+		t.Fatalf("failed to write bad fm md: %v", writeErr)
+	}
+	buildCmd.SetArgs([]string{invalidFmMD})
+	err = buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error for invalid frontmatter")
+	}
+	if code := determineExitCode(err); code != model.ExitParseError {
+		t.Errorf("expected ExitParseError (%d), got %d (err: %v)", model.ExitParseError, code, err)
+	}
+
+	// 4. Missing required input argument: ExitInvalidUsage (2)
+	resetFlags()
+	buildCmd.SetArgs([]string{})
+	err = buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error for missing input argument")
+	}
+	if code := determineExitCode(err); code != model.ExitInvalidUsage {
+		t.Errorf("expected ExitInvalidUsage (%d), got %d", model.ExitInvalidUsage, code)
+	}
 }

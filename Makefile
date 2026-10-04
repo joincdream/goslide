@@ -1,4 +1,4 @@
-.PHONY: all build test test-race lint complexity fmt clean help setup-tools
+.PHONY: all build test test-race lint complexity fmt clean help setup-tools golden-update bench
 
 BINARY_NAME=goslide
 BIN_DIR=bin
@@ -42,6 +42,16 @@ test:
 test-race:
 	@echo "==> Running tests with race detector..."
 	$(GO) test -v -race -cover ./...
+
+## golden-update: Update golden file fixtures with actual test outputs
+golden-update:
+	@echo "==> Updating golden test fixtures..."
+	$(GO) test -v ./internal/renderer/html ./internal/testutil -update
+
+## bench: Run performance benchmarks with memory allocations
+bench:
+	@echo "==> Running performance benchmarks..."
+	$(GO) test -v -bench=. -benchmem -run=^$$ ./cmd/goslide/...
 
 ## lint: Run golangci-lint static analysis (auto-installs if missing)
 lint: setup-tools

@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/yundream/goslide/internal/i18n"
+	"github.com/yundream/goslide/internal/model"
 	"github.com/yundream/goslide/pkg/goslide"
 )
 
@@ -72,10 +74,37 @@ func parseEarlyLang() {
 	}
 }
 
-// Execute runs the root CLI command.
+// determineExitCode resolves the appropriate exit code from a given error.
+func determineExitCode(err error) int {
+	if err == nil {
+		return model.ExitSuccess
+	}
+	var cliErr *CLIError
+	if errors.As(err, &cliErr) {
+		return cliErr.Code
+	}
+	if errors.Is(err, os.ErrNotExist) {
+		return model.ExitFileNotFound
+	}
+	if errors.Is(err, model.ErrInvalidFrontmatter) {
+		return model.ExitParseError
+	}
+	errStr := err.Error()
+	if strings.Contains(errStr, "unknown flag") ||
+		strings.Contains(errStr, "unknown shorthand flag") ||
+		strings.Contains(errStr, "flag needs an argument") ||
+		strings.Contains(errStr, "invalid argument") ||
+		strings.Contains(errStr, "accepts ") {
+		return model.ExitInvalidUsage
+	}
+	return model.ExitGeneralError
+}
+
+// Execute runs the root CLI command and terminates with standard exit codes.
 func Execute() {
 	initCLI()
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		code := determineExitCode(err)
+		os.Exit(code)
 	}
 }

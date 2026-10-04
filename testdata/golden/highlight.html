@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syntax Highlighting Test</title>
+  <style id="goslide-theme-styles">
+/* --- Base Styles --- */
+/* Goslide Base Stylesheet
+ * 16:9 Presentation Layout, Box Model, and Typography Defaults
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0b0f19;
+  color: #f8fafc;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Presentation Stage: Fullscreen center container */
+.goslide-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 16:9 Deck Frame */
+.goslide-deck {
+  width: 960px;
+  height: 540px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Slide Wrapper & Frame (Legacy/Preview fallback) */
+.slide-wrapper {
+  position: relative;
+  width: 960px;
+  height: 540px;
+  flex-shrink: 0;
+}
+
+.slide-badge {
+  position: absolute;
+  top: -1.6rem;
+  left: 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* 16:9 Slide Canvas: Strict Dimension & Visibility */
+.slide-card {
+  width: 960px !important;
+  height: 540px !important;
+  min-width: 960px !important;
+  max-width: 960px !important;
+  min-height: 540px !important;
+  max-height: 540px !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  padding: 3rem 4rem;
+  display: none !important;
+  flex-direction: column !important;
+  flex-shrink: 0;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  border-radius: 8px;
+}
+
+.slide-card.active {
+  display: flex !important;
+}
+
+/* 1:1 Transparent Annotation Canvas */
+.goslide-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+body.drawing-mode {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Floating Progress Indicator */
+.goslide-indicator {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.5rem;
+  background-color: rgba(15, 23, 42, 0.75);
+  color: #94a3b8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+  user-select: none;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.goslide-indicator.pen-active {
+  background-color: rgba(239, 68, 68, 0.9);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+/* Header & Footer */
+.slide-header {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.slide-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.slide-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
+/* Semantic Layouts */
+.slide-card.cover,
+.slide-card.layout-cover {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem;
+}
+
+.slide-card.cover .slide-body,
+.slide-card.layout-cover .slide-body {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slide-card.cover h1,
+.slide-card.layout-cover h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.slide-card.cover p,
+.slide-card.layout-cover p {
+  font-size: 1.3rem;
+  margin: 0.5rem 0;
+  opacity: 0.85;
+}
+
+.slide-card.section,
+.slide-card.layout-section {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem;
+}
+
+.slide-card.section .slide-body,
+.slide-card.layout-section .slide-body {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slide-card.section h1,
+.slide-card.section h2,
+.slide-card.layout-section h1,
+.slide-card.layout-section h2 {
+  font-size: 2.75rem;
+  margin: 0;
+}
+
+.slide-card.blank,
+.slide-card.layout-blank {
+  padding: 0;
+}
+
+.slide-card.blank .slide-body,
+.slide-card.layout-blank .slide-body {
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Two Columns Layout (Scoped strictly inside slide-body) */
+.slide-body .two-cols {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2.5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.slide-body .two-cols .col-left,
+.slide-body .two-cols .col-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography & Markdown Defaults */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.35rem; }
+h4 { font-size: 1.15rem; }
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+ul, ol {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-left: 1.75rem;
+  line-height: 1.6;
+}
+
+li {
+  margin-bottom: 0.4rem;
+}
+
+blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+}
+
+pre {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+th, td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Scoped Classes */
+.slide-card.lead {
+  font-size: 1.25rem;
+}
+
+.slide-card.lead p {
+  line-height: 1.7;
+}
+
+
+/* --- Theme: dark --- */
+/* Goslide Dark Theme
+ * One Dark / Catppuccin Mocha Palette
+ */
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  background-color: #11111b;
+  color: #cdd6f4;
+}
+
+.slide-card {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border: 1px solid #313244;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Headings */
+.slide-card h1 {
+  color: #89b4fa;
+  letter-spacing: -0.025em;
+}
+
+.slide-card h2 {
+  color: #b4befe;
+  letter-spacing: -0.02em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  color: #cdd6f4;
+}
+
+/* Links & Accents */
+.slide-card a {
+  color: #89b4fa;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.slide-card strong {
+  color: #f5e0dc;
+  font-weight: 700;
+}
+
+/* Header & Footer */
+.slide-card .slide-header {
+  color: #6c7086;
+  border-bottom: 1px solid #313244;
+  padding-bottom: 0.4rem;
+}
+
+.slide-card .slide-footer {
+  color: #6c7086;
+  border-top: 1px solid #313244;
+  padding-top: 0.4rem;
+}
+
+/* Blockquote */
+.slide-card blockquote {
+  background-color: #181825;
+  border-left: 4px solid #89b4fa;
+  color: #a6adc8;
+}
+
+/* Code Blocks & Inline Code */
+.slide-card pre {
+  background-color: #11111b;
+  border: 1px solid #313244;
+  color: #cdd6f4;
+}
+
+.slide-card :not(pre) > code {
+  background-color: #313244;
+  color: #f38ba8;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Tables */
+.slide-card table {
+  border: 1px solid #313244;
+}
+
+.slide-card th {
+  background-color: #181825;
+  color: #89b4fa;
+  font-weight: 600;
+  border-bottom: 2px solid #45475a;
+}
+
+.slide-card td {
+  border-bottom: 1px solid #313244;
+  color: #bac2de;
+}
+
+.slide-card tr:nth-child(even) td {
+  background-color: #181825;
+}
+
+/* Cover & Section Layout Overrides */
+.slide-card.cover h1 {
+  color: #89b4fa;
+}
+
+.slide-card.section {
+  background-color: #181825;
+  color: #cdd6f4;
+  border-color: #45475a;
+}
+
+.slide-card.section h1,
+.slide-card.section h2 {
+  color: #cba6f7;
+}
+
+.slide-card.section p {
+  color: #a6adc8;
+}
+
+/* Invert Utility Class */
+.slide-card.invert {
+  background-color: #cdd6f4;
+  color: #1e1e2e;
+}
+
+.slide-card.invert h1,
+.slide-card.invert h2 {
+  color: #1e1e2e;
+}
+
+.slide-card.invert .slide-header,
+.slide-card.invert .slide-footer {
+  color: #585b70;
+  border-color: #bac2de;
+}
+
+
+
+  </style>
+</head>
+<body>
+  <div id="goslide-stage" class="goslide-stage">
+    <div id="goslide-deck" class="goslide-deck">
+      
+      <section class="slide-card default layout-default  active"
+               data-slide="1"
+               style="">
+        
+        <div class="slide-body">
+          
+          <h1 id="code-syntax-highlighting">Code Syntax Highlighting</h1>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span><span style="color:#ff79c6">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff79c6">import</span> <span style="color:#f1fa8c">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#8be9fd;font-style:italic">func</span> <span style="color:#50fa7b">main</span>() {
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#50fa7b">Println</span>(<span style="color:#f1fa8c">&#34;Goslide Pure Go Chroma Highlighting&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          
+        </div>
+        <div class="slide-footer">
+          <span></span>
+          <span>1</span>
+        </div>
+      </section>
+      
+      <section class="slide-card default layout-default "
+               data-slide="2"
+               style="">
+        
+        <div class="slide-body">
+          
+          <h2 id="python--json-samples">Python &amp; JSON Samples</h2>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span><span style="color:#ff79c6">def</span> <span style="color:#50fa7b">calculate_metrics</span>(items: <span style="color:#8be9fd;font-style:italic">list</span>[<span style="color:#8be9fd;font-style:italic">int</span>]) <span style="color:#ff79c6">-&gt;</span> <span style="color:#8be9fd;font-style:italic">float</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f1fa8c">&#34;&#34;&#34;Calculate mean metric value.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">return</span> <span style="color:#8be9fd;font-style:italic">sum</span>(items) <span style="color:#ff79c6">/</span> <span style="color:#8be9fd;font-style:italic">len</span>(items) <span style="color:#ff79c6">if</span> items <span style="color:#ff79c6">else</span> <span style="color:#bd93f9">0.0</span>
+</span></span></code></pre><pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">&#34;name&#34;</span>: <span style="color:#f1fa8c">&#34;goslide&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">&#34;version&#34;</span>: <span style="color:#f1fa8c">&#34;0.1.0&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">&#34;pure_go&#34;</span>: <span style="color:#ff79c6">true</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#ff79c6">&#34;benchmarks&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#ff79c6">&#34;slides_50_latency_ms&#34;</span>: <span style="color:#bd93f9">120</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre>
+          
+        </div>
+        <div class="slide-footer">
+          <span></span>
+          <span>2</span>
+        </div>
+      </section>
+      
+    </div>
+  </div>
+
+  <canvas id="goslide-canvas" class="goslide-canvas"></canvas>
+  <div id="goslide-indicator" class="goslide-indicator">1 / 2</div>
+
+  <script id="goslide-runtime-script">
+/**
+ * Goslide Core Presentation Runtime (Vanilla JS)
+ * Handles slide navigation, keyboard shortcuts, fullscreen, and 1:1 transparent canvas drawing.
+ */
+(function() {
+  'use strict';
+
+  // State
+  let slides = [];
+  let currentIndex = 0;
+  let isDrawMode = false;
+  let isDrawing = false;
+  let lastX = 0;
+  let lastY = 0;
+  let numberBuffer = '';
+  let numberTimeout = null;
+
+  // DOM Elements
+  let deck = null;
+  let indicator = null;
+  let canvas = null;
+  let ctx = null;
+
+  function init() {
+    deck = document.getElementById('goslide-deck');
+    slides = Array.from(document.querySelectorAll('.slide-card'));
+    indicator = document.getElementById('goslide-indicator');
+    canvas = document.getElementById('goslide-canvas');
+
+    if (canvas) {
+      ctx = canvas.getContext('2d');
+      setupCanvasAndViewport();
+    }
+
+    if (slides.length > 0) {
+      const initialIndex = getIndexFromHash();
+      goToSlide(initialIndex, false);
+    }
+
+    setupKeyboard();
+    window.addEventListener('hashchange', () => {
+      const hashIndex = getIndexFromHash();
+      if (hashIndex !== currentIndex) {
+        goToSlide(hashIndex, false);
+      }
+    });
+  }
+
+  function setupCanvasAndViewport() {
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+
+      // 1. High-DPI physical buffer scaling to eliminate aliasing/stair-stepping
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+
+      // 2. Re-apply scale and stroke styles (buffer resizing resets context state)
+      ctx.scale(dpr, dpr);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3.5;
+
+      // 3. Responsive 16:9 Deck Scaling
+      if (deck) {
+        const scale = Math.min(window.innerWidth / 960, window.innerHeight / 540) * 0.96;
+        deck.style.transform = 'scale(' + scale + ')';
+        deck.style.transformOrigin = 'center center';
+      }
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (!isDrawMode || e.button !== 0) return;
+      isDrawing = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing || !isDrawMode) return;
+      const currX = e.clientX;
+      const currY = e.clientY;
+
+      // Midpoint quadratic bezier interpolation for smooth handwriting stroke
+      const midX = (lastX + currX) / 2;
+      const midY = (lastY + currY) / 2;
+
+      ctx.quadraticCurveTo(lastX, lastY, midX, midY);
+      ctx.stroke();
+
+      lastX = currX;
+      lastY = currY;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDrawing && isDrawMode) {
+        ctx.lineTo(lastX, lastY);
+        ctx.stroke();
+      }
+      isDrawing = false;
+    });
+  }
+
+  function clearCanvas() {
+    if (ctx && canvas) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+  }
+
+  function toggleDrawMode() {
+    isDrawMode = !isDrawMode;
+    if (canvas) {
+      canvas.style.pointerEvents = isDrawMode ? 'auto' : 'none';
+      canvas.style.cursor = isDrawMode ? 'crosshair' : 'default';
+    }
+    document.body.classList.toggle('drawing-mode', isDrawMode);
+    if (indicator) {
+      indicator.classList.toggle('pen-active', isDrawMode);
+    }
+  }
+
+  function goToSlide(index, updateHash = true) {
+    if (slides.length === 0) return;
+    const bounded = Math.max(0, Math.min(index, slides.length - 1));
+
+    slides.forEach((slide, idx) => {
+      slide.classList.toggle('active', idx === bounded);
+    });
+
+    currentIndex = bounded;
+    clearCanvas();
+
+    if (indicator) {
+      indicator.textContent = (currentIndex + 1) + ' / ' + slides.length;
+    }
+
+    if (updateHash) {
+      window.location.hash = '#' + (currentIndex + 1);
+    }
+  }
+
+  function nextSlide() {
+    if (currentIndex < slides.length - 1) {
+      goToSlide(currentIndex + 1);
+    }
+  }
+
+  function prevSlide() {
+    if (currentIndex > 0) {
+      goToSlide(currentIndex - 1);
+    }
+  }
+
+  function getIndexFromHash() {
+    const raw = window.location.hash.replace('#', '');
+    const num = parseInt(raw, 10);
+    if (!isNaN(num) && num >= 1 && num <= slides.length) {
+      return num - 1;
+    }
+    return 0;
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  function setupKeyboard() {
+    window.addEventListener('keydown', (e) => {
+      const activeTag = document.activeElement ? document.activeElement.tagName : '';
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)) return;
+
+      // Number jump buffer (0-9)
+      if (e.key >= '0' && e.key <= '9') {
+        numberBuffer += e.key;
+        clearTimeout(numberTimeout);
+        numberTimeout = setTimeout(() => { numberBuffer = ''; }, 1500);
+        return;
+      }
+
+      // Enter key jump
+      if (e.key === 'Enter' && numberBuffer !== '') {
+        e.preventDefault();
+        const target = parseInt(numberBuffer, 10);
+        numberBuffer = '';
+        clearTimeout(numberTimeout);
+        if (target >= 1 && target <= slides.length) {
+          goToSlide(target - 1);
+        }
+        return;
+      }
+
+      // Navigation & action shortcuts
+      switch (e.key) {
+        case ' ':
+        case 'ArrowRight':
+        case 'PageDown':
+        case 'j':
+        case 'l':
+          e.preventDefault();
+          nextSlide();
+          break;
+        case 'ArrowLeft':
+        case 'Backspace':
+        case 'PageUp':
+        case 'k':
+        case 'h':
+          e.preventDefault();
+          prevSlide();
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToSlide(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToSlide(slides.length - 1);
+          break;
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'd':
+        case 'D':
+          e.preventDefault();
+          toggleDrawMode();
+          break;
+        case 'c':
+        case 'C':
+          e.preventDefault();
+          clearCanvas();
+          break;
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+  </script>
+</body>
+</html>
