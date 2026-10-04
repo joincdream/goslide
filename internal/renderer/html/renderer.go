@@ -198,5 +198,6 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		HTMLContent: template.HTML(htmlContent), // nolint:gosec
 		LeftHTML:    template.HTML(leftHTML),    // nolint:gosec
 		RightHTML:   template.HTML(rightHTML),   // nolint:gosec
+		Notes:       s.Notes,
 	}, nil
 }

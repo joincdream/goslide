@@ -72,7 +72,7 @@ html, body {
   flex-direction: column !important;
   flex-shrink: 0;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-  border-radius: 8px;
+  border-radius: 0;
 }
 
 .slide-card.active {
@@ -306,3 +306,398 @@ img {
 .slide-card.lead p {
   line-height: 1.7;
 }
+
+/* ==========================================================================
+   Interactive Presentation Tools & Presenter View (GOS-11)
+   ========================================================================== */
+
+/* 1. Laser Pointer */
+.goslide-laser {
+  position: fixed;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ff0055;
+  box-shadow: 0 0 8px 2px #ff0055, 0 0 16px 4px rgba(255, 0, 85, 0.6);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  display: none;
+  transition: transform 0.04s ease-out;
+}
+.goslide-laser.active {
+  display: block;
+}
+
+body.laser-mode,
+body.laser-mode * {
+  cursor: none !important;
+}
+
+/* 2. Spotlight Mask */
+.goslide-spotlight {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  display: none;
+}
+.goslide-spotlight.active {
+  display: block;
+}
+
+/* 3. Screen Blackout & Whiteout */
+.goslide-blackout,
+.goslide-whiteout {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: none;
+}
+.goslide-blackout.active {
+  display: block;
+  background-color: #000000;
+}
+.goslide-whiteout.active {
+  display: block;
+  background-color: #ffffff;
+}
+
+/* 4. In-Window Presenter Sidebar */
+.goslide-presenter-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-left: 1px solid #334155;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+}
+
+body.sidebar-open .goslide-presenter-sidebar {
+  transform: translateX(0);
+}
+
+body.sidebar-open .goslide-stage {
+  padding-right: 400px;
+}
+
+/* 1080p Pixel-Perfect Screencast Mode */
+body.lock-1080p {
+  overflow: hidden !important;
+}
+
+body.lock-1080p #goslide-stage {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #000000 !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.7) !important;
+  z-index: 100 !important;
+}
+
+body.lock-1080p #goslide-deck {
+  width: 960px !important;
+  height: 540px !important;
+  transform: scale(2) !important;
+  transform-origin: center center !important;
+}
+
+body.lock-1080p #goslide-canvas {
+  width: 1920px !important;
+  height: 1080px !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 150 !important;
+}
+
+body.lock-1080p .goslide-presenter-sidebar {
+  transform: translateX(0) !important;
+  left: 1920px !important;
+  right: auto !important;
+  width: calc(100vw - 1920px) !important;
+  min-width: 380px !important;
+  box-shadow: none !important;
+  border-left: 2px solid #38bdf8 !important;
+}
+
+.sidebar-mode-selector {
+  display: flex;
+  background-color: #0b0f19;
+  padding: 4px;
+  gap: 4px;
+  border-bottom: 1px solid #334155;
+}
+
+.mode-tab {
+  flex: 1;
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mode-tab:hover {
+  color: #f8fafc;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.mode-tab.active {
+  background-color: #334155;
+  color: #38bdf8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-header {
+  padding: 12px 16px;
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #38bdf8;
+}
+
+.sidebar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sidebar-btn {
+  background: #334155;
+  color: #f8fafc;
+  border: 1px solid #475569;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sidebar-btn:hover {
+  background: #0284c7;
+}
+
+.sidebar-timer-bar {
+  padding: 10px 16px;
+  background-color: #1e293b;
+  border-bottom: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-timer {
+  font-family: monospace;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #f8fafc;
+  min-width: 75px;
+}
+
+.sidebar-btn-sm {
+  background: #334155;
+  color: #f8fafc;
+  border: none;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.sidebar-btn-sm:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.sidebar-clock {
+  margin-left: auto;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.sidebar-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.sidebar-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-preview-box {
+  width: 100%;
+  height: 180px;
+  background-color: #000;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-preview-box .slide-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+  transform-origin: top left;
+  transform: scale(0.38);
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.sidebar-notes-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar-notes-body {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  background-color: #1e293b;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+.sidebar-notes-body:empty::before {
+  content: "작성된 발표자 메모가 없습니다.";
+  color: #64748b;
+  font-style: italic;
+}
+
+.sidebar-footer {
+  padding: 10px 16px;
+  background-color: #1e293b;
+  border-top: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#sidebar-progress-text {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 600;
+  min-width: 50px;
+}
+
+.sidebar-progress-bar {
+  flex: 1;
+  height: 6px;
+  background-color: #334155;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sidebar-progress-fill {
+  height: 100%;
+  background-color: #38bdf8;
+  width: 0%;
+  transition: width 0.2s ease;
+}
+
+/* 5. Grid Overview Mode */
+body.overview-mode {
+  overflow-y: auto !important;
+  background-color: #0b0f19 !important;
+}
+
+body.overview-mode #goslide-stage {
+  display: block !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 40px !important;
+}
+
+body.overview-mode #goslide-deck {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 24px !important;
+  width: 100% !important;
+  height: auto !important;
+  transform: none !important;
+  position: static !important;
+}
+
+body.overview-mode .slide-card {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+  opacity: 0.85 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  border: 2px solid transparent !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease !important;
+  font-size: 0.45rem !important;
+}
+
+body.overview-mode .slide-card:hover {
+  opacity: 1 !important;
+  transform: scale(1.04) !important;
+  border-color: #38bdf8 !important;
+  z-index: 10 !important;
+}
+
+body.overview-mode .slide-card.active {
+  border-color: #38bdf8 !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4) !important;
+}
+
+body.overview-mode #goslide-canvas,
+body.overview-mode #goslide-indicator {
+  display: none !important;
+}
+

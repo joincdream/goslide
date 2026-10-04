@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goslide Presenter Console</title>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --border: #475569;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+    header {
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
+    }
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .timer-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .timer-display {
+      font-family: monospace;
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--text-main);
+      min-width: 80px;
+    }
+    .btn-timer {
+      background: var(--border);
+      color: var(--text-main);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .btn-timer:hover {
+      background: var(--accent);
+    }
+    .clock-display {
+      font-family: monospace;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      overflow: hidden;
+    }
+    .panel {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-header {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .preview-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+      overflow: hidden;
+      position: relative;
+    }
+    .slide-frame {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform-origin: center center;
+    }
+    .slide-content-preview {
+      width: 960px;
+      height: 540px;
+      background: #fff;
+      color: #000;
+      overflow: hidden;
+      transform-origin: top left;
+      position: absolute;
+    }
+    .panel-notes {
+      grid-column: 1 / -1;
+      flex: 1;
+      min-height: 0;
+    }
+    .notes-content {
+      flex: 1;
+      padding: 16px 20px;
+      overflow-y: auto;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      user-select: text;
+      white-space: pre-wrap;
+    }
+    .notes-content:empty::before {
+      content: "작성된 발표자 메모가 없습니다.";
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    footer {
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .progress-bar-container {
+      flex: 1;
+      max-width: 400px;
+      height: 8px;
+      background: var(--bg-card);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0 20px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-nav {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-nav:hover {
+      background: var(--accent);
+    }
+    .slide-counter {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-title">
+      <span>🖥️ Goslide Presenter Console</span>
+    </div>
+    <div class="header-controls">
+      <div class="timer-group">
+        <span class="timer-display" id="timer-display">00:00:00</span>
+        <button class="btn-timer" id="btn-timer-toggle">시작</button>
+        <button class="btn-timer" id="btn-timer-reset">리셋</button>
+      </div>
+      <div class="clock-display" id="clock-display">00:00:00</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-header">
+        <span>현재 슬라이드</span>
+        <span id="current-slide-number">Slide 1</span>
+      </div>
+      <div class="preview-container" id="current-preview-container">
+        <div class="slide-frame" id="current-slide-frame"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <span>다음 슬라이드</span>
+        <span id="next-slide-number">Slide 2</span>
+      </div>
+      <div class="preview-container" id="next-preview-container">
+        <div class="slide-frame" id="next-slide-frame"></div>
+      </div>
+    </section>
+
+    <section class="panel panel-notes">
+      <div class="panel-header">
+        <span>발표자 메모 (Notes)</span>
+      </div>
+      <div class="notes-content" id="notes-content"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="slide-counter" id="slide-counter">1 / 1</div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progress-bar-fill"></div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn-nav" id="btn-prev">이전 (←)</button>
+      <button class="btn-nav" id="btn-next">다음 (→)</button>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      'use strict';
+
+      const channelName = 'goslide-sync-' + (window.opener ? window.opener.location.pathname : 'default');
+      const channel = new BroadcastChannel(channelName);
+
+      let currentIndex = 0;
+      let totalSlides = 1;
+      let slidesData = [];
+
+      // Timer State
+      let timerSeconds = 0;
+      let timerInterval = null;
+      let isTimerRunning = false;
+
+      const timerDisplay = document.getElementById('timer-display');
+      const btnTimerToggle = document.getElementById('btn-timer-toggle');
+      const btnTimerReset = document.getElementById('btn-timer-reset');
+      const clockDisplay = document.getElementById('clock-display');
+      const notesContent = document.getElementById('notes-content');
+      const slideCounter = document.getElementById('slide-counter');
+      const progressBar = document.getElementById('progress-bar-fill');
+      const currentSlideNumber = document.getElementById('current-slide-number');
+      const nextSlideNumber = document.getElementById('next-slide-number');
+      const currentFrame = document.getElementById('current-slide-frame');
+      const nextFrame = document.getElementById('next-slide-frame');
+
+      function updateClock() {
+        const now = new Date();
+        clockDisplay.textContent = now.toTimeString().split(' ')[0];
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      function updateTimer() {
+        timerSeconds++;
+        const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(timerSeconds % 60).padStart(2, '0');
+        timerDisplay.textContent = hrs + ':' + mins + ':' + secs;
+      }
+
+      btnTimerToggle.addEventListener('click', () => {
+        if (isTimerRunning) {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+          btnTimerToggle.textContent = '재개';
+        } else {
+          timerInterval = setInterval(updateTimer, 1000);
+          isTimerRunning = true;
+          btnTimerToggle.textContent = '일시정지';
+        }
+      });
+
+      btnTimerReset.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        timerSeconds = 0;
+        timerDisplay.textContent = '00:00:00';
+        btnTimerToggle.textContent = '시작';
+      });
+
+      function renderViews() {
+        if (slidesData.length === 0) return;
+
+        slideCounter.textContent = (currentIndex + 1) + ' / ' + totalSlides;
+        const progress = ((currentIndex + 1) / totalSlides) * 100;
+        progressBar.style.width = progress + '%';
+
+        currentSlideNumber.textContent = 'Slide ' + (currentIndex + 1);
+        if (slidesData[currentIndex]) {
+          notesContent.textContent = slidesData[currentIndex].notes || '';
+          currentFrame.innerHTML = slidesData[currentIndex].html || '';
+        }
+
+        if (currentIndex + 1 < totalSlides) {
+          nextSlideNumber.textContent = 'Slide ' + (currentIndex + 2);
+          nextFrame.innerHTML = slidesData[currentIndex + 1].html || '';
+        } else {
+          nextSlideNumber.textContent = '종료 (마지막 슬라이드)';
+          nextFrame.innerHTML = '<div style="color:#64748b;font-size:1.5rem;display:flex;height:100%;align-items:center;justify-content:center;">Next slide none</div>';
+        }
+      }
+
+      channel.onmessage = (e) => {
+        const msg = e.data;
+        if (!msg) return;
+        if (msg.type === 'SYNC_INIT') {
+          currentIndex = msg.payload.currentIndex;
+          totalSlides = msg.payload.totalSlides;
+          slidesData = msg.payload.slidesData;
+          renderViews();
+        } else if (msg.type === 'SLIDE_CHANGE') {
+          currentIndex = msg.payload.index;
+          renderViews();
+        }
+      };
+
+      document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentIndex > 0) {
+          channel.postMessage({ type: 'NAV_PREV' });
+        }
+      });
+
+      document.getElementById('btn-next').addEventListener('click', () => {
+        if (currentIndex < totalSlides - 1) {
+          channel.postMessage({ type: 'NAV_NEXT' });
+        }
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+          channel.postMessage({ type: 'NAV_NEXT' });
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          channel.postMessage({ type: 'NAV_PREV' });
+        }
+      });
+
+      // Request initial state from main window
+      channel.postMessage({ type: 'REQUEST_INIT' });
+    })();
+  </script>
+</body>
+</html>

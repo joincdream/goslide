@@ -1,4 +1,4 @@
-.PHONY: all build test test-race lint complexity fmt clean help setup-tools golden-update bench
+.PHONY: all build test test-race lint complexity fmt clean help setup-tools golden-update bench check
 
 BINARY_NAME=goslide
 BIN_DIR=bin
@@ -91,6 +91,12 @@ complexity: setup-tools
 fmt:
 	@echo "==> Formatting code..."
 	$(GO) fmt ./...
+
+## check: Run all code quality checks (fmt, lint, complexity, test-race)
+check: fmt lint complexity test-race
+	@echo "================================================================================"
+	@echo "🎉 All code quality, complexity, and unit tests passed successfully!"
+	@echo "================================================================================"
 
 ## clean: Remove build artifacts and temporary files
 clean:

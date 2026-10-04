@@ -25,6 +25,7 @@ type slideTemplateData struct {
 	HTMLContent template.HTML
 	LeftHTML    template.HTML
 	RightHTML   template.HTML
+	Notes       string
 }
 
 const masterHTMLTemplate = `<!DOCTYPE html>
@@ -59,10 +60,52 @@ const masterHTMLTemplate = `<!DOCTYPE html>
           <span>{{ .Footer }}</span>
           {{ if .Paginate }}<span>{{ .Index }}</span>{{ end }}
         </div>
+        {{ if .Notes }}<aside class="slide-notes" style="display:none;">{{ .Notes }}</aside>{{ end }}
       </section>
       {{ end }}
     </div>
   </div>
+
+  <!-- Interactive Presentation Tools -->
+  <div id="goslide-laser" class="goslide-laser"></div>
+  <div id="goslide-spotlight" class="goslide-spotlight"></div>
+  <div id="goslide-blackout" class="goslide-blackout"></div>
+  <div id="goslide-whiteout" class="goslide-whiteout"></div>
+
+  <!-- In-Window Presenter Sidebar -->
+  <aside id="goslide-presenter-sidebar" class="goslide-presenter-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">🎙️ Presenter View</div>
+      <div class="sidebar-actions">
+        <button id="btn-sidebar-popout" class="sidebar-btn" title="별도 창으로 분리 (P)">↗ Pop out</button>
+        <button id="btn-sidebar-close" class="sidebar-btn" title="사이드바 닫기 (N)">✕</button>
+      </div>
+    </div>
+    <div class="sidebar-mode-selector">
+      <button id="btn-mode-fit" class="mode-tab active" title="창 크기에 맞게 자동 리사이즈">↔ 화면 맞춤</button>
+      <button id="btn-mode-1080p" class="mode-tab" title="1920×1080 고정 (스크린캐스트용)">🔒 1080p 고정</button>
+    </div>
+    <div class="sidebar-timer-bar">
+      <span id="sidebar-timer-display" class="sidebar-timer">00:00:00</span>
+      <button id="sidebar-timer-toggle" class="sidebar-btn-sm">시작</button>
+      <button id="sidebar-timer-reset" class="sidebar-btn-sm">리셋</button>
+      <span id="sidebar-clock" class="sidebar-clock"></span>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">다음 슬라이드 (<span id="sidebar-next-index">Slide 2</span>)</div>
+      <div id="sidebar-next-preview" class="sidebar-preview-box"></div>
+    </div>
+    <div class="sidebar-section sidebar-notes-section">
+      <div class="sidebar-section-title">발표자 메모 (Notes)</div>
+      <div id="sidebar-notes-content" class="sidebar-notes-body"></div>
+    </div>
+    <div class="sidebar-footer">
+      <span id="sidebar-progress-text">1 / {{ len .Slides }}</span>
+      <div class="sidebar-progress-bar">
+        <div id="sidebar-progress-fill" class="sidebar-progress-fill"></div>
+      </div>
+    </div>
+  </aside>
 
   <canvas id="goslide-canvas" class="goslide-canvas"></canvas>
   <div id="goslide-indicator" class="goslide-indicator">1 / {{ len .Slides }}</div>
