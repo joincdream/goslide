@@ -41,10 +41,6 @@ var buildCmd = &cobra.Command{
 var serveCmd = &cobra.Command{
 	Use:   "serve <input.md>",
 	Short: "Start local development server with live reload",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("Serve command will be implemented in upcoming milestone (M2-3).")
-		return nil
-	},
 }
 
 func initCLI() {
