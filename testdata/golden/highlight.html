@@ -251,6 +251,8 @@ h1 { font-size: 2.25rem; }
 h2 { font-size: 1.75rem; }
 h3 { font-size: 1.35rem; }
 h4 { font-size: 1.15rem; }
+h5 { font-size: 1.0rem; font-weight: 600; margin-bottom: 0.5rem; }
+h6 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
 
 p {
   margin-top: 0;
@@ -269,10 +271,82 @@ li {
   margin-bottom: 0.4rem;
 }
 
+/* Nested lists spacing optimization */
+li > ul, li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  padding-left: 1.4rem;
+}
+
+/* GFM Task List */
+ul.contains-task-list {
+  list-style: none;
+  padding-left: 0.25rem;
+}
+
+li.task-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+li.task-list-item input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Strikethrough & Keyboard Caps */
+del {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background-color: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+}
+
 blockquote {
   margin: 1rem 0;
   padding: 0.75rem 1.25rem;
   border-radius: 4px;
+}
+
+/* GFM Callouts / Alerts */
+.markdown-alert {
+  padding: 0.75rem 1.25rem;
+  margin: 1rem 0;
+  border-left: 4px solid #3b82f6;
+  border-radius: 6px;
+  background-color: rgba(148, 163, 184, 0.08);
+}
+
+.markdown-alert-note { border-left-color: #3b82f6; background-color: rgba(59, 130, 246, 0.08); }
+.markdown-alert-tip { border-left-color: #10b981; background-color: rgba(16, 185, 129, 0.08); }
+.markdown-alert-important { border-left-color: #8b5cf6; background-color: rgba(139, 92, 246, 0.08); }
+.markdown-alert-warning { border-left-color: #f59e0b; background-color: rgba(245, 158, 11, 0.08); }
+.markdown-alert-caution { border-left-color: #ef4444; background-color: rgba(239, 68, 68, 0.08); }
+
+.markdown-alert-title {
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.markdown-alert > :last-child {
+  margin-bottom: 0;
 }
 
 pre {
@@ -300,19 +374,84 @@ th, td {
   text-align: left;
 }
 
+/* Table GFM Alignments Restoration */
+.slide-card th[align="center"], .slide-card td[align="center"] { text-align: center !important; }
+.slide-card th[align="right"],  .slide-card td[align="right"]  { text-align: right !important; }
+.slide-card th[align="left"],   .slide-card td[align="left"]   { text-align: left !important; }
+
 img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
 }
 
-/* Scoped Classes */
+img.img-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Background Dimming Overlay */
+.slide-card.has-bg-dim {
+  position: relative;
+}
+
+.slide-bg-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.slide-card > *:not(.slide-bg-dim) {
+  position: relative;
+  z-index: 2;
+}
+
+.slide-card[style*="color:"] h1,
+.slide-card[style*="color:"] h2,
+.slide-card[style*="color:"] h3,
+.slide-card[style*="color:"] h4,
+.slide-card[style*="color:"] h5,
+.slide-card[style*="color:"] h6 {
+  color: inherit;
+}
+
+/* Slide Utility Classes & Presets */
+.slide-card.compact, .slide-card.small {
+  font-size: 0.88rem;
+  padding: 2.25rem 3.25rem;
+}
+.slide-card.compact h1 { font-size: 1.85rem; }
+.slide-card.compact h2 { font-size: 1.45rem; }
+.slide-card.compact pre { padding: 0.75rem 1rem; font-size: 0.82rem; }
+.slide-card.compact table { font-size: 0.82rem; }
+
+.slide-card.dense {
+  font-size: 0.8rem;
+  padding: 2rem 3rem;
+}
+.slide-card.dense pre {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  padding: 0.6rem 0.8rem;
+}
+
 .slide-card.lead {
-  font-size: 1.25rem;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  font-size: 1.4rem;
+}
+
+.slide-card.lead h1 {
+  font-size: 3.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .slide-card.lead p {
-  line-height: 1.7;
+  font-size: 1.5rem;
+  line-height: 1.6;
 }
 
 /* ==========================================================================
@@ -840,8 +979,12 @@ body {
 }
 
 .slide-card.invert h1,
-.slide-card.invert h2 {
-  color: #1e1e2e;
+.slide-card.invert h2,
+.slide-card.invert h3,
+.slide-card.invert h4,
+.slide-card.invert h5,
+.slide-card.invert h6 {
+  color: #11111b;
 }
 
 .slide-card.invert .slide-header,
@@ -849,6 +992,47 @@ body {
   color: #585b70;
   border-color: #bac2de;
 }
+
+.slide-card.invert pre {
+  background-color: #bac2de;
+  border-color: #a6adc8;
+  color: #11111b;
+}
+
+.slide-card.invert kbd {
+  background-color: #bac2de;
+  border-color: #a6adc8;
+  color: #11111b;
+}
+
+.slide-card.invert table {
+  border-color: #a6adc8;
+}
+
+.slide-card.invert th {
+  color: #11111b;
+  border-bottom-color: #a6adc8;
+}
+
+.slide-card.invert td {
+  border-bottom-color: #bac2de;
+  color: #313244;
+}
+
+.slide-card.invert blockquote {
+  background-color: #bac2de;
+  border-left-color: #8839ef;
+  color: #45475a;
+}
+
+.slide-card input[type="checkbox"] {
+  accent-color: #cba6f7;
+}
+
+.slide-card.invert input[type="checkbox"] {
+  accent-color: #8839ef;
+}
+
 
 
 
@@ -861,6 +1045,7 @@ body {
       <section class="slide-card default layout-default  active"
                data-slide="1"
                style="">
+        
         
         <div class="slide-body">
           
@@ -885,6 +1070,7 @@ body {
       <section class="slide-card default layout-default "
                data-slide="2"
                style="">
+        
         
         <div class="slide-body">
           

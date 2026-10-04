@@ -47,6 +47,7 @@ type SlideDirectives struct {
 	Class           []string   `json:"class,omitempty"`
 	BackgroundColor string     `json:"background_color,omitempty"`
 	BackgroundImage string     `json:"background_image,omitempty"`
+	BackgroundDim   string     `json:"background_dim,omitempty"`
 	Color           string     `json:"color,omitempty"`
 	Header          string     `json:"header,omitempty"`
 	Footer          string     `json:"footer,omitempty"`

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/yundream/goslide/internal/model"
@@ -191,6 +192,7 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		Classes:     strings.Join(s.Directives.Class, " "),
 		BgColor:     s.Directives.BackgroundColor,
 		BgImage:     s.Directives.BackgroundImage,
+		BgDim:       template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
 		Color:       s.Directives.Color,
 		Header:      header,
 		Footer:      footer,
@@ -200,4 +202,35 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		RightHTML:   template.HTML(rightHTML),   // nolint:gosec
 		Notes:       s.Notes,
 	}, nil
+}
+
+func resolveBgDim(rawDim string, classes []string) string {
+	rawDim = strings.TrimSpace(rawDim)
+	if rawDim == "" {
+		for _, c := range classes {
+			if strings.EqualFold(c, "dim") {
+				return "rgba(0, 0, 0, 0.5)"
+			}
+		}
+		return ""
+	}
+
+	if strings.HasPrefix(rawDim, "rgba(") || strings.HasPrefix(rawDim, "rgb(") || strings.HasPrefix(rawDim, "#") {
+		return rawDim
+	}
+
+	clean := strings.TrimSuffix(rawDim, "%")
+	if val, err := strconv.ParseFloat(clean, 64); err == nil {
+		if strings.HasSuffix(rawDim, "%") {
+			val = val / 100.0
+		}
+		if val < 0 {
+			val = 0
+		} else if val > 1 {
+			val = 1
+		}
+		return fmt.Sprintf("rgba(0, 0, 0, %g)", val)
+	}
+
+	return rawDim
 }

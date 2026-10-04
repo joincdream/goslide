@@ -85,6 +85,15 @@ func main() {
 <!-- note: Explain the decoupled architecture and performance benefits -->
 ````
 
+### 🤖 Generating Slides with AI / LLMs
+
+You can instantly generate production-ready Goslide presentations using ChatGPT, Claude, or any LLM:
+
+> "Please create a slide deck about [Your Topic] in Markdown, referencing the specification at:  
+> https://raw.githubusercontent.com/yundream/goslide/main/examples/example-dsl.md"
+
+👉 For full semantic rules, directive catalogs, and golden samples, see the [Goslide DSL Specification & Example Guide](examples/example-dsl.md).
+
 ### Build Slides
 
 ```bash

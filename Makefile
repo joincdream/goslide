@@ -1,7 +1,8 @@
-.PHONY: all build test test-race lint complexity fmt clean help setup-tools golden-update bench check
+.PHONY: all build install test test-race lint complexity fmt clean help setup-tools golden-update bench check
 
 BINARY_NAME=goslide
 BIN_DIR=bin
+INSTALL_DIR ?= $(HOME)/.local/bin
 GO=go
 
 GOPATH ?= $(shell $(GO) env GOPATH)
@@ -32,6 +33,13 @@ build:
 	@echo "==> Building $(BINARY_NAME) (CGO_ENABLED=0)..."
 	@mkdir -p $(BIN_DIR)
 	CGO_ENABLED=0 $(GO) build -trimpath -ldflags="-s -w" -o $(BIN_DIR)/$(BINARY_NAME) ./cmd/goslide
+
+## install: Build and install binary to ~/.local/bin
+install: build
+	@echo "==> Installing $(BINARY_NAME) to $(INSTALL_DIR)..."
+	@mkdir -p $(INSTALL_DIR)
+	@cp -f $(BIN_DIR)/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
+	@echo "==> Successfully installed $(BINARY_NAME) to $(INSTALL_DIR)/$(BINARY_NAME)"
 
 ## test: Run unit tests
 test:

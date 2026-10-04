@@ -46,15 +46,93 @@ var serveCmd = &cobra.Command{
 func initCLI() {
 	parseEarlyLang()
 
+	refreshCLITexts()
+
+	if rootCmd.PersistentFlags().Lookup("lang") == nil {
+		rootCmd.PersistentFlags().StringVar(&langFlag, "lang", "auto", i18n.T("cli.lang.flag"))
+	}
+	if rootCmd.Flags().Lookup("version") == nil {
+		rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, i18n.T("cli.version.flag"))
+	}
+
+	if !hasCommand(rootCmd, buildCmd.Name()) {
+		rootCmd.AddCommand(buildCmd)
+	}
+	if !hasCommand(rootCmd, serveCmd.Name()) {
+		rootCmd.AddCommand(serveCmd)
+	}
+}
+
+func hasCommand(root *cobra.Command, name string) bool {
+	for _, c := range root.Commands() {
+		if c.Name() == name {
+			return true
+		}
+	}
+	return false
+}
+
+func refreshCLITexts() {
 	rootCmd.Short = i18n.T("cli.description")
+	rootCmd.Long = i18n.T("cli.long")
+	rootCmd.Example = i18n.T("cli.example")
+
 	buildCmd.Short = i18n.T("cli.build.desc")
+	buildCmd.Long = i18n.T("cli.build.long")
+	buildCmd.Example = i18n.T("cli.build.example")
+
 	serveCmd.Short = i18n.T("cli.serve.desc")
+	serveCmd.Long = i18n.T("cli.serve.long")
+	serveCmd.Example = i18n.T("cli.serve.example")
 
-	rootCmd.PersistentFlags().StringVar(&langFlag, "lang", "auto", i18n.T("cli.lang.flag"))
-	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "Print version information")
+	updateFlagDescriptions()
+}
 
-	rootCmd.AddCommand(buildCmd)
-	rootCmd.AddCommand(serveCmd)
+func updateFlagDescriptions() {
+	if f := rootCmd.PersistentFlags().Lookup("lang"); f != nil {
+		f.Usage = i18n.T("cli.lang.flag")
+	}
+	if f := rootCmd.Flags().Lookup("version"); f != nil {
+		f.Usage = i18n.T("cli.version.flag")
+	}
+
+	if f := buildCmd.Flags().Lookup("output"); f != nil {
+		f.Usage = i18n.T("cli.build.flag.output")
+	}
+	if f := buildCmd.Flags().Lookup("theme"); f != nil {
+		f.Usage = i18n.T("cli.build.flag.theme")
+	}
+	if f := buildCmd.Flags().Lookup("theme-path"); f != nil {
+		f.Usage = i18n.T("cli.build.flag.theme_path")
+	}
+	if f := buildCmd.Flags().Lookup("standalone"); f != nil {
+		f.Usage = i18n.T("cli.build.flag.standalone")
+	}
+	if f := buildCmd.Flags().Lookup("quiet"); f != nil {
+		f.Usage = i18n.T("cli.build.flag.quiet")
+	}
+	if f := buildCmd.Flags().Lookup("verbose"); f != nil {
+		f.Usage = i18n.T("cli.build.flag.verbose")
+	}
+
+	if f := serveCmd.Flags().Lookup("port"); f != nil {
+		f.Usage = i18n.T("cli.serve.flag.port")
+	}
+	if f := serveCmd.Flags().Lookup("bind"); f != nil {
+		f.Usage = i18n.T("cli.serve.flag.bind")
+	}
+	if f := serveCmd.Flags().Lookup("open"); f != nil {
+		f.Usage = i18n.T("cli.serve.flag.open")
+	}
+	if f := serveCmd.Flags().Lookup("theme"); f != nil {
+		f.Usage = i18n.T("cli.serve.flag.theme")
+	}
+	if f := serveCmd.Flags().Lookup("theme-path"); f != nil {
+		f.Usage = i18n.T("cli.serve.flag.theme_path")
+	}
+	if f := serveCmd.Flags().Lookup("debounce"); f != nil {
+		f.Usage = i18n.T("cli.serve.flag.debounce")
+	}
 }
 
 func parseEarlyLang() {

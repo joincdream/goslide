@@ -18,6 +18,7 @@ func TestDirectiveManager_Scopes(t *testing.T) {
 	s1Raw := `<!--
 _class: lead
 _backgroundColor: #112233
+_backgroundDim: 0.5
 header: "Chapter 1"
 -->
 # Slide 1 Content`
@@ -28,6 +29,9 @@ header: "Chapter 1"
 	}
 	if res1.Directives.BackgroundColor != "#112233" {
 		t.Errorf("slide 1 bg color mismatch: got %q, want #112233", res1.Directives.BackgroundColor)
+	}
+	if res1.Directives.BackgroundDim != "0.5" {
+		t.Errorf("slide 1 bg dim mismatch: got %q, want 0.5", res1.Directives.BackgroundDim)
 	}
 	if res1.Directives.Header != "Chapter 1" {
 		t.Errorf("slide 1 header mismatch: got %q, want 'Chapter 1'", res1.Directives.Header)

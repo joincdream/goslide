@@ -130,7 +130,11 @@ body {
 }
 
 .slide-card.invert h1,
-.slide-card.invert h2 {
+.slide-card.invert h2,
+.slide-card.invert h3,
+.slide-card.invert h4,
+.slide-card.invert h5,
+.slide-card.invert h6 {
   color: #ffffff;
 }
 
@@ -138,3 +142,44 @@ body {
 .slide-card.invert .slide-footer {
   color: #9ca3af;
 }
+
+.slide-card.invert pre {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.slide-card.invert kbd {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+.slide-card.invert table {
+  border-color: #4b5563;
+}
+
+.slide-card.invert th {
+  color: #ffffff;
+  border-bottom-color: #374151;
+}
+
+.slide-card.invert td {
+  border-bottom-color: #1f2937;
+  color: #e5e7eb;
+}
+
+.slide-card.invert blockquote {
+  background-color: #1f2937;
+  border-left-color: #f9fafb;
+  color: #d1d5db;
+}
+
+.slide-card input[type="checkbox"] {
+  accent-color: #111827;
+}
+
+.slide-card.invert input[type="checkbox"] {
+  accent-color: #60a5fa;
+}
+

@@ -204,3 +204,47 @@ func TestHTMLRenderer_Render_CustomCSS(t *testing.T) {
 		t.Errorf("custom css rule not found in rendered output")
 	}
 }
+
+func TestHTMLRenderer_Render_BackgroundDim(t *testing.T) {
+	t.Parallel()
+
+	deck := &model.Deck{
+		Title: "Dim Test",
+		Slides: []*model.Slide{
+			{
+				Index:  1,
+				Layout: model.LayoutDefault,
+				Directives: model.SlideDirectives{
+					BackgroundImage: "bg.jpg",
+					BackgroundDim:   "0.6",
+				},
+				HTMLContent: "<p>Dimmed Slide</p>",
+			},
+			{
+				Index:  2,
+				Layout: model.LayoutDefault,
+				Directives: model.SlideDirectives{
+					Class: []string{"dim"},
+				},
+				HTMLContent: "<p>Dim Class Slide</p>",
+			},
+		},
+	}
+
+	renderer := htmlrenderer.NewRenderer()
+	var buf bytes.Buffer
+	if err := renderer.Render(context.Background(), deck, &buf); err != nil {
+		t.Fatalf("render failed: %v", err)
+	}
+
+	html := buf.String()
+	if !strings.Contains(html, `has-bg-dim`) {
+		t.Errorf("expected has-bg-dim class in output")
+	}
+	if !strings.Contains(html, `background-color: rgba(0, 0, 0, 0.6);`) {
+		t.Errorf("expected rgba(0, 0, 0, 0.6) in output")
+	}
+	if !strings.Contains(html, `background-color: rgba(0, 0, 0, 0.5);`) {
+		t.Errorf("expected default dim rgba(0, 0, 0, 0.5) for dim class in output")
+	}
+}

@@ -150,7 +150,7 @@ func unquoteValue(s string) string {
 
 func isKnownDirectiveKey(key string) bool {
 	switch key {
-	case "class", "backgroundColor", "backgroundImage", "color",
+	case "class", "backgroundColor", "backgroundImage", "backgroundDim", "color",
 		"header", "footer", "paginate", "layout":
 		return true
 	default:
@@ -183,6 +183,8 @@ func applySingleDirective(
 		target.BackgroundColor = value
 	case "backgroundImage":
 		target.BackgroundImage = value
+	case "backgroundDim":
+		target.BackgroundDim = value
 	case "color":
 		target.Color = value
 	case "header":

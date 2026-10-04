@@ -85,6 +85,15 @@ func main() {
 <!-- note: 분리된 아키텍처의 장점과 성능 이점을 설명할 것 -->
 ````
 
+### 🤖 AI / LLM으로 슬라이드 자동 생성
+
+ChatGPT, Claude 등의 LLM 프롬프트에 아래 문장을 그대로 입력하면 Goslide 규격에 맞는 슬라이드를 즉시 생성할 수 있습니다:
+
+> "https://raw.githubusercontent.com/yundream/goslide/main/examples/example-dsl.ko.md 
+> 문서를 참고해서 [원하는 발표 주제]에 대한 슬라이드를 마크다운으로 작성해 줘."
+
+👉 지원하는 레이아웃, 배경 처리, 수식 및 세부 지시어는 [Goslide DSL 규격 및 골든 예제 가이드](examples/example-dsl.ko.md)에서 확인하실 수 있습니다.
+
 ### 슬라이드 빌드
 
 ```bash

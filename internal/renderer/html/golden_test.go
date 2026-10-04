@@ -38,6 +38,11 @@ func TestGoldenRenderer(t *testing.T) {
 			sourceFile: "cover.md",
 			goldenFile: "cover.html",
 		},
+		{
+			name:       "comprehensive elements",
+			sourceFile: "comprehensive_elements.md",
+			goldenFile: "comprehensive_elements.html",
+		},
 	}
 
 	p := parser.NewParser()

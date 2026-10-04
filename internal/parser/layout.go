@@ -55,5 +55,5 @@ func convertToHTML(gm goldmark.Markdown, markdown string) (string, error) {
 	if err := gm.Convert([]byte(markdown), &buf); err != nil {
 		return "", err
 	}
-	return buf.String(), nil
+	return postProcessHTML(buf.String()), nil
 }

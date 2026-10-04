@@ -18,6 +18,7 @@ type slideTemplateData struct {
 	Classes     string
 	BgColor     string
 	BgImage     string
+	BgDim       template.CSS
 	Color       string
 	Header      string
 	Footer      string
@@ -42,9 +43,10 @@ const masterHTMLTemplate = `<!DOCTYPE html>
   <div id="goslide-stage" class="goslide-stage">
     <div id="goslide-deck" class="goslide-deck">
       {{ range .Slides }}
-      <section class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}{{ if .IsFirst }} active{{ end }}"
+      <section class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}{{ if .IsFirst }} active{{ end }}{{ if .BgDim }} has-bg-dim{{ end }}"
                data-slide="{{ .Index }}"
                style="{{ if .BgColor }}background-color: {{ .BgColor }};{{ end }}{{ if .BgImage }}background-image: url('{{ .BgImage }}'); background-size: cover; background-position: center;{{ end }}{{ if .Color }}color: {{ .Color }};{{ end }}">
+        {{ if .BgDim }}<div class="slide-bg-dim" style="background-color: {{ .BgDim }};"></div>{{ end }}
         {{ if .Header }}<div class="slide-header">{{ .Header }}</div>{{ end }}
         <div class="slide-body">
           {{ if and .LeftHTML .RightHTML }}
