@@ -130,20 +130,7 @@ func resolveSize(size string) model.SizeRatio {
 }
 
 func resolveLayout(layout string) model.LayoutType {
-	switch model.LayoutType(strings.TrimSpace(layout)) {
-	case model.LayoutCover:
-		return model.LayoutCover
-	case model.LayoutSection:
-		return model.LayoutSection
-	case model.LayoutTwoCols:
-		return model.LayoutTwoCols
-	case model.LayoutBlank:
-		return model.LayoutBlank
-	case model.LayoutDefault:
-		return model.LayoutDefault
-	default:
-		return model.LayoutDefault
-	}
+	return model.NormalizeLayout(layout)
 }
 
 func resolveCustomCSS(customCSS, style string) string {

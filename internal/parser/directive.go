@@ -179,7 +179,14 @@ func applySingleDirective(
 ) {
 	switch key {
 	case "class":
-		target.Class = strings.Fields(value)
+		classes := strings.Fields(value)
+		target.Class = classes
+		for _, c := range classes {
+			if strings.EqualFold(c, "lead") || strings.EqualFold(c, "quote") {
+				*layoutTarget = model.LayoutLead
+				break
+			}
+		}
 	case "backgroundColor":
 		target.BackgroundColor = value
 	case "backgroundImage":
@@ -195,7 +202,7 @@ func applySingleDirective(
 	case "paginate":
 		target.Paginate = (value == "true")
 	case "layout":
-		*layoutTarget = resolveLayout(value)
+		*layoutTarget = model.NormalizeLayout(value)
 	case "autofit":
 		target.Autofit = (value == "true" || value == "1" || value == "on")
 	}

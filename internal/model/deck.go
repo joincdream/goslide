@@ -18,6 +18,7 @@ const (
 	LayoutCover   LayoutType = "cover"
 	LayoutSection LayoutType = "section"
 	LayoutTwoCols LayoutType = "two-cols"
+	LayoutLead    LayoutType = "lead"
 	LayoutBlank   LayoutType = "blank"
 )
 

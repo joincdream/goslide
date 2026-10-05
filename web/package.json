@@ -1,0 +1,20 @@
+{
+  "name": "goslide-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && cp dist/goslide-core.js ../internal/theme/assets/js/goslide-core.js && cp dist/presenter.css ../internal/theme/assets/css/presenter.css"
+  },
+  "dependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.11"
+  }
+}

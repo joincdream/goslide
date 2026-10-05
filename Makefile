@@ -28,8 +28,15 @@ setup-tools:
 		$(GO) install github.com/uudashr/gocognit/cmd/gocognit@latest; \
 	fi
 
+## build-web: Build frontend Svelte 5 and Tailwind bundle
+build-web:
+	@if [ -d "web" ] && [ -x "$$(command -v npm)" ]; then \
+		echo "==> Building web frontend (Svelte 5 + Tailwind)..."; \
+		cd web && npm run build; \
+	fi
+
 ## build: Build static single binary with CGO_ENABLED=0
-build:
+build: build-web
 	@echo "==> Building $(BINARY_NAME) (CGO_ENABLED=0)..."
 	@mkdir -p $(BIN_DIR)
 	CGO_ENABLED=0 $(GO) build -trimpath -ldflags="-s -w" -o $(BIN_DIR)/$(BINARY_NAME) ./cmd/goslide

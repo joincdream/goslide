@@ -15,9 +15,15 @@ const (
 	// DefaultTheme is the fallback theme when none is specified.
 	DefaultTheme = "default"
 
-	baseCSSPath = "assets/css/base.css"
 	coreJSPath  = "assets/js/goslide-core.js"
 )
+
+// baseCSSFiles defines the modular stylesheets that compose the foundational presentation styling.
+var baseCSSFiles = []string{
+	"assets/css/deck-canvas.css",
+	"assets/css/deck-content.css",
+	"assets/css/presenter.css",
+}
 
 // Manager handles retrieving built-in themes and composing presentation stylesheets.
 type Manager struct {
@@ -32,13 +38,21 @@ func NewManager(fsys fs.FS) *Manager {
 	return &Manager{fsys: fsys}
 }
 
-// GetBaseCSS returns the raw contents of the base stylesheet.
+// GetBaseCSS returns the composed raw contents of the base stylesheets:
+// deck-canvas.css, deck-content.css, and presenter.css.
 func (m *Manager) GetBaseCSS() (string, error) {
-	data, err := fs.ReadFile(m.fsys, baseCSSPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to read base css: %w", err)
+	var b strings.Builder
+	for i, path := range baseCSSFiles {
+		data, err := fs.ReadFile(m.fsys, path)
+		if err != nil {
+			return "", fmt.Errorf("failed to read base css file %q: %w", path, err)
+		}
+		if i > 0 {
+			b.WriteString("\n\n")
+		}
+		b.Write(data)
 	}
-	return string(data), nil
+	return b.String(), nil
 }
 
 // GetCoreJS returns the raw contents of the core presentation runtime script.

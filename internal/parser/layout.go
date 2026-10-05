@@ -18,8 +18,10 @@ func renderSlideContent(
 	layout model.LayoutType,
 	content string,
 ) (titleHTML string, htmlContent string, leftHTML string, rightHTML string, err error) {
-	// For cover, section, and blank layouts, retain all content centered as a whole (no separated title box)
-	if layout == model.LayoutCover || layout == model.LayoutSection || layout == model.LayoutBlank {
+	spec := model.GetLayoutSpec(layout)
+
+	// If the layout spec dictates keeping the title integrated into the body (cover, section, lead, blank)
+	if !spec.SeparateTitle {
 		fullHTML, err := convertToHTML(gm, content)
 		if err != nil {
 			return "", "", "", "", err
@@ -27,7 +29,7 @@ func renderSlideContent(
 		return "", fullHTML, "", "", nil
 	}
 
-	// For standard layouts, extract the first leading heading as Slide Title
+	// For layouts with SeparateTitle (default, two-cols), extract the first leading heading as Slide Title
 	titleMD, bodyMD := extractFirstHeading(content)
 	if titleMD != "" {
 		tBuf, err := convertToHTML(gm, titleMD)
@@ -37,7 +39,7 @@ func renderSlideContent(
 		titleHTML = tBuf
 	}
 
-	if layout == model.LayoutTwoCols && splitCommentRegex.MatchString(bodyMD) {
+	if spec.ContentFormat == model.FormatTwoCols && splitCommentRegex.MatchString(bodyMD) {
 		parts := splitCommentRegex.Split(bodyMD, 2)
 		leftMD := strings.TrimSpace(parts[0])
 		rightMD := strings.TrimSpace(parts[1])
