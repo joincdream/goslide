@@ -35,6 +35,8 @@ trust:
 | **[`05-rendering-and-export-pipelines.md`](./05-rendering-and-export-pipelines.md)** | `architecture` | • 기술 스택 선정 근거 (CGO 100% 배제 순수 Go)<br>• HTML 렌더러, PDF 벡터 인쇄, PPTX OpenXML 패키징 파이프라인 | [`internal/renderer/`](../../internal/renderer/)<br>[`internal/exporter/`](../../internal/exporter/) |
 | **[`06-runtime-security-and-lifecycle.md`](./06-runtime-security-and-lifecycle.md)** | `operations` | • chromedp Headless 브라우저 프로세스 트리 회수 (좀비 방지)<br>• 동시성 세마포어 및 Raw HTML 보안 샌드박싱 (`--unsafe-html`) | [`internal/exporter/pdf/`](../../internal/exporter/pdf/)<br>[`internal/parser/`](../../internal/parser/) |
 | **[`07-operations-build-and-cicd.md`](./07-operations-build-and-cicd.md)** | `operations` | • 표준 CLI Exit Code 사양표 (0~5)<br>• Makefile 빌드 자동화 및 3단계 테스트 피라미드<br>• GoReleaser 크로스 컴파일 및 릴리즈 파이프라인 | [`Makefile`](../../Makefile)<br>[`cmd/goslide/`](../../cmd/goslide/) |
+| **[`08-embedded-editor-and-vim-mode.md`](./08-embedded-editor-and-vim-mode.md)** | `architecture` | • `goslide serve` 내장 웹 에디터(Goslide Studio) 아키텍처<br>• CodeMirror 6 기반 네이티브 Vim 모드 & `:w` 자동 저장<br>• 메모리 직결 렌더링 & 슬라이드 커서 양방향 동기화 | [`internal/server/`](../../internal/server/)<br>[`web/src/`](../../web/src/) |
+| **[`09-theme-management-and-sharing.md`](./09-theme-management-and-sharing.md)** | `architecture` | • 로컬/전역/내장 3계층 테마 탐색 파이프라인<br>• 구글 슬라이드 스타일 원클릭 테마 전환 갤러리 UI<br>• 드래그 앤 드롭 CSS 임포트 및 CLI 테마 공유/설치 | [`internal/theme/`](../../internal/theme/)<br>[`web/src/`](../../web/src/) |
 
 ---
 
