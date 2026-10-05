@@ -11,17 +11,13 @@
   function resizeCanvas() {
     if (!canvasEl) return;
     const dpr = window.devicePixelRatio || 1;
-    if (deck.isLock1080p) {
-      canvasEl.width = Math.round(1920 * dpr);
-      canvasEl.height = Math.round(1080 * dpr);
-      canvasEl.style.width = '1920px';
-      canvasEl.style.height = '1080px';
-    } else {
-      canvasEl.width = Math.round(window.innerWidth * dpr);
-      canvasEl.height = Math.round(window.innerHeight * dpr);
-      canvasEl.style.width = window.innerWidth + 'px';
-      canvasEl.style.height = window.innerHeight + 'px';
-    }
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    canvasEl.width = Math.round(width * dpr);
+    canvasEl.height = Math.round(height * dpr);
+    canvasEl.style.width = width + 'px';
+    canvasEl.style.height = height + 'px';
 
     ctx = canvasEl.getContext('2d');
     ctx.scale(dpr, dpr);
@@ -117,7 +113,7 @@
 <canvas
   bind:this={canvasEl}
   id="goslide-canvas"
-  class="fixed top-0 left-0 z-[2000] {deck.isDrawMode ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}"
+  class="fixed inset-0 w-screen h-screen z-[2000] {deck.isDrawMode ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}"
   onmousedown={handleMouseDown}
   onmousemove={handleMouseMove}
 ></canvas>
