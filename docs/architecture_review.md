@@ -3,7 +3,7 @@
 > **문서 버전**: v1.0.0  
 > **작성일**: 2026-10-02  
 > **상태**: 검토 완료 (Reviewed)  
-> **대상 문서**: [docs/architecture_design.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md) (v1.2.0)  
+> **대상 문서**: [docs/architecture/index.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md) (v2.0.0)  
 > **핵심 설계 원칙**: **YAGNI** (You Aren't Gonna Need It), **KISS** (Keep It Simple, Stupid), **SoC** (Separation of Concerns)
 
 ---
@@ -208,4 +208,4 @@ Goslide/
 2. **버그 및 오버헤드 원천 차단**:
    - Base64 변환에 따른 메모리 누수, 웹소켓 끊김, 추측성 레이아웃 오판정 등의 잠재적 결함을 아키텍처 단계에서 원천 제거합니다.
 3. **다음 실행 단계**:
-   - 본 분석 보고서의 내용을 바탕으로 [`docs/architecture_design.md`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md)를 린(Lean) 아키텍처로 개정(v2.0)하고, 곧바로 스프린트 1(M1-1 인프라 구축, M1-2 코어 파서) 구현에 착수할 것을 권장합니다.
+   - 본 분석 보고서의 내용을 바탕으로 [`docs/architecture/index.md`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md)를 린(Lean) 아키텍처로 개정(v2.0)하고, 곧바로 스프린트 1(M1-1 인프라 구축, M1-2 코어 파서) 구현에 착수할 것을 권장합니다.

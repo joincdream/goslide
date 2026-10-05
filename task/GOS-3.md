@@ -5,7 +5,7 @@
 > **마감일**: 2026-10-09  
 > **상태**: 완료 (Completed)  
 > **담당자**: Goslide Core Team  
-> **참조 문서**: [development_roadmap.md](file:///home/yundream/myjob/cloit/Goslide/docs/development_roadmap.md), [architecture_design.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md), [contracts-interfaces.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/contracts-interfaces.md), [hard-constraints.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/hard-constraints.md)
+> **참조 문서**: [development_roadmap.md](file:///home/yundream/myjob/cloit/Goslide/docs/development_roadmap.md), [architecture/index.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md), [contracts-interfaces.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/contracts-interfaces.md), [hard-constraints.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/hard-constraints.md)
 
 ---
 

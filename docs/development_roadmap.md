@@ -3,7 +3,7 @@
 > **문서 버전**: v1.0.0  
 > **작성일**: 2026-10-02  
 > **상태**: 확정 (Approved for Implementation)  
-> **기반 문서**: [functional_specification.md](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md), [architecture_design.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md), [project_plan.md](file:///home/yundream/myjob/cloit/Goslide/docs/project_plan.md), [AGENTS.md](file:///home/yundream/myjob/cloit/Goslide/AGENTS.md)
+> **기반 문서**: [functional_specification.md](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md), [architecture/index.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md), [project_plan.md](file:///home/yundream/myjob/cloit/Goslide/docs/project_plan.md), [AGENTS.md](file:///home/yundream/myjob/cloit/Goslide/AGENTS.md)
 
 ---
 
@@ -76,7 +76,7 @@ flowchart LR
 - **담당 패키지**: 루트 인프라, `.github/workflows/`
 - **상세 태스크**:
   1. `go.mod` (Go 1.22+) 초기화 및 프로젝트 기본 설정.
-  2. [architecture_design.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L273-L318)에 정의된 14개 파일 린 디렉토리 구조 스캐폴딩:
+  2. [architecture/index.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L273-L318)에 정의된 14개 파일 린 디렉토리 구조 스캐폴딩:
      - `cmd/goslide/`, `pkg/goslide/`, `internal/{model,parser,theme,renderer,exporter,server,testutil}`, `testdata/`
   3. `Makefile` 작성 (`build`, `test`, `test-race`, `lint`, `golden-update`).
   4. `.golangci.yml` 린터 룰셋 구성 (errcheck, gosimple, govet, ineffassign, staticcheck, unused 등).
@@ -88,12 +88,12 @@ flowchart LR
 #### 마일스톤 M1-2: 도메인 IR 및 코어 마크다운 파서 개발 ([GOS-3](https://joincdream.atlassian.net/browse/GOS-3))
 - **마감일 (Due Date)**: 2026-10-09
 - **기간**: 1주차 3~5일차
-- **담당 패키지**: [`internal/model`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L303-L308), [`internal/parser`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L310-L321)
+- **담당 패키지**: [`internal/model`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L303-L308), [`internal/parser`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L310-L321)
 - **상세 태스크**:
-  1. [`internal/model`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L303-L308): 불변 IR 구조체 선언 ([`Deck`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L397-L404), [`Slide`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L407-L416), [`GlobalDirectives`](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md#L233-L240), [`SlideDirectives`](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md#L256-L265)) 및 코어 인터페이스 ([`Parser`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L357-L359), [`Renderer`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L362-L364)).
-  2. 도메인 센티넬 에러 정의 ([`errors.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L561-L569)).
-  3. [`internal/parser/frontmatter.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L313): YAML Frontmatter 블록 추출 및 `gopkg.in/yaml.v3` 언마샬링.
-  4. [`internal/parser/splitter.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L312): 수평선(`---`) 기준 슬라이드 분할기 구현 (코드블록 Fenced Block 내의 `---` 제외 예외 처리 보장).
+  1. [`internal/model`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L303-L308): 불변 IR 구조체 선언 ([`Deck`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L397-L404), [`Slide`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L407-L416), [`GlobalDirectives`](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md#L233-L240), [`SlideDirectives`](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md#L256-L265)) 및 코어 인터페이스 ([`Parser`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L357-L359), [`Renderer`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L362-L364)).
+  2. 도메인 센티넬 에러 정의 ([`errors.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L561-L569)).
+  3. [`internal/parser/frontmatter.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L313): YAML Frontmatter 블록 추출 및 `gopkg.in/yaml.v3` 언마샬링.
+  4. [`internal/parser/splitter.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L312): 수평선(`---`) 기준 슬라이드 분할기 구현 (코드블록 Fenced Block 내의 `---` 제외 예외 처리 보장).
   5. `Goldmark` 파서 초기화 및 GFM 확장(테이블, 체크리스트, 취소선) 활성화.
 - **완료 기준 (DoD)**:
   - Frontmatter 파싱 및 슬라이드 분할 테이블 기반 단위 테스트 20개 이상 통과 (`parser_test.go`, `splitter_test.go`).
@@ -106,15 +106,15 @@ flowchart LR
 #### 마일스톤 M1-3: 지시어 파서 및 명시적 레이아웃 엔진 ([GOS-4](https://joincdream.atlassian.net/browse/GOS-4))
 - **마감일 (Due Date)**: 2026-10-14
 - **기간**: 2주차 1~3일차
-- **담당 패키지**: [`internal/parser`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L283-L287)
+- **담당 패키지**: [`internal/parser`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L283-L287)
 - **상세 태스크**:
-  1. [`internal/parser/directive.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L286): 인라인 HTML 주석 지시어(`<!-- key: value -->`) 및 발표자 노트(`<!-- note: ... -->`) 토크나이저 개발.
+  1. [`internal/parser/directive.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L286): 인라인 HTML 주석 지시어(`<!-- key: value -->`) 및 발표자 노트(`<!-- note: ... -->`) 토크나이저 개발.
   2. 전역 상속 지시어 vs 슬라이드 국소 지시어(`_` 언더스코어 접두사) 스코프 처리.
   3. 명시적 레이아웃 매핑 (YAGNI/KISS: 추측 배제, 작성자가 지정한 지시어 기준 결정론적 렌더링):
      - `<!-- layout: cover -->` $\rightarrow$ 중앙 정렬 타이틀 슬라이드
      - `<!-- layout: two-cols -->` or `<!-- split -->` $\rightarrow$ 좌/우 2단 그리드
      - 기본값 $\rightarrow$ `default` 일반 슬라이드
-  4. [`internal/parser/highlight.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L287): `alecthomas/chroma/v2` 기반 순수 Go 구문 강조 렌더러 연동.
+  4. [`internal/parser/highlight.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L287): `alecthomas/chroma/v2` 기반 순수 Go 구문 강조 렌더러 연동.
   5. KaTeX 수식 인라인(`$...$`) 및 블록(`$$...$$`) 구문 지원 연동.
 - **완료 기준 (DoD)**:
   - 지시어 파싱 및 명시적 레이아웃 매핑 단위 테스트 통과 (`directive_test.go`).
@@ -123,9 +123,9 @@ flowchart LR
 #### 마일스톤 M1-4: 테마 시스템 및 내장 정적 에셋 파이프라인 ([GOS-5](https://joincdream.atlassian.net/browse/GOS-5))
 - **마감일 (Due Date)**: 2026-10-16
 - **기간**: 2주차 4~5일차
-- **담당 패키지**: [`internal/theme`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L288-L293)
+- **담당 패키지**: [`internal/theme`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L288-L293)
 - **상세 태스크**:
-  1. [`internal/theme/embed.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L291): Go `embed.FS`를 활용한 테마 CSS 및 정적 에셋 내장 체계 구현.
+  1. [`internal/theme/embed.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L291): Go `embed.FS`를 활용한 테마 CSS 및 정적 에셋 내장 체계 구현.
   2. 핵심 테마 CSS 3종 작성:
      - `base.css`: 슬라이드 뷰포트 규격, 16:9/4:3 반응형 비율, 기본 타이포그래피.
      - `default.css`: Pretendard 기반 기술 발표 표준 테마.
@@ -143,9 +143,9 @@ flowchart LR
 #### 마일스톤 M1-5: HTML 렌더러 및 브라우저 네비게이션/판서 런타임 ([GOS-6](https://joincdream.atlassian.net/browse/GOS-6))
 - **마감일 (Due Date)**: 2026-10-21
 - **기간**: 3주차 1~3일차
-- **담당 패키지**: [`internal/renderer/html`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L294-L297), `internal/theme/assets/`
+- **담당 패키지**: [`internal/renderer/html`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L294-L297), `internal/theme/assets/`
 - **상세 태스크**:
-  1. [`internal/renderer/html/renderer.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L295): `model.Renderer` 인터페이스 구현체 작성.
+  1. [`internal/renderer/html/renderer.go`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L295): `model.Renderer` 인터페이스 구현체 작성.
   2. `html/template` 기반 슬라이드 HTML 도큐먼트 합성 로직 (`slide.html`).
   3. 브라우저 슬라이드 코어 JS 작성 (`goslide-core.js`):
      - 방향키, Space, PageUp/Down, Home/End 슬라이드 이동.
@@ -160,7 +160,7 @@ flowchart LR
 #### 마일스톤 M1-6: CLI 빌드 통합 및 MVP 게이트웨이 검증 ([GOS-7](https://joincdream.atlassian.net/browse/GOS-7))
 - **마감일 (Due Date)**: 2026-10-23
 - **기간**: 3주차 4~5일차
-- **담당 패키지**: [`cmd/goslide`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L299-L306), [`internal/testutil`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L373-L376), `testdata/`
+- **담당 패키지**: [`cmd/goslide`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L299-L306), [`internal/testutil`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L373-L376), `testdata/`
 - **상세 태스크**:
   1. Cobra 기반 CLI 진입점 구현:
      - `cmd/goslide/main.go`, `root.go`
@@ -185,7 +185,7 @@ flowchart LR
 #### 마일스톤 M2-1: chromedp 기반 벡터 PDF 익스포터 ([GOS-8](https://joincdream.atlassian.net/browse/GOS-8))
 - **마감일 (Due Date)**: 2026-10-27
 - **기간**: 4주차 1~2일차
-- **담당 패키지**: [`internal/exporter/pdf`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L349-L355)
+- **담당 패키지**: [`internal/exporter/pdf`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L349-L355)
 - **상세 태스크**:
   1. `model.Exporter` 인터페이스 구현체 작성 (`internal/exporter/pdf/exporter.go`).
   2. 시스템 Chrome/Chromium 바이너리 자동 탐색기 (`browser.go`, OS별 기본 경로 및 `GOSLIDE_CHROME_BIN`).
@@ -201,7 +201,7 @@ flowchart LR
 #### 마일스톤 M2-2: 고해상도 PPTX 캡처 및 OpenXML 패키징 빌더 ([GOS-9](https://joincdream.atlassian.net/browse/GOS-9))
 - **마감일 (Due Date)**: 2026-10-30
 - **기간**: 4주차 3~5일차
-- **담당 패키지**: [`internal/exporter/pptx`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L302-L305)
+- **담당 패키지**: [`internal/exporter/pptx`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L302-L305)
 - **상세 태스크**:
   1. `model.Exporter` 인터페이스 구현체 작성 (`internal/exporter/pptx/exporter.go`).
   2. chromedp 기반 슬라이드별 DOM 뷰포트 고해상도(1920x1080 @ 2x Scale) 스크린샷 순차 캡처 파이프라인.
@@ -221,7 +221,7 @@ flowchart LR
 #### 마일스톤 M2-3: 실시간 Live Preview 로컬 개발 서버 ([GOS-10](https://joincdream.atlassian.net/browse/GOS-10))
 - **마감일 (Due Date)**: 2026-11-04
 - **기간**: 5주차 1~2일차
-- **담당 패키지**: [`internal/server`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L306-L309), `cmd/goslide/serve.go`
+- **담당 패키지**: [`internal/server`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L306-L309), `cmd/goslide/serve.go`
 - **상세 태스크**:
   1. Go `net/http` 기반 초경량 슬라이드 호스팅 서버 구현 (`server.go`).
   2. `fsnotify` 기반 소스 마크다운 파일 감시.
@@ -259,7 +259,7 @@ flowchart LR
 #### 마일스톤 M2-5: CLI 고도화, GoReleaser 배포 및 공식 릴리즈 ([GOS-12](https://joincdream.atlassian.net/browse/GOS-12))
 - **마감일 (Due Date)**: 2026-11-13
 - **기간**: 6주차 1~5일차
-- **담당 패키지**: `cmd/goslide/`, [`pkg/goslide`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md#L308-L312), `.goreleaser.yaml`, `.github/workflows/release.yml`
+- **담당 패키지**: `cmd/goslide/`, [`pkg/goslide`](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md#L308-L312), `.goreleaser.yaml`, `.github/workflows/release.yml`
 - **상세 태스크**:
   1. 템플릿 생성기 `goslide init [filename.md] --theme=default` 커맨드 구현.
   2. 서드파티 Go 애플리케이션 연동을 위한 Public Facade API 확립 (`pkg/goslide/goslide.go`).

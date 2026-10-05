@@ -5,7 +5,7 @@
 > **마감일**: 2026-10-06  
 > **상태**: 완료 (Completed)  
 > **담당자**: Goslide Core Team  
-> **참조 문서**: [development_roadmap.md](file:///home/yundream/myjob/cloit/Goslide/docs/development_roadmap.md), [architecture_design.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture_design.md), [hard-constraints.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/hard-constraints.md)
+> **참조 문서**: [development_roadmap.md](file:///home/yundream/myjob/cloit/Goslide/docs/development_roadmap.md), [architecture/index.md](file:///home/yundream/myjob/cloit/Goslide/docs/architecture/index.md), [hard-constraints.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/hard-constraints.md)
 
 ---
 
@@ -30,7 +30,7 @@
 - 원칙: CGO 라이브러리 일체 배제 (100% Pure Go 보장)
 
 ### 2.2 14개 파일 린 패키지 레이아웃 스캐폴딩
-`docs/architecture_design.md` 및 `docs/okf/core-architecture.md`에 정의된 패키지 디렉토리를 생성합니다:
+`docs/architecture/index.md` 및 `docs/okf/core-architecture.md`에 정의된 패키지 디렉토리를 생성합니다:
 
 ```
 Goslide/
