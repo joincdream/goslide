@@ -39,6 +39,7 @@ type GlobalDirectives struct {
 	Paginate bool       `json:"paginate" yaml:"paginate"`
 	Header   string     `json:"header,omitempty" yaml:"header"`
 	Footer   string     `json:"footer,omitempty" yaml:"footer"`
+	Autofit  bool       `json:"autofit" yaml:"autofit"`
 }
 
 // SlideDirectives holds scoped directives applied to a single slide.
@@ -52,6 +53,7 @@ type SlideDirectives struct {
 	Header          string     `json:"header,omitempty"`
 	Footer          string     `json:"footer,omitempty"`
 	Paginate        bool       `json:"paginate"`
+	Autofit         bool       `json:"autofit"`
 }
 
 // Slide represents a single presentation slide.
@@ -60,6 +62,7 @@ type Slide struct {
 	Layout      LayoutType      `json:"layout"`
 	Directives  SlideDirectives `json:"directives"`
 	RawContent  string          `json:"-"`
+	TitleHTML   string          `json:"title_html,omitempty"`
 	HTMLContent string          `json:"html_content"`
 	Notes       string          `json:"notes,omitempty"`
 	LeftHTML    string          `json:"left_html,omitempty"`

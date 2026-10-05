@@ -7,6 +7,7 @@
 # Go artifacts & test coverage
 *.test
 *.out
+*_out.html
 *.prof
 coverage.html
 coverage.txt

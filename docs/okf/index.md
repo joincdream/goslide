@@ -28,6 +28,7 @@ Goslide의 아키텍처, 데이터 모델, 인터페이스 계약, 제약 조건
 | **[hard-constraints.md](./hard-constraints.md)** | `reference` | CGO 배제, panic 금지, 전역상태 금지, CLI 종료 코드 및 DoD 검증 체크리스트 |
 | **[decisions-simplification.md](./decisions-simplification.md)** | `decision` | YAGNI/KISS/SoC 원칙에 따른 7대 오버엔지니어링 제거 결정 기록 (ADR) |
 | **[screencast-annotation.md](./screencast-annotation.md)** | `concept` | 유튜브 교육 영상 스크린캐스트 녹화 특화 초경량 투명 캔버스 판서(Annotation) 레이어 사양 |
+| **[layout-design.md](../layout-design.md)** | `design` | FHD 16:9 기준 In-Flow Flexbox 3단(헤더/본문/푸터) 완전 격리 레이아웃 설계 사양 |
 
 ---
 

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Comprehensive Elements Test</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <style id="goslide-theme-styles">
 /* --- Base Styles --- */
 /* Goslide Base Stylesheet
@@ -22,6 +23,7 @@ html, body {
   overflow: hidden;
   background-color: #0b0f19;
   color: #f8fafc;
+  font-size: 28px;
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
@@ -38,10 +40,10 @@ html, body {
   justify-content: center;
 }
 
-/* 16:9 Deck Frame */
+/* 16:9 Deck Frame: Physical Fixed 1920x1080 */
 .goslide-deck {
-  width: 960px;
-  height: 540px;
+  width: 1920px;
+  height: 1080px;
   position: relative;
   flex-shrink: 0;
 }
@@ -49,8 +51,8 @@ html, body {
 /* Slide Wrapper & Frame (Legacy/Preview fallback) */
 .slide-wrapper {
   position: relative;
-  width: 960px;
-  height: 540px;
+  width: 1920px;
+  height: 1080px;
   flex-shrink: 0;
 }
 
@@ -63,23 +65,24 @@ html, body {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 16:9 Slide Canvas: Strict Dimension & Visibility */
+/* 16:9 Slide Canvas: Physical Fixed 1920x1080 Dimension */
 .slide-card {
-  width: 960px !important;
-  height: 540px !important;
-  min-width: 960px !important;
-  max-width: 960px !important;
-  min-height: 540px !important;
-  max-height: 540px !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  min-width: 1920px !important;
+  max-width: 1920px !important;
+  min-height: 1080px !important;
+  max-height: 1080px !important;
   position: absolute;
   top: 0;
   left: 0;
   overflow: hidden;
-  padding: 3rem 4rem;
+  padding: 0 !important;
   display: none !important;
   flex-direction: column !important;
   flex-shrink: 0;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   border-radius: 0;
 }
 
@@ -127,47 +130,114 @@ body.drawing-mode {
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
 }
 
-/* Header & Footer */
-.slide-header {
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-  opacity: 0.75;
+/* --------------------------------------------------------------------------
+   PPT 4-Tier Master Structure: Fixed 1920x1080
+   40px (Tracker) + 120px (Title) + 840px (Body) + 80px (Footer) = 1080px
+   -------------------------------------------------------------------------- */
+
+/* 1. Running Header / Tracker (Height: 40px) */
+.slide-header,
+.slide-tracker {
+  flex: 0 0 40px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 16px 80px 0 80px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0.6;
+  text-align: left !important; /* 커버/섹션 상속 방어 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0;
+  position: static;
+  z-index: 10;
 }
 
-.slide-body {
-  flex: 1 1 auto;
-  min-height: 0;
+/* 2. Slide Title Placeholder Box (Height: 120px) */
+.slide-title-box {
+  flex: 0 0 120px;
+  height: 120px;
+  box-sizing: border-box;
+  padding: 10px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left !important;
+  position: static;
+  z-index: 10;
+}
+
+.slide-title-box h1,
+.slide-title-box h2 {
+  margin: 0;
+  font-size: 2.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 3. Slide Content / Body Placeholder Box (Height: 840px) */
+.slide-body,
+.slide-content-box {
+  flex: 0 0 840px;
+  height: 840px;
+  min-height: 840px;
+  max-height: 840px;
+  box-sizing: border-box;
+  padding: 20px 80px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  position: relative;
+  z-index: 1;
 }
 
+/* 4. Slide Footer (Height: 80px) */
 .slide-footer {
+  flex: 0 0 80px;
+  height: 80px;
+  box-sizing: border-box;
+  padding: 0 80px 24px 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
-  margin-top: 1rem;
-  opacity: 0.75;
-  flex-shrink: 0;
+  font-size: 0.75rem;
+  opacity: 0.65;
+  position: static;
+  z-index: 10;
+}
+
+.slide-header:empty,
+.slide-tracker:empty,
+.slide-title-box:empty,
+.slide-footer:empty {
+  border: none !important;
 }
 
 /* Semantic Layouts */
 .slide-card.cover,
 .slide-card.layout-cover {
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  padding: 4rem;
+}
+
+.slide-card.cover .slide-header,
+.slide-card.cover .slide-tracker,
+.slide-card.cover .slide-title-box,
+.slide-card.layout-cover .slide-header,
+.slide-card.layout-cover .slide-tracker,
+.slide-card.layout-cover .slide-title-box {
+  display: none !important;
 }
 
 .slide-card.cover .slide-body,
 .slide-card.layout-cover .slide-body {
+  flex: 0 0 1000px;
+  height: 1000px;
+  min-height: 1000px;
+  max-height: 1000px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -189,14 +259,24 @@ body.drawing-mode {
 
 .slide-card.section,
 .slide-card.layout-section {
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  padding: 4rem;
+}
+
+.slide-card.section .slide-header,
+.slide-card.section .slide-tracker,
+.slide-card.section .slide-title-box,
+.slide-card.layout-section .slide-header,
+.slide-card.layout-section .slide-tracker,
+.slide-card.layout-section .slide-title-box {
+  display: none !important;
 }
 
 .slide-card.section .slide-body,
 .slide-card.layout-section .slide-body {
+  flex: 0 0 1000px;
+  height: 1000px;
+  min-height: 1000px;
+  max-height: 1000px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -210,16 +290,55 @@ body.drawing-mode {
   margin: 0;
 }
 
+/* List alignment in centered layouts (cover & section) */
+.slide-card.cover ul,
+.slide-card.cover ol,
+.slide-card.layout-cover ul,
+.slide-card.layout-cover ol,
+.slide-card.section ul,
+.slide-card.section ol,
+.slide-card.layout-section ul,
+.slide-card.layout-section ol {
+  text-align: left;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90%;
+}
+
+.slide-card.cover li,
+.slide-card.layout-cover li,
+.slide-card.section li,
+.slide-card.layout-section li {
+  text-align: left;
+}
+
+/* Blank Layout */
 .slide-card.blank,
 .slide-card.layout-blank {
   padding: 0;
 }
 
+.slide-card.blank .slide-header,
+.slide-card.blank .slide-tracker,
+.slide-card.blank .slide-title-box,
+.slide-card.blank .slide-footer,
+.slide-card.layout-blank .slide-header,
+.slide-card.layout-blank .slide-tracker,
+.slide-card.layout-blank .slide-title-box,
+.slide-card.layout-blank .slide-footer {
+  display: none !important;
+}
+
 .slide-card.blank .slide-body,
 .slide-card.layout-blank .slide-body {
+  flex: 0 0 1080px;
+  height: 1080px;
+  min-height: 1080px;
+  max-height: 1080px;
+  padding: 0;
   justify-content: center;
   align-items: center;
-  height: 100%;
 }
 
 /* Two Columns Layout (Scoped strictly inside slide-body) */
@@ -265,6 +384,7 @@ ul, ol {
   margin-bottom: 1rem;
   padding-left: 1.75rem;
   line-height: 1.6;
+  text-align: left;
 }
 
 li {
@@ -560,9 +680,9 @@ body.lock-1080p #goslide-stage {
 }
 
 body.lock-1080p #goslide-deck {
-  width: 960px !important;
-  height: 540px !important;
-  transform: scale(2) !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  transform: scale(1) !important;
   transform-origin: center center !important;
 }
 
@@ -725,10 +845,10 @@ body.lock-1080p .goslide-presenter-sidebar {
   position: absolute;
   top: 0;
   left: 0;
-  width: 960px;
-  height: 540px;
+  width: 1920px;
+  height: 1080px;
   transform-origin: top left;
-  transform: scale(0.38);
+  transform: scale(0.19);
   opacity: 1 !important;
   pointer-events: none;
 }
@@ -827,7 +947,30 @@ body.overview-mode .slide-card {
   border-radius: 8px !important;
   overflow: hidden !important;
   transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease !important;
-  font-size: 0.45rem !important;
+  font-size: 0.35rem !important;
+}
+
+body.overview-mode .slide-header {
+  flex: 0 0 16px !important;
+  height: 16px !important;
+  padding: 2px 10px 0 10px !important;
+  font-size: 0.3rem !important;
+  line-height: 1.2 !important;
+}
+
+body.overview-mode .slide-body {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 4px 10px !important;
+}
+
+body.overview-mode .slide-footer {
+  flex: 0 0 16px !important;
+  height: 16px !important;
+  padding: 0 10px 2px 10px !important;
+  font-size: 0.3rem !important;
 }
 
 body.overview-mode .slide-card:hover {
@@ -1047,32 +1190,37 @@ body {
       
       <section class="slide-card default layout-default lead active"
                data-slide="1"
+               
                style="">
         
-        <div class="slide-header">Goslide Presentation Test</div>
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">Goslide Presentation Test</div>
+        
+        <div class="slide-title-box"><h1 id="goslide-expression-showcase">Goslide Expression Showcase</h1>
+</div>
+        
+        <div class="slide-body slide-content-box">
           
-          <h1 id="goslide-expression-showcase">Goslide Expression Showcase</h1>
-<p>High performance pure Go presentation engine</p>
+          <p>High performance pure Go presentation engine</p>
 
           
         </div>
-        <div class="slide-footer">
-          <span>Confidential - Cloit Inc.</span>
-          <span>1</span>
-        </div>
+        <div class="slide-footer"><span>Confidential - Cloit Inc.</span><span>1</span></div>
         
       </section>
       
       <section class="slide-card default layout-default "
                data-slide="2"
+               
                style="">
         
-        <div class="slide-header">Goslide Presentation Test</div>
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">Goslide Presentation Test</div>
+        
+        <div class="slide-title-box"><h2 id="1-table-alignment--headings">1. Table Alignment &amp; Headings</h2>
+</div>
+        
+        <div class="slide-body slide-content-box">
           
-          <h2 id="1-table-alignment--headings">1. Table Alignment &amp; Headings</h2>
-<table>
+          <table>
 <thead>
 <tr>
 <th style="text-align:left">Feature (Left)</th>
@@ -1103,22 +1251,23 @@ body {
 
           
         </div>
-        <div class="slide-footer">
-          <span>Confidential - Cloit Inc.</span>
-          <span>2</span>
-        </div>
+        <div class="slide-footer"><span>Confidential - Cloit Inc.</span><span>2</span></div>
         
       </section>
       
       <section class="slide-card default layout-default "
                data-slide="3"
+               
                style="">
         
-        <div class="slide-header">Goslide Presentation Test</div>
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">Goslide Presentation Test</div>
+        
+        <div class="slide-title-box"><h2 id="2-gfm-task-lists-del--kbd">2. GFM Task Lists, Del &amp; Kbd</h2>
+</div>
+        
+        <div class="slide-body slide-content-box">
           
-          <h2 id="2-gfm-task-lists-del--kbd">2. GFM Task Lists, Del &amp; Kbd</h2>
-<ul>
+          <ul>
 <li><input checked="" disabled="" type="checkbox"> Phase 1: Core CSS alignment fixes</li>
 <li><input checked="" disabled="" type="checkbox"> Phase 2: GFM task lists and keycaps</li>
 <li><input disabled="" type="checkbox"> Phase 3: Future enhancements</li>
@@ -1138,22 +1287,23 @@ body {
 
           
         </div>
-        <div class="slide-footer">
-          <span>Confidential - Cloit Inc.</span>
-          <span>3</span>
-        </div>
+        <div class="slide-footer"><span>Confidential - Cloit Inc.</span><span>3</span></div>
         
       </section>
       
       <section class="slide-card default layout-default invert"
                data-slide="4"
+               
                style="">
         
-        <div class="slide-header">Goslide Presentation Test</div>
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">Goslide Presentation Test</div>
+        
+        <div class="slide-title-box"><h1 id="inverted-slide-dark-mode-accent">Inverted Slide (Dark Mode Accent)</h1>
+</div>
+        
+        <div class="slide-body slide-content-box">
           
-          <h1 id="inverted-slide-dark-mode-accent">Inverted Slide (Dark Mode Accent)</h1>
-<p>This slide demonstrates the safe <code>invert</code> class on Clean theme.</p>
+          <p>This slide demonstrates the safe <code>invert</code> class on Clean theme.</p>
 <pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span><span style="color:#ff79c6">package</span> main
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#ff79c6">import</span> <span style="color:#f1fa8c">&#34;fmt&#34;</span>
@@ -1164,43 +1314,45 @@ body {
 </span></span></code></pre>
           
         </div>
-        <div class="slide-footer">
-          <span>Confidential - Cloit Inc.</span>
-          <span>4</span>
-        </div>
+        <div class="slide-footer"><span>Confidential - Cloit Inc.</span><span>4</span></div>
         
       </section>
       
       <section class="slide-card default layout-default  has-bg-dim"
                data-slide="5"
+               
                style="background-image: url('./sample.jpg'); background-size: cover; background-position: center;">
         <div class="slide-bg-dim" style="background-color: rgba(0, 0, 0, 0.6);"></div>
-        <div class="slide-header">Goslide Presentation Test</div>
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">Goslide Presentation Test</div>
+        
+        <div class="slide-title-box"><h1 id="slide-with-background-image-and-dimming">Slide with Background Image and Dimming</h1>
+</div>
+        
+        <div class="slide-body slide-content-box">
           
-          <h1 id="slide-with-background-image-and-dimming">Slide with Background Image and Dimming</h1>
-<p>This slide has a background image with a 60% black dimming layer.
+          <p>This slide has a background image with a 60% black dimming layer.
 The text remains perfectly legible!</p>
 <p><img src="./sample.jpg" alt="" style="width: 300px;" class="img-center"></p>
 
           
         </div>
-        <div class="slide-footer">
-          <span>Confidential - Cloit Inc.</span>
-          <span>5</span>
-        </div>
+        <div class="slide-footer"><span>Confidential - Cloit Inc.</span><span>5</span></div>
         
       </section>
       
       <section class="slide-card default layout-default compact"
                data-slide="6"
+               
                style="">
         
-        <div class="slide-header">Goslide Presentation Test</div>
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">Goslide Presentation Test</div>
+        
+        <div class="slide-title-box"><h2 id="3-compact-preset--gfm-alerts">3. Compact Preset &amp; GFM Alerts</h2>
+</div>
+        
+        <div class="slide-body slide-content-box">
           
-          <h2 id="3-compact-preset--gfm-alerts">3. Compact Preset &amp; GFM Alerts</h2>
-<div class="markdown-alert markdown-alert-note"><div class="markdown-alert-title"><span class="markdown-alert-icon">ℹ️</span> Design Principle</div><p>Goslide maintains zero raw HTML requirements for slide authors.</p>
+          <div class="markdown-alert markdown-alert-note"><div class="markdown-alert-title"><span class="markdown-alert-icon">ℹ️</span> Design Principle</div><p>Goslide maintains zero raw HTML requirements for slide authors.</p>
 </div>
 <div class="markdown-alert markdown-alert-warning"><div class="markdown-alert-title"><span class="markdown-alert-icon">⚠️</span> Production Advice</div><p>Always verify slide contrast when presenting in lit rooms.</p>
 </div>
@@ -1210,10 +1362,7 @@ The text remains perfectly legible!</p>
 
           
         </div>
-        <div class="slide-footer">
-          <span>Confidential - Cloit Inc.</span>
-          <span>6</span>
-        </div>
+        <div class="slide-footer"><span>Confidential - Cloit Inc.</span><span>6</span></div>
         
       </section>
       
@@ -1404,17 +1553,21 @@ The text remains perfectly legible!</p>
       // Restore drawing buffer if available
       restoreCurrentCanvas();
 
-      // Responsive 16:9 Deck Scaling
+      // Responsive 16:9 Deck Scaling (Physical Fixed: 1920x1080)
       if (deck && !isOverviewMode) {
         if (isLock1080p) {
-          deck.style.transform = 'scale(2)';
+          deck.style.transform = 'scale(1)';
           deck.style.transformOrigin = 'center center';
         } else {
           const availableWidth = isSidebarOpen ? window.innerWidth - 400 : window.innerWidth;
-          const scale = Math.min(availableWidth / 960, window.innerHeight / 540) * 0.96;
-          deck.style.transform = 'scale(' + Math.max(0.2, scale) + ')';
+          const scale = Math.min(availableWidth / 1920, window.innerHeight / 1080) * 0.96;
+          deck.style.transform = 'scale(' + Math.max(0.1, scale) + ')';
           deck.style.transformOrigin = 'center center';
         }
+      }
+
+      if (slides[currentIndex]) {
+        applyAutofit(slides[currentIndex]);
       }
     }
 
@@ -1735,8 +1888,8 @@ ${themeStylesCSS}
       position: absolute !important;
       top: 50% !important;
       left: 50% !important;
-      width: 960px !important;
-      height: 540px !important;
+      width: 1920px !important;
+      height: 1080px !important;
       display: flex !important;
       opacity: 1 !important;
       box-shadow: none !important;
@@ -1812,7 +1965,7 @@ ${themeStylesCSS}
         if (!box) return;
         const slide = box.querySelector('.slide-card');
         if (!slide) return;
-        const scale = Math.min((box.clientWidth - 16) / 960, (box.clientHeight - 16) / 540);
+        const scale = Math.min((box.clientWidth - 16) / 1920, (box.clientHeight - 16) / 1080);
         slide.style.transform = 'translate(-50%, -50%) scale(' + Math.max(0.1, scale) + ')';
       });
     }
@@ -1898,6 +2051,35 @@ ${themeStylesCSS}
     });
   }
 
+  // Autofit Safety Net: dynamically scale overflowing slides
+  function applyAutofit(slide) {
+    if (!slide) return;
+    const isAutofit = slide.classList.contains('has-autofit') || slide.dataset.autofit === 'true';
+    if (!isAutofit) return;
+
+    const body = slide.querySelector('.slide-body');
+    if (!body) return;
+
+    // Reset inline styles to measure natural dimensions
+    body.style.transform = '';
+    body.style.transformOrigin = '';
+    body.style.width = '';
+
+    const availHeight = body.clientHeight;
+    const contentHeight = body.scrollHeight;
+
+    if (contentHeight > availHeight && availHeight > 0) {
+      const scale = Math.max(0.4, (availHeight / contentHeight) * 0.98);
+      body.style.transform = 'scale(' + scale + ')';
+      const isCentered = slide.classList.contains('cover') ||
+                         slide.classList.contains('section') ||
+                         slide.classList.contains('layout-cover') ||
+                         slide.classList.contains('layout-section');
+      body.style.transformOrigin = isCentered ? 'center center' : 'top left';
+      body.style.width = (100 / scale) + '%';
+    }
+  }
+
   function goToSlide(index, updateHash = true) {
     if (slides.length === 0) return;
     const bounded = Math.max(0, Math.min(index, slides.length - 1));
@@ -1907,6 +2089,7 @@ ${themeStylesCSS}
     });
 
     currentIndex = bounded;
+    applyAutofit(slides[bounded]);
     restoreCurrentCanvas();
 
     if (indicator) {
@@ -2098,6 +2281,30 @@ ${themeStylesCSS}
   }
 })();
 
+  </script>
+
+  
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      function renderMath() {
+        if (typeof renderMathInElement === 'function') {
+          renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false}
+            ],
+            throwOnError: false
+          });
+        }
+      }
+      if (typeof renderMathInElement === 'function') {
+        renderMath();
+      } else {
+        window.addEventListener('load', renderMath);
+      }
+    });
   </script>
 </body>
 </html>

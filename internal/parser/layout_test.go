@@ -10,12 +10,15 @@ import (
 
 func TestRenderSlideContent_TwoCols_WithSplit(t *testing.T) {
 	gm := goldmark.New()
-	input := "### Left Side\n- Item L\n\n<!-- split -->\n\n### Right Side\n- Item R"
-	html, left, right, err := renderSlideContent(gm, model.LayoutTwoCols, input)
+	input := "## Two Cols Slide\n\n### Left Side\n- Item L\n\n<!-- split -->\n\n### Right Side\n- Item R"
+	title, html, left, right, err := renderSlideContent(gm, model.LayoutTwoCols, input)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	if !strings.Contains(title, "Two Cols Slide</h2>") {
+		t.Errorf("expected title in title return, got: %s", title)
+	}
 	if !strings.Contains(html, "<div class=\"two-cols\">") {
 		t.Errorf("expected two-cols wrapper in html: %s", html)
 	}
@@ -30,11 +33,14 @@ func TestRenderSlideContent_TwoCols_WithSplit(t *testing.T) {
 func TestRenderSlideContent_TwoCols_WithoutSplit(t *testing.T) {
 	gm := goldmark.New()
 	input := "### Single Column Content"
-	html, left, right, err := renderSlideContent(gm, model.LayoutTwoCols, input)
+	title, html, left, right, err := renderSlideContent(gm, model.LayoutTwoCols, input)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	if title != "" {
+		t.Errorf("expected empty title for h3, got %q", title)
+	}
 	if strings.Contains(html, "<div class=\"two-cols\">") {
 		t.Errorf("did not expect two-cols wrapper when split marker is missing: %s", html)
 	}
@@ -45,12 +51,15 @@ func TestRenderSlideContent_TwoCols_WithoutSplit(t *testing.T) {
 
 func TestRenderSlideContent_DefaultLayout(t *testing.T) {
 	gm := goldmark.New()
-	input := "Left\n<!-- split -->\nRight"
-	html, left, right, err := renderSlideContent(gm, model.LayoutDefault, input)
+	input := "## Slide Header\n\nLeft\n<!-- split -->\nRight"
+	title, html, left, right, err := renderSlideContent(gm, model.LayoutDefault, input)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
+	if !strings.Contains(title, "Slide Header</h2>") {
+		t.Errorf("expected title to be extracted: %s", title)
+	}
 	if strings.Contains(html, "<div class=\"two-cols\">") {
 		t.Errorf("default layout should not create two-cols container: %s", html)
 	}

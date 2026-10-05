@@ -20,6 +20,7 @@ func newDirectiveManager(global model.GlobalDirectives) *directiveManager {
 			Header:   global.Header,
 			Footer:   global.Footer,
 			Paginate: global.Paginate,
+			Autofit:  global.Autofit,
 		},
 		inheritedLayout: global.Layout,
 	}
@@ -151,7 +152,7 @@ func unquoteValue(s string) string {
 func isKnownDirectiveKey(key string) bool {
 	switch key {
 	case "class", "backgroundColor", "backgroundImage", "backgroundDim", "color",
-		"header", "footer", "paginate", "layout":
+		"header", "footer", "paginate", "layout", "autofit":
 		return true
 	default:
 		return false
@@ -195,5 +196,7 @@ func applySingleDirective(
 		target.Paginate = (value == "true")
 	case "layout":
 		*layoutTarget = resolveLayout(value)
+	case "autofit":
+		target.Autofit = (value == "true" || value == "1" || value == "on")
 	}
 }

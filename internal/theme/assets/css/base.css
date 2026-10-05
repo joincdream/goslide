@@ -14,6 +14,7 @@ html, body {
   overflow: hidden;
   background-color: #0b0f19;
   color: #f8fafc;
+  font-size: 28px;
   word-break: keep-all;
   overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
@@ -30,10 +31,10 @@ html, body {
   justify-content: center;
 }
 
-/* 16:9 Deck Frame */
+/* 16:9 Deck Frame: Physical Fixed 1920x1080 */
 .goslide-deck {
-  width: 960px;
-  height: 540px;
+  width: 1920px;
+  height: 1080px;
   position: relative;
   flex-shrink: 0;
 }
@@ -41,8 +42,8 @@ html, body {
 /* Slide Wrapper & Frame (Legacy/Preview fallback) */
 .slide-wrapper {
   position: relative;
-  width: 960px;
-  height: 540px;
+  width: 1920px;
+  height: 1080px;
   flex-shrink: 0;
 }
 
@@ -55,23 +56,24 @@ html, body {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* 16:9 Slide Canvas: Strict Dimension & Visibility */
+/* 16:9 Slide Canvas: Physical Fixed 1920x1080 Dimension */
 .slide-card {
-  width: 960px !important;
-  height: 540px !important;
-  min-width: 960px !important;
-  max-width: 960px !important;
-  min-height: 540px !important;
-  max-height: 540px !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  min-width: 1920px !important;
+  max-width: 1920px !important;
+  min-height: 1080px !important;
+  max-height: 1080px !important;
   position: absolute;
   top: 0;
   left: 0;
   overflow: hidden;
-  padding: 3rem 4rem;
+  padding: 0 !important;
   display: none !important;
   flex-direction: column !important;
   flex-shrink: 0;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   border-radius: 0;
 }
 
@@ -119,47 +121,114 @@ body.drawing-mode {
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
 }
 
-/* Header & Footer */
-.slide-header {
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-  opacity: 0.75;
+/* --------------------------------------------------------------------------
+   PPT 4-Tier Master Structure: Fixed 1920x1080
+   40px (Tracker) + 120px (Title) + 840px (Body) + 80px (Footer) = 1080px
+   -------------------------------------------------------------------------- */
+
+/* 1. Running Header / Tracker (Height: 40px) */
+.slide-header,
+.slide-tracker {
+  flex: 0 0 40px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 16px 80px 0 80px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0.6;
+  text-align: left !important; /* 커버/섹션 상속 방어 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-shrink: 0;
+  position: static;
+  z-index: 10;
 }
 
-.slide-body {
-  flex: 1 1 auto;
-  min-height: 0;
+/* 2. Slide Title Placeholder Box (Height: 120px) */
+.slide-title-box {
+  flex: 0 0 120px;
+  height: 120px;
+  box-sizing: border-box;
+  padding: 10px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left !important;
+  position: static;
+  z-index: 10;
+}
+
+.slide-title-box h1,
+.slide-title-box h2 {
+  margin: 0;
+  font-size: 2.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 3. Slide Content / Body Placeholder Box (Height: 840px) */
+.slide-body,
+.slide-content-box {
+  flex: 0 0 840px;
+  height: 840px;
+  min-height: 840px;
+  max-height: 840px;
+  box-sizing: border-box;
+  padding: 20px 80px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  position: relative;
+  z-index: 1;
 }
 
+/* 4. Slide Footer (Height: 80px) */
 .slide-footer {
+  flex: 0 0 80px;
+  height: 80px;
+  box-sizing: border-box;
+  padding: 0 80px 24px 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
-  margin-top: 1rem;
-  opacity: 0.75;
-  flex-shrink: 0;
+  font-size: 0.75rem;
+  opacity: 0.65;
+  position: static;
+  z-index: 10;
+}
+
+.slide-header:empty,
+.slide-tracker:empty,
+.slide-title-box:empty,
+.slide-footer:empty {
+  border: none !important;
 }
 
 /* Semantic Layouts */
 .slide-card.cover,
 .slide-card.layout-cover {
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  padding: 4rem;
+}
+
+.slide-card.cover .slide-header,
+.slide-card.cover .slide-tracker,
+.slide-card.cover .slide-title-box,
+.slide-card.layout-cover .slide-header,
+.slide-card.layout-cover .slide-tracker,
+.slide-card.layout-cover .slide-title-box {
+  display: none !important;
 }
 
 .slide-card.cover .slide-body,
 .slide-card.layout-cover .slide-body {
+  flex: 0 0 1000px;
+  height: 1000px;
+  min-height: 1000px;
+  max-height: 1000px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -181,14 +250,24 @@ body.drawing-mode {
 
 .slide-card.section,
 .slide-card.layout-section {
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  padding: 4rem;
+}
+
+.slide-card.section .slide-header,
+.slide-card.section .slide-tracker,
+.slide-card.section .slide-title-box,
+.slide-card.layout-section .slide-header,
+.slide-card.layout-section .slide-tracker,
+.slide-card.layout-section .slide-title-box {
+  display: none !important;
 }
 
 .slide-card.section .slide-body,
 .slide-card.layout-section .slide-body {
+  flex: 0 0 1000px;
+  height: 1000px;
+  min-height: 1000px;
+  max-height: 1000px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -202,16 +281,55 @@ body.drawing-mode {
   margin: 0;
 }
 
+/* List alignment in centered layouts (cover & section) */
+.slide-card.cover ul,
+.slide-card.cover ol,
+.slide-card.layout-cover ul,
+.slide-card.layout-cover ol,
+.slide-card.section ul,
+.slide-card.section ol,
+.slide-card.layout-section ul,
+.slide-card.layout-section ol {
+  text-align: left;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90%;
+}
+
+.slide-card.cover li,
+.slide-card.layout-cover li,
+.slide-card.section li,
+.slide-card.layout-section li {
+  text-align: left;
+}
+
+/* Blank Layout */
 .slide-card.blank,
 .slide-card.layout-blank {
   padding: 0;
 }
 
+.slide-card.blank .slide-header,
+.slide-card.blank .slide-tracker,
+.slide-card.blank .slide-title-box,
+.slide-card.blank .slide-footer,
+.slide-card.layout-blank .slide-header,
+.slide-card.layout-blank .slide-tracker,
+.slide-card.layout-blank .slide-title-box,
+.slide-card.layout-blank .slide-footer {
+  display: none !important;
+}
+
 .slide-card.blank .slide-body,
 .slide-card.layout-blank .slide-body {
+  flex: 0 0 1080px;
+  height: 1080px;
+  min-height: 1080px;
+  max-height: 1080px;
+  padding: 0;
   justify-content: center;
   align-items: center;
-  height: 100%;
 }
 
 /* Two Columns Layout (Scoped strictly inside slide-body) */
@@ -257,6 +375,7 @@ ul, ol {
   margin-bottom: 1rem;
   padding-left: 1.75rem;
   line-height: 1.6;
+  text-align: left;
 }
 
 li {
@@ -552,9 +671,9 @@ body.lock-1080p #goslide-stage {
 }
 
 body.lock-1080p #goslide-deck {
-  width: 960px !important;
-  height: 540px !important;
-  transform: scale(2) !important;
+  width: 1920px !important;
+  height: 1080px !important;
+  transform: scale(1) !important;
   transform-origin: center center !important;
 }
 
@@ -717,10 +836,10 @@ body.lock-1080p .goslide-presenter-sidebar {
   position: absolute;
   top: 0;
   left: 0;
-  width: 960px;
-  height: 540px;
+  width: 1920px;
+  height: 1080px;
   transform-origin: top left;
-  transform: scale(0.38);
+  transform: scale(0.19);
   opacity: 1 !important;
   pointer-events: none;
 }
@@ -819,7 +938,30 @@ body.overview-mode .slide-card {
   border-radius: 8px !important;
   overflow: hidden !important;
   transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease !important;
-  font-size: 0.45rem !important;
+  font-size: 0.35rem !important;
+}
+
+body.overview-mode .slide-header {
+  flex: 0 0 16px !important;
+  height: 16px !important;
+  padding: 2px 10px 0 10px !important;
+  font-size: 0.3rem !important;
+  line-height: 1.2 !important;
+}
+
+body.overview-mode .slide-body {
+  flex: 1 1 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 4px 10px !important;
+}
+
+body.overview-mode .slide-footer {
+  flex: 0 0 16px !important;
+  height: 16px !important;
+  padding: 0 10px 2px 10px !important;
+  font-size: 0.3rem !important;
 }
 
 body.overview-mode .slide-card:hover {

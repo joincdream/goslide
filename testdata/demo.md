@@ -268,6 +268,7 @@ func StreamTokenProxy(ctx context.Context, w http.ResponseWriter, upstreamBody i
 ---
 
 <!-- _layout: cover -->
+<!-- _autofit: true -->
 
 # 감사합니다 (Q & A)
 ### 질문과 자유 토론을 환영합니다

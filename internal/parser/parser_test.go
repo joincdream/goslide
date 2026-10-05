@@ -67,13 +67,16 @@ func assertDeckSlides(t *testing.T, slides []*model.Slide) {
 	if s1.Index != 1 || s1.Layout != model.LayoutDefault || s1.Notes != "" {
 		t.Errorf("slide 1 fields mismatch: index=%d, layout=%v, notes=%q", s1.Index, s1.Layout, s1.Notes)
 	}
-	if !strings.Contains(s1.HTMLContent, "First Slide</h1>") {
-		t.Errorf("slide 1 html missing h1: %s", s1.HTMLContent)
+	if !strings.Contains(s1.TitleHTML, "First Slide</h1>") {
+		t.Errorf("slide 1 title missing h1: %s", s1.TitleHTML)
 	}
 
 	s2 := slides[1]
 	if s2.Index != 2 || !strings.Contains(s2.HTMLContent, "<li>Item 1</li>") {
 		t.Errorf("slide 2 html missing list items: %s", s2.HTMLContent)
+	}
+	if !strings.Contains(s2.TitleHTML, "Second Slide</h1>") {
+		t.Errorf("slide 2 title missing h1: %s", s2.TitleHTML)
 	}
 }
 

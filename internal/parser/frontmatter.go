@@ -17,6 +17,7 @@ type frontmatterData struct {
 	Paginate  *bool  `yaml:"paginate"`
 	Header    string `yaml:"header"`
 	Footer    string `yaml:"footer"`
+	Autofit   *bool  `yaml:"autofit"`
 	CustomCSS string `yaml:"custom_css"`
 	Style     string `yaml:"style"` // Marp style compatibility
 	Marp      any    `yaml:"marp"`  // Marp compatibility flag
@@ -94,6 +95,7 @@ func extractFrontmatter(content string) (*FrontmatterResult, error) {
 			Paginate: data.Paginate != nil && *data.Paginate,
 			Header:   data.Header,
 			Footer:   data.Footer,
+			Autofit:  data.Autofit != nil && *data.Autofit,
 		},
 		CustomCSS: resolveCustomCSS(data.CustomCSS, data.Style),
 		Body:      remainingBody,

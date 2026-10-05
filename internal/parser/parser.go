@@ -97,7 +97,7 @@ func (p *Parser) buildSlides(ctx context.Context, fm *FrontmatterResult) ([]*mod
 		}
 
 		parsed := dm.processSlide(chunk)
-		htmlContent, leftHTML, rightHTML, err := renderSlideContent(p.gm, parsed.Layout, parsed.CleanedContent)
+		titleHTML, htmlContent, leftHTML, rightHTML, err := renderSlideContent(p.gm, parsed.Layout, parsed.CleanedContent)
 		if err != nil {
 			return nil, fmt.Errorf("failed to render slide %d: %w", i+1, err)
 		}
@@ -107,6 +107,7 @@ func (p *Parser) buildSlides(ctx context.Context, fm *FrontmatterResult) ([]*mod
 			Layout:      parsed.Layout,
 			Directives:  parsed.Directives,
 			RawContent:  chunk,
+			TitleHTML:   titleHTML,
 			HTMLContent: htmlContent,
 			Notes:       parsed.Notes,
 			LeftHTML:    leftHTML,

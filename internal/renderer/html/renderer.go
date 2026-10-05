@@ -195,8 +195,10 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		BgDim:       template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
 		Color:       s.Directives.Color,
 		Header:      header,
+		TitleHTML:   template.HTML(s.TitleHTML), // nolint:gosec
 		Footer:      footer,
 		Paginate:    s.Directives.Paginate || deck.GlobalAttrs.Paginate,
+		Autofit:     s.Directives.Autofit || deck.GlobalAttrs.Autofit,
 		HTMLContent: template.HTML(htmlContent), // nolint:gosec
 		LeftHTML:    template.HTML(leftHTML),    // nolint:gosec
 		RightHTML:   template.HTML(rightHTML),   // nolint:gosec

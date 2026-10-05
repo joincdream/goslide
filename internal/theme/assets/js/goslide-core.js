@@ -137,17 +137,21 @@
       // Restore drawing buffer if available
       restoreCurrentCanvas();
 
-      // Responsive 16:9 Deck Scaling
+      // Responsive 16:9 Deck Scaling (Physical Fixed: 1920x1080)
       if (deck && !isOverviewMode) {
         if (isLock1080p) {
-          deck.style.transform = 'scale(2)';
+          deck.style.transform = 'scale(1)';
           deck.style.transformOrigin = 'center center';
         } else {
           const availableWidth = isSidebarOpen ? window.innerWidth - 400 : window.innerWidth;
-          const scale = Math.min(availableWidth / 960, window.innerHeight / 540) * 0.96;
-          deck.style.transform = 'scale(' + Math.max(0.2, scale) + ')';
+          const scale = Math.min(availableWidth / 1920, window.innerHeight / 1080) * 0.96;
+          deck.style.transform = 'scale(' + Math.max(0.1, scale) + ')';
           deck.style.transformOrigin = 'center center';
         }
+      }
+
+      if (slides[currentIndex]) {
+        applyAutofit(slides[currentIndex]);
       }
     }
 
@@ -468,8 +472,8 @@ ${themeStylesCSS}
       position: absolute !important;
       top: 50% !important;
       left: 50% !important;
-      width: 960px !important;
-      height: 540px !important;
+      width: 1920px !important;
+      height: 1080px !important;
       display: flex !important;
       opacity: 1 !important;
       box-shadow: none !important;
@@ -545,7 +549,7 @@ ${themeStylesCSS}
         if (!box) return;
         const slide = box.querySelector('.slide-card');
         if (!slide) return;
-        const scale = Math.min((box.clientWidth - 16) / 960, (box.clientHeight - 16) / 540);
+        const scale = Math.min((box.clientWidth - 16) / 1920, (box.clientHeight - 16) / 1080);
         slide.style.transform = 'translate(-50%, -50%) scale(' + Math.max(0.1, scale) + ')';
       });
     }
@@ -631,6 +635,35 @@ ${themeStylesCSS}
     });
   }
 
+  // Autofit Safety Net: dynamically scale overflowing slides
+  function applyAutofit(slide) {
+    if (!slide) return;
+    const isAutofit = slide.classList.contains('has-autofit') || slide.dataset.autofit === 'true';
+    if (!isAutofit) return;
+
+    const body = slide.querySelector('.slide-body');
+    if (!body) return;
+
+    // Reset inline styles to measure natural dimensions
+    body.style.transform = '';
+    body.style.transformOrigin = '';
+    body.style.width = '';
+
+    const availHeight = body.clientHeight;
+    const contentHeight = body.scrollHeight;
+
+    if (contentHeight > availHeight && availHeight > 0) {
+      const scale = Math.max(0.4, (availHeight / contentHeight) * 0.98);
+      body.style.transform = 'scale(' + scale + ')';
+      const isCentered = slide.classList.contains('cover') ||
+                         slide.classList.contains('section') ||
+                         slide.classList.contains('layout-cover') ||
+                         slide.classList.contains('layout-section');
+      body.style.transformOrigin = isCentered ? 'center center' : 'top left';
+      body.style.width = (100 / scale) + '%';
+    }
+  }
+
   function goToSlide(index, updateHash = true) {
     if (slides.length === 0) return;
     const bounded = Math.max(0, Math.min(index, slides.length - 1));
@@ -640,6 +673,7 @@ ${themeStylesCSS}
     });
 
     currentIndex = bounded;
+    applyAutofit(slides[bounded]);
     restoreCurrentCanvas();
 
     if (indicator) {

@@ -21,8 +21,10 @@ type slideTemplateData struct {
 	BgDim       template.CSS
 	Color       string
 	Header      string
+	TitleHTML   template.HTML
 	Footer      string
 	Paginate    bool
+	Autofit     bool
 	HTMLContent template.HTML
 	LeftHTML    template.HTML
 	RightHTML   template.HTML
@@ -35,6 +37,7 @@ const masterHTMLTemplate = `<!DOCTYPE html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ .Title }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <style id="goslide-theme-styles">
 {{ .ComposedCSS }}
   </style>
@@ -43,12 +46,16 @@ const masterHTMLTemplate = `<!DOCTYPE html>
   <div id="goslide-stage" class="goslide-stage">
     <div id="goslide-deck" class="goslide-deck">
       {{ range .Slides }}
-      <section class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}{{ if .IsFirst }} active{{ end }}{{ if .BgDim }} has-bg-dim{{ end }}"
+      <section class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}{{ if .IsFirst }} active{{ end }}{{ if .BgDim }} has-bg-dim{{ end }}{{ if .Autofit }} has-autofit{{ end }}"
                data-slide="{{ .Index }}"
+               {{ if .Autofit }}data-autofit="true"{{ end }}
                style="{{ if .BgColor }}background-color: {{ .BgColor }};{{ end }}{{ if .BgImage }}background-image: url('{{ .BgImage }}'); background-size: cover; background-position: center;{{ end }}{{ if .Color }}color: {{ .Color }};{{ end }}">
         {{ if .BgDim }}<div class="slide-bg-dim" style="background-color: {{ .BgDim }};"></div>{{ end }}
-        {{ if .Header }}<div class="slide-header">{{ .Header }}</div>{{ end }}
-        <div class="slide-body">
+        <div class="slide-header slide-tracker">{{ .Header }}</div>
+        {{ if .TitleHTML }}
+        <div class="slide-title-box">{{ .TitleHTML }}</div>
+        {{ end }}
+        <div class="slide-body slide-content-box">
           {{ if and .LeftHTML .RightHTML }}
           <div class="two-cols">
             <div class="col-left">{{ .LeftHTML }}</div>
@@ -58,10 +65,7 @@ const masterHTMLTemplate = `<!DOCTYPE html>
           {{ .HTMLContent }}
           {{ end }}
         </div>
-        <div class="slide-footer">
-          <span>{{ .Footer }}</span>
-          {{ if .Paginate }}<span>{{ .Index }}</span>{{ end }}
-        </div>
+        <div class="slide-footer">{{ if or .Footer .Paginate }}<span>{{ .Footer }}</span>{{ if .Paginate }}<span>{{ .Index }}</span>{{ end }}{{ end }}</div>
         {{ if .Notes }}<aside class="slide-notes" style="display:none;">{{ .Notes }}</aside>{{ end }}
       </section>
       {{ end }}
@@ -114,6 +118,30 @@ const masterHTMLTemplate = `<!DOCTYPE html>
 
   <script id="goslide-runtime-script">
 {{ .CoreJS }}
+  </script>
+
+  <!-- KaTeX Math Rendering Support -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      function renderMath() {
+        if (typeof renderMathInElement === 'function') {
+          renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false}
+            ],
+            throwOnError: false
+          });
+        }
+      }
+      if (typeof renderMathInElement === 'function') {
+        renderMath();
+      } else {
+        window.addEventListener('load', renderMath);
+      }
+    });
   </script>
 </body>
 </html>
