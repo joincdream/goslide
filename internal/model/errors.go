@@ -8,6 +8,7 @@ var (
 	ErrInvalidFrontmatter = errors.New("invalid frontmatter syntax")
 	ErrThemeNotFound      = errors.New("theme not found")
 	ErrBrowserNotFound    = errors.New("headless browser executable not found")
+	ErrChromeNotFound     = ErrBrowserNotFound
 	ErrExportFailed       = errors.New("export operation failed")
 	ErrCanceled           = errors.New("operation canceled")
 )

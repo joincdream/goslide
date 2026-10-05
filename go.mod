@@ -1,6 +1,6 @@
 module github.com/yundream/goslide
 
-go 1.25.0
+go 1.27
 
 require (
 	github.com/alecthomas/chroma/v2 v2.27.0
@@ -10,6 +10,8 @@ require (
 )
 
 require (
+	github.com/chromedp/cdproto v0.157.4 // indirect
+	github.com/chromedp/chromedp v0.19.1 // indirect
 	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

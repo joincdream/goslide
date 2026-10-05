@@ -167,12 +167,16 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 	htmlContent := s.HTMLContent
 	leftHTML := s.LeftHTML
 	rightHTML := s.RightHTML
+	bgImage := s.Directives.BackgroundImage
 
 	if r.standalone {
 		var err error
 		htmlContent, leftHTML, rightHTML, err = r.bundleSlide(s)
 		if err != nil {
 			return slideTemplateData{}, err
+		}
+		if bgImage != "" {
+			bgImage = r.bundler.BundleSingleImage(bgImage)
 		}
 	}
 
@@ -192,7 +196,7 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		Layout:      string(s.Layout),
 		Classes:     strings.Join(s.Directives.Class, " "),
 		BgColor:     s.Directives.BackgroundColor,
-		BgImage:     s.Directives.BackgroundImage,
+		BgImage:     bgImage,
 		BgDim:       template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
 		Color:       s.Directives.Color,
 		Header:      header,

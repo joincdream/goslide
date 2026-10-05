@@ -15,7 +15,7 @@ const (
 	// DefaultTheme is the fallback theme when none is specified.
 	DefaultTheme = "default"
 
-	coreJSPath  = "assets/js/goslide-core.js"
+	coreJSPath = "assets/js/goslide-core.js"
 )
 
 // baseCSSFiles defines the modular stylesheets that compose the foundational presentation styling.

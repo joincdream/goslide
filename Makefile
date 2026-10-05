@@ -6,19 +6,14 @@ INSTALL_DIR ?= $(HOME)/.local/bin
 GO=go
 
 GOPATH ?= $(shell $(GO) env GOPATH)
-GOLANGCI_LINT ?= $(shell which golangci-lint 2>/dev/null || echo $(GOPATH)/bin/golangci-lint)
 GOCYCLO ?= $(shell which gocyclo 2>/dev/null || echo $(GOPATH)/bin/gocyclo)
 GOCOGNIT ?= $(shell which gocognit 2>/dev/null || echo $(GOPATH)/bin/gocognit)
 
 # Default target
 all: build
 
-## setup-tools: Ensure dev tools (golangci-lint, gocyclo, gocognit) are installed
+## setup-tools: Ensure dev tools (gocyclo, gocognit) are installed
 setup-tools:
-	@if [ ! -x "$$(command -v $(GOLANGCI_LINT))" ]; then \
-		echo "==> Installing golangci-lint to $(GOPATH)/bin..."; \
-		$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
-	fi
 	@if [ ! -x "$$(command -v $(GOCYCLO))" ]; then \
 		echo "==> Installing gocyclo to $(GOPATH)/bin..."; \
 		$(GO) install github.com/fzipp/gocyclo/cmd/gocyclo@latest; \
@@ -68,10 +63,10 @@ bench:
 	@echo "==> Running performance benchmarks..."
 	$(GO) test -v -bench=. -benchmem -run=^$$ ./cmd/goslide/...
 
-## lint: Run golangci-lint static analysis (auto-installs if missing)
-lint: setup-tools
-	@echo "==> Running golangci-lint..."
-	$(GOLANGCI_LINT) run ./...
+## lint: Run Go official static analysis (go vet)
+lint:
+	@echo "==> Running go vet..."
+	$(GO) vet ./...
 
 ## complexity: Run and report code complexity analysis (cyclomatic & cognitive)
 complexity: setup-tools

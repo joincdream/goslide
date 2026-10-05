@@ -73,6 +73,25 @@ func (b *AssetBundler) BundleImages(htmlContent string) (string, error) {
 	return bundled, nil
 }
 
+// BundleSingleImage encodes a single local image path into a Base64 Data URI.
+func (b *AssetBundler) BundleSingleImage(src string) string {
+	src = strings.TrimSpace(src)
+	if src == "" {
+		return ""
+	}
+	lowerSrc := strings.ToLower(src)
+	if strings.HasPrefix(lowerSrc, "http://") ||
+		strings.HasPrefix(lowerSrc, "https://") ||
+		strings.HasPrefix(lowerSrc, "data:") {
+		return src
+	}
+	dataURI, err := b.encodeFileToDataURI(src)
+	if err != nil {
+		return src
+	}
+	return dataURI
+}
+
 func (b *AssetBundler) encodeFileToDataURI(relPath string) (string, error) {
 	cleanPath := relPath
 	if !filepath.IsAbs(relPath) {

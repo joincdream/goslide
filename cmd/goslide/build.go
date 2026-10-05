@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	pdfexporter "github.com/yundream/goslide/internal/exporter/pdf"
+	pptxexporter "github.com/yundream/goslide/internal/exporter/pptx"
 	"github.com/yundream/goslide/internal/model"
 	"github.com/yundream/goslide/internal/parser"
 	htmlrenderer "github.com/yundream/goslide/internal/renderer/html"
@@ -37,6 +39,7 @@ func newCLIError(code int, err error) error {
 
 var (
 	outputPathFlag string
+	formatFlag     string
 	themeFlag      string
 	themePathFlag  string
 	standaloneFlag bool
@@ -45,7 +48,8 @@ var (
 )
 
 func init() {
-	buildCmd.Flags().StringVarP(&outputPathFlag, "output", "o", "", "Output HTML file path (default: <input>.html)")
+	buildCmd.Flags().StringVarP(&outputPathFlag, "output", "o", "", "Output file path (default: <input>.<ext>)")
+	buildCmd.Flags().StringVarP(&formatFlag, "format", "f", "html", "Output format: html, pdf, pptx (default: html)")
 	buildCmd.Flags().StringVarP(&themeFlag, "theme", "t", "", "Theme name (default, clean, dark; overrides frontmatter)")
 	buildCmd.Flags().StringVar(&themePathFlag, "theme-path", "", "Path to custom external CSS stylesheet")
 	buildCmd.Flags().BoolVar(&standaloneFlag, "standalone", false, "Inline local image assets as Base64 Data URIs")
@@ -61,6 +65,10 @@ func validateBuildOptions(args []string) error {
 	}
 	if quietFlag && verboseFlag {
 		return newCLIError(model.ExitInvalidUsage, errors.New("cannot specify both --quiet and --verbose"))
+	}
+	fmtLower := strings.ToLower(formatFlag)
+	if fmtLower != "html" && fmtLower != "pdf" && fmtLower != "pptx" {
+		return newCLIError(model.ExitInvalidUsage, fmt.Errorf("unsupported output format %q: supported formats are 'html', 'pdf', 'pptx'", formatFlag))
 	}
 	if themePathFlag != "" {
 		if _, err := os.Stat(themePathFlag); err != nil {
@@ -112,6 +120,36 @@ func renderAndWriteHTML(cmd *cobra.Command, deck *model.Deck, inputPath, outputP
 	return nil
 }
 
+func exportPDF(cmd *cobra.Command, deck *model.Deck, inputPath, outputPath, chosenTheme string) error {
+	baseDir := filepath.Dir(inputPath)
+	exporter := pdfexporter.NewExporter(
+		pdfexporter.WithTheme(chosenTheme),
+		pdfexporter.WithCustomCSS(themePathFlag),
+		pdfexporter.WithStandalone(standaloneFlag),
+		pdfexporter.WithBaseDir(baseDir),
+	)
+
+	if err := exporter.Export(cmd.Context(), deck, outputPath); err != nil {
+		return newCLIError(model.ExitExportFailed, fmt.Errorf("failed to export PDF slides: %w", err))
+	}
+	return nil
+}
+
+func exportPPTX(cmd *cobra.Command, deck *model.Deck, inputPath, outputPath, chosenTheme string) error {
+	baseDir := filepath.Dir(inputPath)
+	exporter := pptxexporter.NewExporter(
+		pptxexporter.WithTheme(chosenTheme),
+		pptxexporter.WithCustomCSS(themePathFlag),
+		pptxexporter.WithStandalone(standaloneFlag),
+		pptxexporter.WithBaseDir(baseDir),
+	)
+
+	if err := exporter.Export(cmd.Context(), deck, outputPath); err != nil {
+		return newCLIError(model.ExitExportFailed, fmt.Errorf("failed to export PPTX slides: %w", err))
+	}
+	return nil
+}
+
 func logBuildStatus(slidesCount int, inputPath, outputPath, chosenTheme string) {
 	if verboseFlag {
 		fmt.Printf("[verbose] Successfully parsed %d slides from %s\n", slidesCount, inputPath)
@@ -133,7 +171,8 @@ func runBuild(cmd *cobra.Command, args []string) error {
 	}
 
 	inputPath := args[0]
-	outputPath := resolveOutputPath(inputPath, outputPathFlag)
+	format := strings.ToLower(formatFlag)
+	outputPath := resolveOutputPath(inputPath, outputPathFlag, format)
 
 	deck, err := openInputDeck(cmd, inputPath)
 	if err != nil {
@@ -141,8 +180,19 @@ func runBuild(cmd *cobra.Command, args []string) error {
 	}
 
 	chosenTheme := resolveThemeName(themeFlag, deck.GlobalAttrs.Theme)
-	if err := renderAndWriteHTML(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-		return err
+	switch format {
+	case "pdf":
+		if err := exportPDF(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+			return err
+		}
+	case "pptx":
+		if err := exportPPTX(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+			return err
+		}
+	default:
+		if err := renderAndWriteHTML(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+			return err
+		}
 	}
 
 	logBuildStatus(len(deck.Slides), inputPath, outputPath, chosenTheme)
@@ -159,11 +209,18 @@ func resolveThemeName(cliTheme, frontmatterTheme string) string {
 	return theme.DefaultTheme
 }
 
-func resolveOutputPath(inputPath, outputFlag string) string {
+func resolveOutputPath(inputPath, outputFlag, format string) string {
 	if outputFlag != "" {
 		return outputFlag
 	}
 	ext := filepath.Ext(inputPath)
 	base := strings.TrimSuffix(inputPath, ext)
-	return base + ".html"
+	switch format {
+	case "pdf":
+		return base + ".pdf"
+	case "pptx":
+		return base + ".pptx"
+	default:
+		return base + ".html"
+	}
 }

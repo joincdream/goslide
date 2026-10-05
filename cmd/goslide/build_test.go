@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"bytes"
 	"io"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 func resetFlags() {
 	outputPathFlag = ""
+	formatFlag = "html"
 	themeFlag = ""
 	themePathFlag = ""
 	standaloneFlag = false
@@ -280,5 +282,151 @@ func TestBuildCommand_ExitCodes(t *testing.T) {
 	}
 	if code := determineExitCode(err); code != model.ExitInvalidUsage {
 		t.Errorf("expected ExitInvalidUsage (%d), got %d", model.ExitInvalidUsage, code)
+	}
+}
+
+func TestBuildCommand_InvalidFormat(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
+	tempDir := t.TempDir()
+	sampleMD := filepath.Join(tempDir, "sample.md")
+	if err := os.WriteFile(sampleMD, []byte("# Hello\n"), 0600); err != nil {
+		t.Fatalf("failed to write sample.md: %v", err)
+	}
+
+	buildCmd.SetArgs([]string{sampleMD, "-f", "docx"})
+	err := buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error for unsupported format docx, got nil")
+	}
+	if code := determineExitCode(err); code != model.ExitInvalidUsage {
+		t.Errorf("expected ExitInvalidUsage (%d) for unsupported format, got %d (err: %v)", model.ExitInvalidUsage, code, err)
+	}
+}
+
+func TestBuildCommand_PDFExport(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
+	tempDir := t.TempDir()
+	sampleMD := filepath.Join(tempDir, "presentation.md")
+	outputPDF := filepath.Join(tempDir, "presentation.pdf")
+
+	mdContent := `---
+title: "CLI PDF Export"
+theme: "clean"
+---
+
+# Title Slide
+
+---
+
+## Content Slide
+- Point 1
+- Point 2
+`
+	if err := os.WriteFile(sampleMD, []byte(mdContent), 0600); err != nil {
+		t.Fatalf("failed to write presentation.md: %v", err)
+	}
+
+	buildCmd.SetArgs([]string{sampleMD, "-f", "pdf", "-o", outputPDF})
+	err := buildCmd.Execute()
+	if err != nil {
+		t.Fatalf("build command with -f pdf failed: %v", err)
+	}
+
+	pdfData, err := os.ReadFile(outputPDF)
+	if err != nil {
+		t.Fatalf("failed to read generated pdf: %v", err)
+	}
+	if !bytes.HasPrefix(pdfData, []byte("%PDF-")) {
+		t.Errorf("expected %%PDF- header, got: %q", string(pdfData[:min(len(pdfData), 10)]))
+	}
+}
+
+func TestBuildCommand_PPTXExport(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
+	tempDir := t.TempDir()
+	sampleMD := filepath.Join(tempDir, "presentation.md")
+	outputPPTX := filepath.Join(tempDir, "presentation.pptx")
+
+	mdContent := `---
+title: "CLI PPTX Export"
+theme: "clean"
+---
+
+# Title Slide
+
+<!-- note: Speaker notes test -->
+
+---
+
+## Content Slide
+- Item A
+- Item B
+`
+	if err := os.WriteFile(sampleMD, []byte(mdContent), 0600); err != nil {
+		t.Fatalf("failed to write presentation.md: %v", err)
+	}
+
+	buildCmd.SetArgs([]string{sampleMD, "-f", "pptx", "-o", outputPPTX})
+	err := buildCmd.Execute()
+	if err != nil {
+		t.Fatalf("build command with -f pptx failed: %v", err)
+	}
+
+	pptxData, err := os.ReadFile(outputPPTX)
+	if err != nil {
+		t.Fatalf("failed to read generated pptx: %v", err)
+	}
+	if !bytes.HasPrefix(pptxData, []byte("PK\x03\x04")) {
+		t.Errorf("expected ZIP magic header, got: %q", string(pptxData[:min(len(pptxData), 10)]))
+	}
+
+	zr, err := zip.OpenReader(outputPPTX)
+	if err != nil {
+		t.Fatalf("failed to open generated pptx as zip: %v", err)
+	}
+	defer func() { _ = zr.Close() }()
+
+	hasContentTypes := false
+	hasNotesSlide := false
+	for _, f := range zr.File {
+		if f.Name == "[Content_Types].xml" {
+			hasContentTypes = true
+		}
+		if f.Name == "ppt/notesSlides/notesSlide1.xml" {
+			hasNotesSlide = true
+		}
+	}
+	if !hasContentTypes {
+		t.Errorf("missing [Content_Types].xml in generated PPTX")
+	}
+	if !hasNotesSlide {
+		t.Errorf("missing ppt/notesSlides/notesSlide1.xml in generated PPTX")
+	}
+}
+
+func TestResolveOutputPath_Formats(t *testing.T) {
+	tests := []struct {
+		input  string
+		flag   string
+		format string
+		want   string
+	}{
+		{"talk.md", "", "html", "talk.html"},
+		{"talk.md", "", "pdf", "talk.pdf"},
+		{"talk.md", "", "pptx", "talk.pptx"},
+		{"talk.md", "custom.pptx", "pptx", "custom.pptx"},
+	}
+
+	for _, tt := range tests {
+		got := resolveOutputPath(tt.input, tt.flag, tt.format)
+		if got != tt.want {
+			t.Errorf("resolveOutputPath(%q, %q, %q) = %q, want %q", tt.input, tt.flag, tt.format, got, tt.want)
+		}
 	}
 }

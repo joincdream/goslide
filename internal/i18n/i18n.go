@@ -126,6 +126,15 @@ func DetectLocale() string {
 
 // Global convenience functions for CLI and application use.
 
+// Lookup translates a message key without variadic format arguments.
+func Lookup(key string) string {
+	b, err := GetDefaultBundle()
+	if err != nil {
+		return key
+	}
+	return b.T(key)
+}
+
 // T translates a message key using the default bundle.
 func T(key string, args ...any) string {
 	b, err := GetDefaultBundle()

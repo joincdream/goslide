@@ -89,49 +89,36 @@ func refreshCLITexts() {
 }
 
 func updateFlagDescriptions() {
-	if f := rootCmd.PersistentFlags().Lookup("lang"); f != nil {
-		f.Usage = i18n.T("cli.lang.flag")
-	}
-	if f := rootCmd.Flags().Lookup("version"); f != nil {
-		f.Usage = i18n.T("cli.version.flag")
-	}
-
-	if f := buildCmd.Flags().Lookup("output"); f != nil {
-		f.Usage = i18n.T("cli.build.flag.output")
-	}
-	if f := buildCmd.Flags().Lookup("theme"); f != nil {
-		f.Usage = i18n.T("cli.build.flag.theme")
-	}
-	if f := buildCmd.Flags().Lookup("theme-path"); f != nil {
-		f.Usage = i18n.T("cli.build.flag.theme_path")
-	}
-	if f := buildCmd.Flags().Lookup("standalone"); f != nil {
-		f.Usage = i18n.T("cli.build.flag.standalone")
-	}
-	if f := buildCmd.Flags().Lookup("quiet"); f != nil {
-		f.Usage = i18n.T("cli.build.flag.quiet")
-	}
-	if f := buildCmd.Flags().Lookup("verbose"); f != nil {
-		f.Usage = i18n.T("cli.build.flag.verbose")
+	type flagSpec struct {
+		cmd    *cobra.Command
+		name   string
+		msgKey string
 	}
 
-	if f := serveCmd.Flags().Lookup("port"); f != nil {
-		f.Usage = i18n.T("cli.serve.flag.port")
+	specs := []flagSpec{
+		{rootCmd, "lang", "cli.lang.flag"},
+		{rootCmd, "version", "cli.version.flag"},
+		{buildCmd, "output", "cli.build.flag.output"},
+		{buildCmd, "format", "cli.build.flag.format"},
+		{buildCmd, "theme", "cli.build.flag.theme"},
+		{buildCmd, "theme-path", "cli.build.flag.theme_path"},
+		{buildCmd, "standalone", "cli.build.flag.standalone"},
+		{buildCmd, "quiet", "cli.build.flag.quiet"},
+		{buildCmd, "verbose", "cli.build.flag.verbose"},
+		{serveCmd, "port", "cli.serve.flag.port"},
+		{serveCmd, "bind", "cli.serve.flag.bind"},
+		{serveCmd, "open", "cli.serve.flag.open"},
+		{serveCmd, "theme", "cli.serve.flag.theme"},
+		{serveCmd, "theme-path", "cli.serve.flag.theme_path"},
+		{serveCmd, "debounce", "cli.serve.flag.debounce"},
 	}
-	if f := serveCmd.Flags().Lookup("bind"); f != nil {
-		f.Usage = i18n.T("cli.serve.flag.bind")
-	}
-	if f := serveCmd.Flags().Lookup("open"); f != nil {
-		f.Usage = i18n.T("cli.serve.flag.open")
-	}
-	if f := serveCmd.Flags().Lookup("theme"); f != nil {
-		f.Usage = i18n.T("cli.serve.flag.theme")
-	}
-	if f := serveCmd.Flags().Lookup("theme-path"); f != nil {
-		f.Usage = i18n.T("cli.serve.flag.theme_path")
-	}
-	if f := serveCmd.Flags().Lookup("debounce"); f != nil {
-		f.Usage = i18n.T("cli.serve.flag.debounce")
+
+	for _, s := range specs {
+		if f := s.cmd.Flags().Lookup(s.name); f != nil {
+			f.Usage = i18n.Lookup(s.msgKey)
+		} else if f := s.cmd.PersistentFlags().Lookup(s.name); f != nil {
+			f.Usage = i18n.Lookup(s.msgKey)
+		}
 	}
 }
 

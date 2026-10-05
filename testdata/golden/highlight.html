@@ -452,6 +452,86 @@ body.drawing-mode {
   flex-direction: column;
 }
 
+/* --------------------------------------------------------------------------
+   Print & PDF Export Media Query (16:9 1920x1080 Zero-Margin Vector PDF)
+   -------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: 1920px 1080px;
+    margin: 0;
+  }
+
+  html, body {
+    width: 1920px !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    background: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .goslide-stage {
+    width: 1920px !important;
+    height: auto !important;
+    min-height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+    transform: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .goslide-deck {
+    width: 1920px !important;
+    height: auto !important;
+    display: block !important;
+    position: static !important;
+    transform: none !important;
+  }
+
+  .slide-card {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 1920px !important;
+    height: 1080px !important;
+    min-width: 1920px !important;
+    max-width: 1920px !important;
+    min-height: 1080px !important;
+    max-height: 1080px !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .slide-card:last-child {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Hide interactive widgets and presenter controls during print */
+  #goslide-app,
+  .goslide-canvas,
+  .goslide-indicator,
+  .slide-badge,
+  .slide-controls {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
 
 /* Goslide Deck Content Stylesheet
  * Markdown Typography, Code Blocks, Tables, GFM Alerts, Dimming & Utility Presets
