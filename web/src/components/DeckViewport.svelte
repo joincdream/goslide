@@ -3,8 +3,10 @@
   import { deck } from '../stores/deck.svelte.js';
 
   let deckEl;
+  let isReady = $state(false);
 
   function resizeDeck() {
+    if (!isReady) return;
     if (!deckEl) {
       deckEl = document.getElementById('goslide-deck');
     }
@@ -31,7 +33,18 @@
     resizeDeck();
   });
 
-  onMount(() => {
+  onMount(async () => {
+    if (typeof window !== 'undefined' && window.__goslide_mermaid_promise) {
+      try {
+        await Promise.race([
+          window.__goslide_mermaid_promise,
+          new Promise((resolve) => setTimeout(resolve, 1500))
+        ]);
+      } catch (e) {
+        console.warn('Mermaid render wait error:', e);
+      }
+    }
+    isReady = true;
     resizeDeck();
     window.addEventListener('resize', resizeDeck);
     return () => window.removeEventListener('resize', resizeDeck);

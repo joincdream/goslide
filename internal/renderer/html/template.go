@@ -6,6 +6,7 @@ import (
 
 type documentTemplateData struct {
 	Title       string
+	Theme       string
 	ComposedCSS template.CSS
 	CoreJS      template.JS
 	Slides      []slideTemplateData
@@ -72,17 +73,48 @@ const masterHTMLTemplate = `<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- Svelte 5 Application Mount Point -->
-  <div id="goslide-app"></div>
-
-  <script id="goslide-runtime-script">
-{{ .CoreJS }}
-  </script>
-
   <!-- KaTeX Math Rendering Support -->
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Mermaid Diagram Rendering Support -->
+  <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script>
+    window.__goslide_mermaid_promise = new Promise(function(resolve) {
+      function renderMermaid() {
+        if (typeof mermaid !== 'undefined') {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: {{ if eq .Theme "dark" }}'dark'{{ else }}'default'{{ end }},
+            securityLevel: 'loose'
+          });
+          var els = document.querySelectorAll('.mermaid');
+          if (els.length > 0) {
+            mermaid.run({ querySelector: '.mermaid' }).then(resolve).catch(function(e) {
+              console.warn("Mermaid render error:", e);
+              resolve();
+            });
+            return;
+          }
+        }
+        resolve();
+      }
+
+      function init() {
+        if (typeof mermaid !== 'undefined') {
+          renderMermaid();
+        } else {
+          window.addEventListener('load', renderMermaid);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
       function renderMath() {
         if (typeof renderMathInElement === 'function') {
@@ -101,6 +133,13 @@ const masterHTMLTemplate = `<!DOCTYPE html>
         window.addEventListener('load', renderMath);
       }
     });
+  </script>
+
+  <!-- Svelte 5 Application Mount Point -->
+  <div id="goslide-app"></div>
+
+  <script id="goslide-runtime-script">
+{{ .CoreJS }}
   </script>
 </body>
 </html>

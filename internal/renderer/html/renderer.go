@@ -121,6 +121,7 @@ func (r *HTMLRenderer) Render(ctx context.Context, deck *model.Deck, w io.Writer
 
 	data := documentTemplateData{
 		Title:       title,
+		Theme:       chosenTheme,
 		ComposedCSS: template.CSS(composedCSS), // nolint:gosec
 		CoreJS:      template.JS(coreJS),       // nolint:gosec
 		Slides:      slideViews,

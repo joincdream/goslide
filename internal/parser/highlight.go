@@ -2,6 +2,8 @@ package parser
 
 import (
 	"bytes"
+	"html/template"
+	"strings"
 
 	"github.com/alecthomas/chroma/v2"
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
@@ -61,6 +63,13 @@ func (r *chromaRenderer) renderFencedCodeBlock(
 	for i := 0; i < lines.Len(); i++ {
 		line := lines.At(i)
 		buf.Write(line.Value(source))
+	}
+
+	if strings.EqualFold(language, "mermaid") {
+		_, _ = w.WriteString("<pre class=\"mermaid\">\n")
+		template.HTMLEscape(w, buf.Bytes())
+		_, _ = w.WriteString("</pre>\n")
+		return ast.WalkSkipChildren, nil
 	}
 
 	return r.formatCode(w, language, buf.String())

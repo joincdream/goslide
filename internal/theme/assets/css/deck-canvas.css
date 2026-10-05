@@ -74,7 +74,11 @@ body.sidebar-open .goslide-stage {
   left: 0;
   overflow: hidden;
   padding: 0 !important;
-  display: none !important;
+  display: flex !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: 0;
   flex-direction: column !important;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -83,7 +87,10 @@ body.sidebar-open .goslide-stage {
 }
 
 .slide-card.active {
-  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 10;
 }
 
 /* 1:1 Transparent Annotation Canvas */

@@ -56,3 +56,23 @@ func TestChromaHighlightExtension(t *testing.T) {
 		}
 	})
 }
+
+func TestChromaHighlightExtension_Mermaid(t *testing.T) {
+	gm := goldmark.New(
+		goldmark.WithExtensions(newChromaHighlightExtension("dracula")),
+	)
+
+	input := "```mermaid\nflowchart LR\nA --> B\n```"
+	var buf bytes.Buffer
+	if err := gm.Convert([]byte(input), &buf); err != nil {
+		t.Fatalf("conversion failed: %v", err)
+	}
+
+	html := buf.String()
+	if !strings.Contains(html, "<pre class=\"mermaid\">") {
+		t.Errorf("expected <pre class=\"mermaid\"> in output: %s", html)
+	}
+	if !strings.Contains(html, "flowchart LR") || !strings.Contains(html, "A --&gt; B") {
+		t.Errorf("missing escaped mermaid content in output: %s", html)
+	}
+}

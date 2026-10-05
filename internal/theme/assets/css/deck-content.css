@@ -234,3 +234,96 @@ img.img-center {
   font-size: 1.5rem;
   line-height: 1.6;
 }
+
+/* Mermaid Diagrams: 슬라이드 폭 기준 자동 반응형 핏 & 모던 카드 UI 테마 */
+.slide-card .mermaid,
+.slide-card pre.mermaid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-height: 100%;
+  margin: 1.25rem auto;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  text-align: center;
+}
+
+.slide-card .mermaid svg,
+.slide-card pre.mermaid svg {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  height: auto !important;
+}
+
+/* 1. 모던 카드 박스: 둥근 모서리, 부드러운 배경 및 그림자 */
+.slide-card .mermaid .node rect,
+.slide-card .mermaid .node polygon {
+  rx: 10px !important;
+  ry: 10px !important;
+  stroke: #818cf8 !important;
+  stroke-width: 1.5px !important;
+  fill: #f8faff !important;
+  filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.08)) !important;
+}
+
+/* 2. 연결선 및 화살표: 인디고 블루 톤과 유려한 두께 */
+.slide-card .mermaid .flowchart-link {
+  stroke: #6366f1 !important;
+  stroke-width: 2px !important;
+}
+.slide-card .mermaid .marker {
+  fill: #6366f1 !important;
+  stroke: #6366f1 !important;
+}
+
+/* 3. 타이포그래피: 본문 폰트 계층화 및 가독성 */
+.slide-card .mermaid .nodeLabel {
+  font-family: inherit !important;
+  color: #1e293b !important;
+  letter-spacing: -0.01em;
+}
+
+.slide-card .mermaid .edgeLabel {
+  background-color: #f1f5f9 !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+  color: #475569 !important;
+  font-size: 0.85em !important;
+}
+
+/* 4. 다크 모드 자동 대응 */
+.slide-card.dark .mermaid .node rect,
+.slide-card.dark .mermaid .node polygon,
+.slide-card.invert .mermaid .node rect,
+.slide-card.invert .mermaid .node polygon {
+  fill: #1e293b !important;
+  stroke: #6366f1 !important;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35)) !important;
+}
+.slide-card.dark .mermaid .nodeLabel,
+.slide-card.invert .mermaid .nodeLabel {
+  color: #f1f5f9 !important;
+}
+.slide-card.dark .mermaid .flowchart-link,
+.slide-card.invert .mermaid .flowchart-link {
+  stroke: #818cf8 !important;
+}
+.slide-card.dark .mermaid .marker,
+.slide-card.invert .mermaid .marker {
+  fill: #818cf8 !important;
+  stroke: #818cf8 !important;
+}
+.slide-card.dark .mermaid .node .katex path,
+.slide-card.invert .mermaid .node .katex path {
+  fill: #f1f5f9 !important;
+  stroke: #f1f5f9 !important;
+}
+.slide-card.dark .mermaid .node .katex,
+.slide-card.invert .mermaid .node .katex {
+  color: #f1f5f9 !important;
+}
+
+

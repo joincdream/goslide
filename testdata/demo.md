@@ -5,7 +5,7 @@ theme: "clean"
 size: "16:9"
 paginate: true
 header: "2026 AI Tech Seminar: Deep Dive into LLMs"
-footer: "© 2026 Cloit Tech Architecture. All rights reserved."
+footer: "© 2026 joinc edu AI 기술연구소. All rights reserved."
 ---
 
 <!-- _layout: cover -->
@@ -13,7 +13,7 @@ footer: "© 2026 Cloit Tech Architecture. All rights reserved."
 # 현대 대형 언어 모델(LLM) 아키텍처
 ### 트랜스포머 코어 메커니즘부터 에이전틱 AI 파이프라인까지
 
-**발표자**: 클로잇 AI 기술연구소  
+**발표자**: joinc edu AI 기술연구소  
 **일시**: 2026년 10월 기술 세미나  
 **단축키 가이드**: <kbd>P</kbd> 발표자 뷰 | <kbd>N</kbd> 사이드바 | <kbd>D</kbd> 판서 모드 | <kbd>?</kbd> 전체 단축키
 
@@ -97,6 +97,35 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
 <!-- note:
 - 수식의 각 항이 데이터베이스의 질의(Query), 인덱스 키(Key), 실제 레코드(Value)와 유사한 개념임을 비유로 설명합니다.
 - 'D' 키를 눌러 화면에 자유 필기(Annotation)를 켜고, 분모에 원을 그려 스케일링 계수의 역할을 직관적으로 짚어주세요.
+-->
+
+---
+
+## 트랜스포머 Self-Attention 연산 데이터 흐름
+
+입력 임베딩이 선형 투영($W_Q, W_K, W_V$)을 거쳐 가중치 합성 벡터로 변환되는 전체 파이프라인:
+
+```mermaid
+flowchart LR
+    In["입력 시퀀스 토큰<br/>(Input Embeddings)"] --> Q["$$\text{Query}(Q)$$<br/>질의 벡터"]
+    In --> K["$$\text{Key}(K)$$<br/>속성 인덱스"]
+    In --> V["$$\text{Value}(V)$$<br/>원천 정보"]
+
+    Q --> Dot["행렬 곱셈<br/>$$Q \times K^T$$"]
+    K --> Dot
+    Dot --> Scale["스케일링 & 마스킹<br/>$$/\sqrt{d_k}$$"]
+    Scale --> Softmax["Softmax 확률화<br/>(Attention Weights)"]
+    Softmax --> Weighted["가중합 계산<br/>$$\times V$$"]
+    V --> Weighted
+    Weighted --> Out(["최종 컨텍스트 표현<br/>(Multi-Head Output)"])
+```
+
+> [!NOTE] 병렬 텐서 연산 최적화
+> 모든 토큰 쌍의 유사도를 단 한 번의 대규모 행렬 곱셈(Matmul)으로 일괄 계산하여 GPU 가속을 극대화합니다.
+
+<!-- note:
+- Q, K, V 벡터의 투영부터 최종 가중합 출력까지의 병렬 연산 파이프라인을 시각적으로 짚어줍니다.
+- Mermaid 다이어그램이 16:9 슬라이드 폭에 맞춰 좌우로 유려하게 펼쳐지는지 확인합니다.
 -->
 
 ---
@@ -200,6 +229,30 @@ response = client.chat.completions.create(model="gpt-4o", messages=[{"role": "us
 <!-- note:
 - 'S' 키를 눌러 스포트라이트를 켜고, 우측의 '자기 교정(Self-Correction)' 부분에 마우스를 올려 주목도를 높여보세요.
 - 단순 RAG에서 에이전틱 RAG로 진화하는 업계 트렌드를 설명합니다.
+-->
+
+---
+
+## 자율 에이전트 ReAct 추론 루프 아키텍처
+
+사용자 목표 달성을 위해 사고(Thought)와 도구 실행(Action), 관측(Observation)을 반복하는 상태 머신:
+
+```mermaid
+flowchart LR
+    Start(["사용자 질의 입력"]) --> Thought["1. 사고 (Thought)<br/>도구 및 전략 수립"]
+    Thought --> Action["2. 실행 (Action)<br/>API/DB/코드 실행"]
+    Action --> Obs["3. 관측 (Observation)<br/>실행 결과 검증"]
+    Obs --> Check{"목표 달성 여부"}
+    Check -- "미완료 / 오류" --> Thought
+    Check -- "완료" --> Final(["최종 답변 생성 및 반환"])
+```
+
+> [!TIP] 결정론적 검증 게이트
+> 에이전트 루프에 정적 린터나 스키마 검증기를 배치하면 환각 발생률을 0%에 가깝게 낮출 수 있습니다.
+
+<!-- note:
+- Mermaid 다이어그램을 활용하여 에이전트의 ReAct 루프가 어떻게 작동하는지 시각적으로 설명합니다.
+- 슬라이드 폭에 맞춰 벡터 다이어그램이 깔끔하게 스케일링되는 모습을 확인합니다.
 -->
 
 ---
