@@ -596,23 +596,40 @@ img.img-center {
 }
 
 /* Slide Utility Classes & Presets */
-.slide-card.compact, .slide-card.small {
-  font-size: 0.88rem;
-  padding: 2.25rem 3.25rem;
+/* Slide Title Invariant: 슬라이드 제목은 compact/dense 여부와 무관하게 2.25rem 일관 고정 */
+.slide-card .slide-title-box h1,
+.slide-card .slide-title-box h2 {
+  font-size: 2.25rem !important;
+  line-height: 1.2;
 }
-.slide-card.compact h1 { font-size: 1.85rem; }
-.slide-card.compact h2 { font-size: 1.45rem; }
-.slide-card.compact pre { padding: 0.75rem 1rem; font-size: 0.82rem; }
-.slide-card.compact table { font-size: 0.82rem; }
 
-.slide-card.dense {
-  font-size: 0.8rem;
-  padding: 2rem 3rem;
+/* compact / small: 본문(slide-body) 영역의 텍스트, 코드 블록, 테이블을 정밀 축소 */
+.slide-card.compact .slide-body,
+.slide-card.small .slide-body {
+  font-size: 0.88rem;
 }
-.slide-card.dense pre {
+.slide-card.compact .slide-body h3,
+.slide-card.small .slide-body h3 { font-size: 1.2rem; }
+.slide-card.compact .slide-body h4,
+.slide-card.small .slide-body h4 { font-size: 1.05rem; }
+.slide-card.compact .slide-body pre,
+.slide-card.small .slide-body pre { padding: 0.75rem 1rem; font-size: 0.82rem; }
+.slide-card.compact .slide-body table,
+.slide-card.small .slide-body table { font-size: 0.82rem; }
+
+/* dense: 많은 양의 데이터/코드를 수용하기 위한 고밀도 본문 축소 */
+.slide-card.dense .slide-body {
+  font-size: 0.8rem;
+}
+.slide-card.dense .slide-body h3 { font-size: 1.1rem; }
+.slide-card.dense .slide-body h4 { font-size: 0.95rem; }
+.slide-card.dense .slide-body pre {
   font-size: 0.72rem;
   line-height: 1.35;
   padding: 0.6rem 0.8rem;
+}
+.slide-card.dense .slide-body table {
+  font-size: 0.75rem;
 }
 
 .slide-card.lead {
