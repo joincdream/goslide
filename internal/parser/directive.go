@@ -149,14 +149,55 @@ func unquoteValue(s string) string {
 	return trimmed
 }
 
+type directiveHandler func(
+	value string,
+	target *model.SlideDirectives,
+	layoutTarget *model.LayoutType,
+)
+
+var directiveRegistry = map[string]directiveHandler{
+	"class": func(value string, target *model.SlideDirectives, layoutTarget *model.LayoutType) {
+		classes := strings.Fields(value)
+		target.Class = classes
+		for _, c := range classes {
+			if strings.EqualFold(c, "lead") || strings.EqualFold(c, "quote") {
+				*layoutTarget = model.LayoutLead
+				break
+			}
+		}
+	},
+	"backgroundColor": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.BackgroundColor = value
+	},
+	"backgroundImage": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.BackgroundImage = value
+	},
+	"backgroundDim": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.BackgroundDim = value
+	},
+	"color": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.Color = value
+	},
+	"header": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.Header = value
+	},
+	"footer": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.Footer = value
+	},
+	"paginate": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.Paginate = (value == "true")
+	},
+	"layout": func(value string, _ *model.SlideDirectives, layoutTarget *model.LayoutType) {
+		*layoutTarget = model.NormalizeLayout(value)
+	},
+	"autofit": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.Autofit = (value == "true" || value == "1" || value == "on")
+	},
+}
+
 func isKnownDirectiveKey(key string) bool {
-	switch key {
-	case "class", "backgroundColor", "backgroundImage", "backgroundDim", "color",
-		"header", "footer", "paginate", "layout", "autofit":
-		return true
-	default:
-		return false
-	}
+	_, ok := directiveRegistry[key]
+	return ok
 }
 
 func (dm *directiveManager) applyDirectives(
@@ -177,33 +218,7 @@ func applySingleDirective(
 	target *model.SlideDirectives,
 	layoutTarget *model.LayoutType,
 ) {
-	switch key {
-	case "class":
-		classes := strings.Fields(value)
-		target.Class = classes
-		for _, c := range classes {
-			if strings.EqualFold(c, "lead") || strings.EqualFold(c, "quote") {
-				*layoutTarget = model.LayoutLead
-				break
-			}
-		}
-	case "backgroundColor":
-		target.BackgroundColor = value
-	case "backgroundImage":
-		target.BackgroundImage = value
-	case "backgroundDim":
-		target.BackgroundDim = value
-	case "color":
-		target.Color = value
-	case "header":
-		target.Header = value
-	case "footer":
-		target.Footer = value
-	case "paginate":
-		target.Paginate = (value == "true")
-	case "layout":
-		*layoutTarget = model.NormalizeLayout(value)
-	case "autofit":
-		target.Autofit = (value == "true" || value == "1" || value == "on")
+	if handler, ok := directiveRegistry[key]; ok {
+		handler(value, target, layoutTarget)
 	}
 }

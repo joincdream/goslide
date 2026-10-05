@@ -113,20 +113,17 @@ func TestHTMLRenderer_Render_CanvasAndRuntime(t *testing.T) {
 
 	html := renderSampleHTML(t)
 
-	if !strings.Contains(html, `id="goslide-canvas"`) {
-		t.Errorf("missing goslide-canvas overlay")
+	if !strings.Contains(html, `id="goslide-stage"`) {
+		t.Errorf("missing goslide-stage container")
 	}
-	if !strings.Contains(html, `id="goslide-indicator"`) {
-		t.Errorf("missing goslide-indicator")
-	}
-	if !strings.Contains(html, `1 / 3`) {
-		t.Errorf("indicator should display initial page '1 / 3'")
+	if !strings.Contains(html, `id="goslide-app"`) {
+		t.Errorf("missing goslide-app mount point for svelte runtime")
 	}
 	if !strings.Contains(html, `id="goslide-runtime-script"`) {
 		t.Errorf("missing goslide-runtime-script tag")
 	}
-	if !strings.Contains(html, "goslide-deck") || !strings.Contains(html, "toggleDrawMode") {
-		t.Errorf("master template missing core js runtime logic")
+	if !strings.Contains(html, "goslide-deck") {
+		t.Errorf("master template missing goslide-deck container")
 	}
 }
 

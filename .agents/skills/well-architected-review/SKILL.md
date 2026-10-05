@@ -36,11 +36,11 @@ flowchart LR
    ```
    - 확인 지표: Data Race 발생 건수 (목표: 0건), 패키지별 커버리지 비율 (핵심 패키지 > 70%).
 
-2. **정적 코드 분석**:
+2. **정적 코드 분석 및 분기 중첩도**:
    ```bash
    make lint
    ```
-   - 확인 지표: `golangci-lint` 경고/오류 건수 (목표: 0건).
+   - 확인 지표: `golangci-lint` (버그, 스타일, `nestif` 중첩 깊이 > 3) 경고/오류 건수 (목표: 0건).
 
 3. **순환 및 인지 복잡도**:
    ```bash
@@ -81,8 +81,9 @@ flowchart LR
 4. **M4. 에러 맥락 및 실행 가능성 (Actionable Errors) [20점]**:
    - Go 1.13+ `%w` 에러 래핑 및 도메인 센티넬 에러 매핑 여부.
    - 실패 시 파일 경로/테마명 등 구체적 맥락(%q) 제공 여부.
-5. **M5. 도메인 모델 불변성 & 확장성 (Immutability & Extensibility) [20점]**:
+5. **M5. 도메인 모델 불변성 및 확장성/OCP (Immutability, Extensibility & Registry Pattern) [20점]**:
    - `model.Deck`, `model.Slide`가 마크다운 AST에 오염되지 않은 순수 IR인지 점검.
+   - **Replace Conditional with Registry/Strategy**: 레이아웃, 포맷, 테마, 노드 디스패치에 3개 이상의 if-else 체인 배제 및 불변 Registry/Strategy 매핑 적용 여부 점검 (하드 체크포인트: 다중 if-else 체인 0건).
    - 차기 마일스톤(HTML, PDF, PPTX) 확장에 필요한 메타데이터 완비 여부.
 
 ---
