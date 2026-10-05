@@ -6,6 +6,7 @@
   import LaserSpotlight from './components/LaserSpotlight.svelte';
   import ScreenMask from './components/ScreenMask.svelte';
   import PresenterSidebar from './components/PresenterSidebar.svelte';
+  import PresenterToolbar from './components/PresenterToolbar.svelte';
   import OverviewGrid from './components/OverviewGrid.svelte';
   import KeyboardHandler from './components/KeyboardHandler.svelte';
 
@@ -50,4 +51,5 @@
 <LaserSpotlight />
 <ScreenMask />
 <PresenterSidebar bind:this={sidebarComponent} />
+<PresenterToolbar />
 <OverviewGrid />

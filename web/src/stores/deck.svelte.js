@@ -3,6 +3,19 @@
  * Centralizes all presentation state, view modes, interactive tools, and sync.
  */
 
+export const COLOR_PRESETS = [
+  { id: 'red', hex: '#ef4444', label: '레드' },
+  { id: 'blue', hex: '#3b82f6', label: '블루' },
+  { id: 'green', hex: '#22c55e', label: '그린' },
+  { id: 'yellow', hex: '#eab308', label: '옐로' }
+];
+
+export const WIDTH_PRESETS = {
+  thin: { pen: 2, laser: 8, glow: 6, label: '얇게' },
+  medium: { pen: 4, laser: 14, glow: 10, label: '보통' },
+  thick: { pen: 8, laser: 22, glow: 16, label: '굵게' }
+};
+
 export class DeckStore {
   currentIndex = $state(0);
   totalSlides = $state(0);
@@ -23,7 +36,23 @@ export class DeckStore {
 
   isDrawMode = $state(false);
   penColor = $state('#ef4444');
-  penWidth = $state(3.5);
+  penWidth = $state(4);
+
+  // Active Tool Color & Width Presets (Drawing & Laser Pointer)
+  activeColor = $state('#ef4444');
+  activeWidthPreset = $state('medium'); // 'thin' | 'medium' | 'thick'
+
+  get currentPenWidth() {
+    return (WIDTH_PRESETS[this.activeWidthPreset] || WIDTH_PRESETS.medium).pen;
+  }
+
+  get currentLaserSize() {
+    return (WIDTH_PRESETS[this.activeWidthPreset] || WIDTH_PRESETS.medium).laser;
+  }
+
+  get currentLaserGlow() {
+    return (WIDTH_PRESETS[this.activeWidthPreset] || WIDTH_PRESETS.medium).glow;
+  }
 
   // Presenter Timer & Clock
   timerSeconds = $state(0);
@@ -120,6 +149,7 @@ export class DeckStore {
       if (this.isSpotlightActive) this.toggleSpotlight(false);
     }
     document.body.classList.toggle('laser-mode', this.isLaserActive);
+    this.broadcastToolSettings();
   }
 
   toggleSpotlight(force) {
@@ -128,6 +158,7 @@ export class DeckStore {
       if (this.isDrawMode) this.toggleDrawMode(false);
       if (this.isLaserActive) this.toggleLaser(false);
     }
+    this.broadcastToolSettings();
   }
 
   toggleBlackout(force) {
@@ -147,14 +178,51 @@ export class DeckStore {
       if (this.isSpotlightActive) this.toggleSpotlight(false);
     }
     document.body.classList.toggle('drawing-mode', this.isDrawMode);
+    this.broadcastToolSettings();
   }
 
   setPenColor(color) {
     this.penColor = color;
+    this.activeColor = color;
+    this.broadcastToolSettings();
   }
 
   adjustPenWidth(delta) {
     this.penWidth = Math.max(1.5, Math.min(16, this.penWidth + delta));
+  }
+
+  setPresetColor(color) {
+    this.activeColor = color;
+    this.penColor = color;
+    this.broadcastToolSettings();
+  }
+
+  setPresetWidth(presetKey) {
+    if (WIDTH_PRESETS[presetKey]) {
+      this.activeWidthPreset = presetKey;
+      this.penWidth = WIDTH_PRESETS[presetKey].pen;
+      this.broadcastToolSettings();
+    }
+  }
+
+  cycleWidthPreset(direction = 1) {
+    const keys = ['thin', 'medium', 'thick'];
+    const curIdx = keys.indexOf(this.activeWidthPreset);
+    const nextIdx = Math.max(0, Math.min(keys.length - 1, curIdx + direction));
+    this.setPresetWidth(keys[nextIdx]);
+  }
+
+  broadcastToolSettings() {
+    if (!this.channel) return;
+    this.channel.postMessage({
+      type: 'TOOL_SETTINGS_SYNC',
+      payload: {
+        activeColor: this.activeColor,
+        activeWidthPreset: this.activeWidthPreset,
+        isLaserActive: this.isLaserActive,
+        isDrawMode: this.isDrawMode
+      }
+    });
   }
 
   toggleOverview(force) {
@@ -260,6 +328,30 @@ export class DeckStore {
           this.nextSlide();
         } else if (msg.type === 'NAV_PREV') {
           this.prevSlide();
+        } else if (msg.type === 'TOOL_SETTINGS_SYNC') {
+          const p = msg.payload;
+          if (p.activeColor) {
+            this.activeColor = p.activeColor;
+            this.penColor = p.activeColor;
+          }
+          if (p.activeWidthPreset && WIDTH_PRESETS[p.activeWidthPreset]) {
+            this.activeWidthPreset = p.activeWidthPreset;
+            this.penWidth = WIDTH_PRESETS[p.activeWidthPreset].pen;
+          }
+          if (typeof p.isLaserActive === 'boolean' && p.isLaserActive !== this.isLaserActive) {
+            this.toggleLaser(p.isLaserActive);
+          }
+          if (typeof p.isDrawMode === 'boolean' && p.isDrawMode !== this.isDrawMode) {
+            this.toggleDrawMode(p.isDrawMode);
+          }
+        } else if (msg.type === 'TOOL_ACTION') {
+          if (msg.payload?.action === 'clear-canvas') {
+            window.dispatchEvent(new CustomEvent('goslide:clear-canvas'));
+          } else if (msg.payload?.action === 'toggle-laser') {
+            this.toggleLaser();
+          } else if (msg.payload?.action === 'toggle-draw') {
+            this.toggleDrawMode();
+          }
         }
       };
     } catch (err) {
@@ -282,7 +374,11 @@ export class DeckStore {
       payload: {
         currentIndex: this.currentIndex,
         totalSlides: this.totalSlides,
-        slidesData: slidesData
+        slidesData: slidesData,
+        activeColor: this.activeColor,
+        activeWidthPreset: this.activeWidthPreset,
+        isLaserActive: this.isLaserActive,
+        isDrawMode: this.isDrawMode
       }
     });
   }

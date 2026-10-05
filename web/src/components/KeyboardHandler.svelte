@@ -35,18 +35,17 @@
       return;
     }
 
-    // Pen controls during drawing mode
-    if (deck.isDrawMode) {
+    // Tool controls (Drawing or Laser mode)
+    if (deck.isDrawMode || deck.isLaserActive) {
       switch (e.key) {
-        case '1': deck.setPenColor('#ef4444'); return;
-        case '2': deck.setPenColor('#3b82f6'); return;
-        case '3': deck.setPenColor('#22c55e'); return;
-        case '4': deck.setPenColor('#eab308'); return;
-        case '5': deck.setPenColor('#ffffff'); return;
+        case '1': deck.setPresetColor('#ef4444'); return;
+        case '2': deck.setPresetColor('#3b82f6'); return;
+        case '3': deck.setPresetColor('#22c55e'); return;
+        case '4': deck.setPresetColor('#eab308'); return;
         case '+':
-        case '=': deck.adjustPenWidth(1.5); return;
+        case '=': deck.cycleWidthPreset(1); return;
         case '-':
-        case '_': deck.adjustPenWidth(-1.5); return;
+        case '_': deck.cycleWidthPreset(-1); return;
       }
     }
 

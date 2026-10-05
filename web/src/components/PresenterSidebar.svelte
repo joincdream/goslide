@@ -46,9 +46,19 @@ ${themeStylesCSS}
     .notes-card { grid-column: 1 / -1; }
     .notes-box { flex: 1; padding: 14px; overflow-y: auto; font-size: 1.15rem; line-height: 1.6; user-select: text; white-space: pre-wrap; background: #1e293b; color: #e2e8f0; }
     .notes-box:empty::before { content: "작성된 발표자 메모가 없습니다."; color: #64748b; font-style: italic; }
-    footer { background: #1e293b; border-top: 1px solid #334155; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    footer { background: #1e293b; border-top: 1px solid #334155; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 12px; }
     .btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
     .btn:hover { background: #0284c7; }
+    .pop-toolbar { display: flex; align-items: center; gap: 10px; background: #0f172a; padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
+    .tool-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s; }
+    .tool-btn:hover { background: #475569; color: #fff; }
+    .tool-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; box-shadow: 0 0 8px rgba(2,132,199,0.5); }
+    .color-btn { width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+    .color-btn:hover { transform: scale(1.15); }
+    .color-btn.active { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 6px rgba(0,0,0,0.6); }
+    .width-btn { background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.15s; }
+    .width-btn:hover { color: #fff; }
+    .width-btn.active { background: #334155; color: #38bdf8; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -71,7 +81,34 @@ ${themeStylesCSS}
     </div>
   </main>
   <footer>
-    <div id="p-counter" style="font-weight:600;color:#94a3b8;">1 / 1</div>
+    <div id="p-counter" style="font-weight:600;color:#94a3b8;min-width:70px;">1 / 1</div>
+    
+    <!-- Presentation Toolbar in Pop-out Window -->
+    <div class="pop-toolbar">
+      <div style="display:flex;gap:4px;">
+        <button class="tool-btn" id="p-tool-pen" title="펜 판서 토글 (D)">🖊️ 펜</button>
+        <button class="tool-btn" id="p-tool-laser" title="레이저 포인터 토글 (L)">🔴 포인터</button>
+        <button class="tool-btn" id="p-tool-clear" title="판서 지우기 (C)">🗑️ 지우기</button>
+      </div>
+
+      <div style="width:1px;height:18px;background:#334155;"></div>
+
+      <div style="display:flex;gap:6px;" id="p-colors">
+        <button class="color-btn active" data-color="#ef4444" style="background:#ef4444;" title="레드 (1)"></button>
+        <button class="color-btn" data-color="#3b82f6" style="background:#3b82f6;" title="블루 (2)"></button>
+        <button class="color-btn" data-color="#22c55e" style="background:#22c55e;" title="그린 (3)"></button>
+        <button class="color-btn" data-color="#eab308" style="background:#eab308;" title="옐로 (4)"></button>
+      </div>
+
+      <div style="width:1px;height:18px;background:#334155;"></div>
+
+      <div style="display:flex;gap:4px;" id="p-widths">
+        <button class="width-btn" data-width="thin" title="얇게 (-)">얇게</button>
+        <button class="width-btn active" data-width="medium" title="보통">보통</button>
+        <button class="width-btn" data-width="thick" title="굵게 (+)">굵게</button>
+      </div>
+    </div>
+
     <div>
       <button class="btn" id="p-prev">이전 (←)</button>
       <button class="btn" id="p-next">다음 (→)</button>
@@ -81,6 +118,10 @@ ${themeStylesCSS}
     const ch = new BroadcastChannel('${channelName}');
     let curIdx = 0, total = 1, sData = [];
     let timerSec = 0;
+    let activeColor = '#ef4444';
+    let activeWidthPreset = 'medium';
+    let isDrawMode = false;
+    let isLaserActive = false;
 
     setInterval(() => {
       timerSec++;
@@ -90,6 +131,63 @@ ${themeStylesCSS}
       document.getElementById('p-timer').textContent = hrs + ':' + mins + ':' + secs;
     }, 1000);
 
+    function updateToolbarUI() {
+      document.querySelectorAll('.color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color.toLowerCase() === activeColor.toLowerCase());
+      });
+      document.querySelectorAll('.width-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.width === activeWidthPreset);
+      });
+      document.getElementById('p-tool-pen')?.classList.toggle('active', isDrawMode);
+      document.getElementById('p-tool-laser')?.classList.toggle('active', isLaserActive);
+    }
+
+    function syncToolSettings() {
+      ch.postMessage({
+        type: 'TOOL_SETTINGS_SYNC',
+        payload: {
+          activeColor: activeColor,
+          activeWidthPreset: activeWidthPreset,
+          isLaserActive: isLaserActive,
+          isDrawMode: isDrawMode
+        }
+      });
+    }
+
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.onclick = () => {
+        activeColor = btn.dataset.color;
+        updateToolbarUI();
+        syncToolSettings();
+      };
+    });
+
+    document.querySelectorAll('.width-btn').forEach(btn => {
+      btn.onclick = () => {
+        activeWidthPreset = btn.dataset.width;
+        updateToolbarUI();
+        syncToolSettings();
+      };
+    });
+
+    document.getElementById('p-tool-pen').onclick = () => {
+      isDrawMode = !isDrawMode;
+      if (isDrawMode) isLaserActive = false;
+      updateToolbarUI();
+      syncToolSettings();
+    };
+
+    document.getElementById('p-tool-laser').onclick = () => {
+      isLaserActive = !isLaserActive;
+      if (isLaserActive) isDrawMode = false;
+      updateToolbarUI();
+      syncToolSettings();
+    };
+
+    document.getElementById('p-tool-clear').onclick = () => {
+      ch.postMessage({ type: 'TOOL_ACTION', payload: { action: 'clear-canvas' } });
+    };
+
     ch.onmessage = (e) => {
       const m = e.data;
       if (!m) return;
@@ -97,10 +195,21 @@ ${themeStylesCSS}
         curIdx = m.payload.currentIndex;
         total = m.payload.totalSlides;
         sData = m.payload.slidesData;
+        if (m.payload.activeColor) activeColor = m.payload.activeColor;
+        if (m.payload.activeWidthPreset) activeWidthPreset = m.payload.activeWidthPreset;
+        if (typeof m.payload.isDrawMode === 'boolean') isDrawMode = m.payload.isDrawMode;
+        if (typeof m.payload.isLaserActive === 'boolean') isLaserActive = m.payload.isLaserActive;
+        updateToolbarUI();
         render();
       } else if (m.type === 'SLIDE_CHANGE') {
         curIdx = m.payload.index;
         render();
+      } else if (m.type === 'TOOL_SETTINGS_SYNC') {
+        if (m.payload.activeColor) activeColor = m.payload.activeColor;
+        if (m.payload.activeWidthPreset) activeWidthPreset = m.payload.activeWidthPreset;
+        if (typeof m.payload.isDrawMode === 'boolean') isDrawMode = m.payload.isDrawMode;
+        if (typeof m.payload.isLaserActive === 'boolean') isLaserActive = m.payload.isLaserActive;
+        updateToolbarUI();
       }
     };
 
@@ -140,6 +249,29 @@ ${themeStylesCSS}
     window.onkeydown = (e) => {
       if (['ArrowRight',' ','PageDown'].includes(e.key)) ch.postMessage({ type: 'NAV_NEXT' });
       if (['ArrowLeft','PageUp'].includes(e.key)) ch.postMessage({ type: 'NAV_PREV' });
+      if (e.key === 'd' || e.key === 'D') document.getElementById('p-tool-pen').click();
+      if (e.key === 'l' || e.key === 'L') document.getElementById('p-tool-laser').click();
+      if (e.key === 'c' || e.key === 'C') document.getElementById('p-tool-clear').click();
+      if (['1','2','3','4'].includes(e.key)) {
+        const colors = ['#ef4444','#3b82f6','#22c55e','#eab308'];
+        activeColor = colors[parseInt(e.key, 10) - 1];
+        updateToolbarUI();
+        syncToolSettings();
+      }
+      if (e.key === '+' || e.key === '=') {
+        const widths = ['thin','medium','thick'];
+        const idx = widths.indexOf(activeWidthPreset);
+        activeWidthPreset = widths[Math.min(2, idx + 1)];
+        updateToolbarUI();
+        syncToolSettings();
+      }
+      if (e.key === '-' || e.key === '_') {
+        const widths = ['thin','medium','thick'];
+        const idx = widths.indexOf(activeWidthPreset);
+        activeWidthPreset = widths[Math.max(0, idx - 1)];
+        updateToolbarUI();
+        syncToolSettings();
+      }
     };
     ch.postMessage({ type: 'REQUEST_INIT' });
   <\/script>

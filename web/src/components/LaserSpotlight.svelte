@@ -16,8 +16,8 @@
 
 {#if deck.isLaserActive}
   <div
-    class="fixed w-3.5 h-3.5 rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-[transform] duration-[40ms] ease-out"
-    style="left: {mouseX}px; top: {mouseY}px; background-color: #ff0055; box-shadow: 0 0 8px 2px #ff0055, 0 0 16px 4px rgba(255, 0, 85, 0.6);"
+    class="fixed rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-[transform,width,height] duration-[40ms] ease-out"
+    style="left: {mouseX}px; top: {mouseY}px; width: {deck.currentLaserSize}px; height: {deck.currentLaserSize}px; background-color: {deck.activeColor}; box-shadow: 0 0 {deck.currentLaserGlow}px 2px {deck.activeColor}, 0 0 {deck.currentLaserGlow * 2}px 4px {deck.activeColor}99;"
   ></div>
 {/if}
 
