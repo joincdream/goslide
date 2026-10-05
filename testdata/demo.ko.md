@@ -257,6 +257,17 @@ flowchart LR
 
 ---
 
+## 📽️ 에이전틱 AI 실전 데모 시연
+
+![Agentic AI 실전 데모 영상](https://youtu.be/LPZh9BOjkQs?si=zLU01pXpCZwprx8v)
+
+<!-- note:
+- 유튜브 비디오 플레이어 임베드 시연 슬라이드입니다.
+- 영상을 재생하여 자율 에이전트의 실제 추론 및 도구 실행 과정을 함께 살펴봅니다.
+-->
+
+---
+
 <!--
 _class: compact
 -->

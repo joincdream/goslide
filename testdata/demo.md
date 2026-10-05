@@ -257,6 +257,17 @@ flowchart LR
 
 ---
 
+## 📽️ Agentic AI Live Demonstration
+
+![Agentic Workflow in Action](https://youtu.be/LPZh9BOjkQs?si=zLU01pXpCZwprx8v)
+
+<!-- note:
+- YouTube live demo video embedding demonstration.
+- Play the video to show autonomous multi-step reasoning in real time.
+-->
+
+---
+
 <!--
 _class: compact
 -->
