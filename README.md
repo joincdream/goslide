@@ -34,10 +34,10 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 
 ```bash
 # Using go install (Go 1.22+)
-go install github.com/yundream/goslide/cmd/goslide@latest
+go install github.com/joincdream/goslide/cmd/goslide@latest
 
 # Or build from source
-git clone https://github.com/yundream/goslide.git
+git clone https://github.com/joincdream/goslide.git
 cd goslide
 make build
 ```
@@ -90,31 +90,33 @@ func main() {
 You can instantly generate production-ready Goslide presentations using ChatGPT, Claude, or any LLM:
 
 > "Please create a slide deck about [Your Topic] in Markdown, referencing the specification at:  
-> https://raw.githubusercontent.com/yundream/goslide/main/examples/example-dsl.md"
+> https://raw.githubusercontent.com/joincdream/goslide/main/examples/example-dsl.md"
 
 👉 For full semantic rules, directive catalogs, and golden samples, see the [Goslide DSL Specification & Example Guide](examples/example-dsl.md).
 
 ### Build Slides
 
+You can build the included demo slide deck ([`testdata/demo.md`](testdata/demo.md)):
+
 ```bash
 # Generate standalone interactive HTML
-goslide build presentation.md -o index.html
+goslide build testdata/demo.md -o index.html
 
 # Generate 16:9 Vector PDF
-goslide build presentation.md -f pdf -o presentation.pdf
+goslide build testdata/demo.md -f pdf -o demo.pdf
 
 # Generate Editable PPTX
-goslide build presentation.md -f pptx -o presentation.pptx
+goslide build testdata/demo.md -f pptx -o demo.pptx
 ```
 
 ### Start Live Preview Server
 
 ```bash
 # Start local development server with SSE hot-reload
-goslide serve presentation.md --port 8080
+goslide serve testdata/demo.md --port 8080
 ```
 
-Open `http://localhost:8080` in your browser. Whenever you save `presentation.md`, the browser automatically updates without losing your active slide index.
+Open `http://localhost:8080` in your browser. Whenever you save `testdata/demo.md`, the browser automatically updates without losing your active slide index.
 
 ---
 

@@ -62,18 +62,7 @@ Goslide/
 ```
 
 ### 2.3 인터페이스 격리 (DIP / ISP)
-- 렌더러와 익스포터는 명확한 인터페이스를 통해 분리되어야 하며 상호 의존하지 않습니다.
-
-```go
-// internal/model/interfaces.go 예시
-type Renderer interface {
-    Render(ctx context.Context, deck *Deck, w io.Writer) error
-}
-
-type Exporter interface {
-    Export(ctx context.Context, deck *Deck, outputPath string) error
-}
-```
+- 렌더러와 익스포터는 상호 의존하지 않으며, `internal/model/interfaces.go`에 정의된 인터페이스(`Renderer`, `Exporter`)를 통해 명확히 분리됩니다.
 
 ---
 
@@ -88,130 +77,57 @@ type Exporter interface {
 6. **사용자 미지시 작업 임의 수행 금지 (Strict User-Directed Scope)**: 사용자가 명시적으로 지시하지 않은 추가 작업(테스트 실행, 린트/복잡도 검사, 빌드, 부가 스크립트 실행 등)은 절대로 임의로 먼저 수행하지 마십시오. 오직 사용자가 지시한 작업(예: 티켓 상태 전이, Git 커밋, 특정 파일 수정 등)의 범위 내에서만 엄격히 수행합니다.
 7. **OKF 라우터 우회 및 광범위 파일 탐색 금지 (No Blind Grep/Scan)**: 파일 조사 전 반드시 `docs/okf/index.md`의 라우팅 맵만 참조해야 하며, 프로젝트 전체를 대상으로 하는 광범위한 `grep`, 무작위 디렉터리 순회, 임의의 파일 열람을 엄격히 금지합니다.
 8. **과잉 조사(Over-investigation) 및 불필요한 연쇄 탐색 금지 (Strict Pinpoint Action)**: 문제 원인이 특정되었거나 수정 대상이 명확한 경우, 연관성이 떨어지는 주변 파일들을 '혹시나' 하는 목적으로 연쇄 조회하는 행위를 절대 금지합니다. 오직 단일 목적 파일 1곳만 핀포인트로 접근하여 최소 단위로 수정합니다.
+9. **Jira Task 단위 스코프 엄격 준수 및 반복 회귀 테스트 금지 (Strict Jira Task Scope & No Redundant Testing)**:
+   - 모든 작업은 Jira Task 단위로 엄격히 분할되어 있으므로, 작업 범위는 오직 사용자가 지정한 단일 컴포넌트/파일 1곳으로 제한합니다.
+   - 전체 코드베이스/문서 스캔 및 무작위 탐색을 엄격히 금지합니다.
+   - 이미 앞선 단계에서 검증된 전체 회귀 테스트(`make test`, `make test-race`, `make golden-update`, 헤드리스 브라우저 스크린샷 덤프 등)를 매 작업 단위마다 습관적으로 재실행하여 토큰과 시간을 낭비하는 행위를 절대 금지합니다.
+   - 테스트 및 검증 도구는 오직 사용자가 명시적으로 "테스트 실행해주세요" 또는 "검증해주세요"라고 지시한 경우에만 실행합니다.
+10. **단순 작업의 최소주의 원칙 및 자의적 연쇄 검증 절대 금지 (KISS: Keep It Simple & No Self-Verification Spiral)**:
+   - 단순한 스타일(CSS), 마크다운, 설정, 텍스트 수정 작업은 **[단일 파일 수정 ➔ 즉시 완료 보고]**의 1단계 직행으로 즉시 종료해야 합니다.
+   - '제대로 반영되었는지 확인하겠다'는 명목으로 빌드(`go build`, `goslide build`), 빌드 결과물 열람/검색(`grep`, `cat`), 추가 테스트를 자의적으로 연쇄 실행하는 오버엔지니어링(Self-Verification Spiral)을 절대 금지합니다.
+   - 빌드나 테스트, 실행 검증은 오직 사용자가 "빌드해주세요" 또는 "검증해주세요"라고 직접 지시한 경우에 한해서만 수행합니다.
 
 ### 🟢 권장 사항 (Must-Haves)
 1. **명시적 에러 래핑**: Go 1.13+ 에러 래핑 규칙(`fmt.Errorf("...: %w", err)`)을 준수하여 에러 원인을 추적할 수 있도록 합니다.
 2. **에러 타입/센티넬 에러 정의**: 호출 측에서 `errors.Is` 또는 `errors.As`로 분기할 수 있도록 명확한 에러 상수를 정의합니다.
 3. **리소스 안전성**: 파일, 네트워크 커넥션, 서브프로세스는 반드시 `defer close()` 또는 리소스 정리 로직을 보장합니다.
 
----
+## 4. 코딩 표준 및 Go 관용구
 
-## 4. 모듈별 구현 세부 가이드라인
-
-### 4.1 Parser (Markdown & Directives)
-- **기반 파서**: 검증되고 확장성이 뛰어난 Go Markdown 파서(예: `github.com/yuin/goldmark`)의 AST 확장 메커니즘을 사용합니다.
-- **슬라이드 분할 규칙**:
-  - `---` (수평선)을 기준으로 개별 슬라이드로 분리합니다.
-  - 마크다운 Frontmatter(`---`로 시작하는 상단 YAML 블록)와 슬라이드 분할자를 정확히 구분해야 합니다.
-- **Directives 지원**:
-  - Global Directives: `theme`, `paginate`, `header`, `footer`, `size` (16:9, 4:3 등).
-  - Scoped Directives (슬라이드 단위): `<!-- _class: lead -->`, `<!-- backgroundColor: #f0f0f0 -->`.
-- **불변성(Immutability)**: 파싱된 `Deck` 및 `Slide` 구조체는 파싱 완료 후 읽기 전용으로 취급되어야 합니다.
-
-### 4.2 HTML Renderer
-- **독립형 번들링**:
-  - Go의 `embed.FS`를 사용하여 기본 테마 CSS 및 필수 JS 런타임을 바이너리에 내장합니다.
-  - `--standalone` 옵션 적용 시 외부 리소스(이미지 등)를 Data URI(Base64)로 인라인 임베딩할 수 있는 옵션을 제공합니다.
-- **보안(XSS 방지)**:
-  - 마크다운 파싱 시 기본적으로 위험한 스크립트 실행을 방지하도록 샌드박싱 처리를 고려합니다. (Raw HTML 허용 여부는 플래그로 격리)
-
-### 4.3 PDF Exporter
-- **Headless 브라우저 연동 방식**:
-  - `chromedp/chromedp`를 활용하여 생성된 HTML 슬라이드를 로컬에서 헤드리스로 렌더링 후 `Page.printToPDF` API를 호출하는 방식을 1차 전략으로 취합니다.
-  - 브라우저 인스턴스 라이프사이클을 안전하게 관리하고, 타임아웃 발생 시 좀비 프로세스가 남지 않도록 보장합니다.
-
-### 4.4 PPTX Exporter
-- **오피스 오픈 XML(OpenXML) 사양 준수**:
-  - 슬라이드 레이아웃, 마스터 슬라이드, 텍스트 상자(Rich Text), 표, 코드 블록, 이미지를 PPTX 형태(`p:sp`, `a:p`, `a:r` 등)로 매핑합니다.
-  - 슬라이드 크기(16:9 기준 12192000 x 6858000 EMU) 등 정밀한 치수 단위를 구조화합니다.
-
----
-
-## 5. 코딩 표준 및 Go 관용구
-
-### 5.1 네이밍 및 가시성
+### 4.1 네이밍 및 가시성
 - Go 표준 규칙(Effective Go)을 따릅니다.
 - 축약어는 일관된 대소문자를 유지합니다 (`HTMLRenderer`, `PDFExporter`, `PPTXWriter`).
 - 패키지명은 간결한 소문자 단수 명사를 사용합니다 (`parser`, `theme`, `model`).
 
-### 5.2 에러 핸들링 패턴
-```go
-// Good: 컨텍스트와 함께 에러 래핑 및 센티넬 에러 지원
-var ErrSlideNotFound = errors.New("slide not found")
+### 4.2 에러 핸들링 원칙
+- 모든 에러는 컨텍스트와 함께 명시적으로 래핑(`fmt.Errorf("...: %w", err)`)합니다.
+- 호출 측에서 `errors.Is` 또는 `errors.As`로 분기할 수 있도록 명확한 센티넬 에러(`var Err... = errors.New(...)`)를 정의합니다.
+- 에러 무시(`_ = ...`)나 raw string 에러 생성을 엄격히 금지합니다.
 
-func (p *Parser) Parse(ctx context.Context, r io.Reader) (*model.Deck, error) {
-    if err := ctx.Err(); err != nil {
-        return nil, fmt.Errorf("parse canceled: %w", err)
-    }
-    // ...
-    if err != nil {
-        return nil, fmt.Errorf("failed to parse frontmatter: %w", err)
-    }
-    return deck, nil
-}
-
-// Bad: 에러 무시, 메시지 손실, raw string 에러
-func Parse(r io.Reader) *model.Deck {
-    deck, _ := doSomething(r) // 절대 금지
-    return deck
-}
-```
-
-### 5.3 동시성 및 리소스 누수 방지
-- 고루틴(Goroutine)을 생성할 때는 반드시 언제, 어떻게 종료되는지 생명주기를 정의해야 합니다.
-- `sync.WaitGroup` 또는 `errgroup.Group`을 사용하여 고루틴 완료 및 에러 전파를 확실히 처리합니다.
+### 4.3 동시성 및 리소스 누수 방지
+- 고루틴(Goroutine) 생성 시에는 반드시 생명주기와 종료 시점을 명확히 정의합니다.
+- `sync.WaitGroup` 또는 `errgroup.Group`을 사용하여 고루틴 완료 및 에러 전파를 안전하게 처리합니다.
+- 파일, 네트워크, 브라우저 프로세스 등 외부 리소스는 `defer Close()`로 누수를 방지합니다.
 
 ---
 
-## 6. 테스트 및 검증 규격 (Testing Guardrails)
+## 5. 테스트 및 검증 규격 (Testing Guardrails)
 
-에이전트가 코드를 작성하거나 변경할 때, **테스트 코드가 수반되지 않은 기능 추가는 완료된 것으로 간주하지 않습니다.**
-
-### 6.1 테이블 기반 테스트 (Table-Driven Tests)
-파서, 유틸리티, 디렉티브 처리기는 테이블 기반 테스트 패턴을 작성합니다:
-
-```go
-func TestDirectiveParser(t *testing.T) {
-    tests := []struct {
-        name     string
-        input    string
-        expected model.Directives
-        wantErr  bool
-    }{
-        {
-            name:  "valid theme directive",
-            input: "<!-- theme: default -->",
-            expected: model.Directives{Theme: "default"},
-            wantErr: false,
-        },
-        // ...
-    }
-
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            // 실행 및 검증
-        })
-    }
-}
-```
-
-### 6.2 골든 파일 테스트 (Golden File Testing)
-- HTML 및 복잡한 구조체 생성 결과는 `testdata/` 디렉토리에 `.golden` 파일을 두고 비교 검증합니다.
-- `-update` 플래그를 통해 의도된 변경 시 골든 파일을 갱신할 수 있는 패턴을 적용합니다.
-
-### 6.3 린트 및 정적 분석 준수
-모든 코드는 아래 도구의 검사를 통과해야 합니다:
-```bash
-go vet ./...
-test -z "$(gofmt -l .)"
-golangci-lint run
-```
+- **테스트 동반 필수**: 신규 기능 추가 시 단위 테스트 코드가 수반되지 않은 변경은 완료된 것으로 간주하지 않습니다.
+- **테이블 기반 테스트 (Table-Driven Tests)**: 파서, 지시어, 유틸리티 등 다양한 입력 케이스는 테이블 주도 테스트 패턴으로 간결하게 구성합니다.
+- **골든 파일 테스트 (Golden File Testing)**: HTML 및 복잡한 구조체 생성 결과는 `testdata/` 디렉토리의 `.golden` 파일과 비교 검증합니다 (`-update` 플래그로 의도된 변경 갱신).
+- **린트 및 정적 분석 준수**: 모든 코드는 `go vet`, `gofmt -l`, `golangci-lint` 검사를 통과해야 합니다.
 
 ---
 
-## 7. LLM 에이전트 작업 절차 (Step-by-Step Execution Workflow)
+## 6. LLM 에이전트 작업 절차 (Step-by-Step Execution Workflow)
 
-LLM 에이전트는 작업을 시작할 때 다음 단계를 순차적으로 수행합니다:
+### 6.1 단순 작업 (Simple Task: CSS, 마크다운, 문서/오탈자, 설정 수정 등)
+1. **타겟 파일 핀포인트 수정 (Single-Target Edit)**: 사용자가 지정한 파일 1곳만 최소 단위로 수정.
+2. **즉시 완료 보고 (Immediate Report)**: 자의적인 빌드, 결과 확인 덤프, 테스트 실행 없이 즉시 수정 결과를 보고하고 작업을 종료(Early Exit).
+
+### 6.2 신규 기능 및 복합 구현 작업 (Feature Implementation)
+LLM 에이전트는 복합 작업 시 다음 단계를 순차적으로 수행합니다:
 
 1. **사전 분석 및 OKF 지식 검색 (Pre-check & OKF Retrieval)**:
    - 구현하려는 태스크와 관련된 Google OKF 스펙을 필수로 확인하고 맥락을 동기화합니다:

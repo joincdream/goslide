@@ -34,10 +34,10 @@
 
 ```bash
 # go install 사용 (Go 1.22+)
-go install github.com/yundream/goslide/cmd/goslide@latest
+go install github.com/joincdream/goslide/cmd/goslide@latest
 
 # 또는 소스코드 직접 빌드
-git clone https://github.com/yundream/goslide.git
+git clone https://github.com/joincdream/goslide.git
 cd goslide
 make build
 ```
@@ -89,32 +89,34 @@ func main() {
 
 ChatGPT, Claude 등의 LLM 프롬프트에 아래 문장을 그대로 입력하면 Goslide 규격에 맞는 슬라이드를 즉시 생성할 수 있습니다:
 
-> "https://raw.githubusercontent.com/yundream/goslide/main/examples/example-dsl.ko.md 
+> "https://raw.githubusercontent.com/joincdream/goslide/main/examples/example-dsl.ko.md 
 > 문서를 참고해서 [원하는 발표 주제]에 대한 슬라이드를 마크다운으로 작성해 줘."
 
 👉 지원하는 레이아웃, 배경 처리, 수식 및 세부 지시어는 [Goslide DSL 규격 및 골든 예제 가이드](examples/example-dsl.ko.md)에서 확인하실 수 있습니다.
 
 ### 슬라이드 빌드
 
+저장소에 포함된 공식 데모 슬라이드([`testdata/demo.ko.md`](testdata/demo.ko.md))를 바로 빌드할 수 있습니다:
+
 ```bash
 # 독립형 인터랙티브 HTML 생성
-goslide build presentation.md -o index.html
+goslide build testdata/demo.ko.md -o index.html
 
 # 16:9 무마진 벡터 PDF 생성
-goslide build presentation.md -f pdf -o presentation.pdf
+goslide build testdata/demo.ko.md -f pdf -o demo.pdf
 
 # 파워포인트(PPTX) 파일 생성
-goslide build presentation.md -f pptx -o presentation.pptx
+goslide build testdata/demo.ko.md -f pptx -o demo.pptx
 ```
 
 ### 로컬 라이브 프리뷰 서버 구동
 
 ```bash
 # SSE 기반 실시간 변경 감지 개발 서버 실행
-goslide serve presentation.md --port 8080
+goslide serve testdata/demo.ko.md --port 8080
 ```
 
-웹 브라우저에서 `http://localhost:8080`을 열면 마크다운 수정 저장 시 보고 있던 슬라이드 위치를 유지하며 300ms 이내에 즉시 새로고침됩니다.
+웹 브라우저에서 `http://localhost:8080`을 열면 `testdata/demo.ko.md` 수정 저장 시 보고 있던 슬라이드 위치를 유지하며 300ms 이내에 즉시 새로고침됩니다.
 
 ---
 

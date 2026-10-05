@@ -190,7 +190,10 @@ export class DeckStore {
   }
 
   resetTimer() {
-    clearInterval(this.timerInterval);
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
     this.isTimerRunning = false;
     this.timerSeconds = 0;
   }

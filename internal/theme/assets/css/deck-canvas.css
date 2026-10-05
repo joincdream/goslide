@@ -289,15 +289,35 @@ body.drawing-mode {
 .slide-card.section h2,
 .slide-card.layout-section h1,
 .slide-card.layout-section h2 {
-  font-size: 2.75rem;
-  margin: 0;
+  font-size: 3.25rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.slide-card.section h3,
+.slide-card.layout-section h3,
+.slide-card.section p,
+.slide-card.layout-section p {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 3.5rem;
+  line-height: 1.5;
+  opacity: 0.85;
 }
 
 /* List alignment in centered layouts (cover & section) */
 .slide-card.cover ul,
 .slide-card.cover ol,
 .slide-card.layout-cover ul,
-.slide-card.layout-cover ol,
+.slide-card.layout-cover ol {
+  text-align: left;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90%;
+}
+
 .slide-card.section ul,
 .slide-card.section ol,
 .slide-card.layout-section ul,
@@ -306,14 +326,28 @@ body.drawing-mode {
   display: inline-block;
   margin-left: auto;
   margin-right: auto;
-  max-width: 90%;
+  max-width: 85%;
+  margin-top: 0.5rem;
 }
 
 .slide-card.cover li,
-.slide-card.layout-cover li,
+.slide-card.layout-cover li {
+  text-align: left;
+}
+
 .slide-card.section li,
 .slide-card.layout-section li {
   text-align: left;
+  font-size: 1.35rem;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+.slide-card.section .slide-body > :last-child,
+.slide-card.layout-section .slide-body > :last-child,
+.slide-card.section li:last-child,
+.slide-card.layout-section li:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* Cat 5: Quote / Callout Layout (Lead) */

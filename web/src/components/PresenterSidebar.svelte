@@ -156,23 +156,21 @@ ${themeStylesCSS}
   class="fixed top-0 right-0 w-[480px] max-w-[90vw] h-screen bg-slate-900 text-slate-100 border-l border-slate-700 z-[9990] flex flex-col shadow-2xl transition-transform duration-250 ease-out select-none {deck.isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}"
 >
   <!-- Header -->
-  <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex justify-between items-center flex-shrink-0">
-    <div class="font-bold text-base text-sky-400 flex items-center gap-2">
-      <span>🎙️</span>
-      <span>Presenter View</span>
+  <div class="px-4 py-2.5 bg-slate-800 border-b border-slate-700 flex justify-between items-center flex-shrink-0">
+    <div class="text-slate-300 flex items-center gap-1.5">
+      <span class="text-base" title="Presenter View">🎙️</span>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5">
       <button
         onclick={openPopout}
-        class="bg-slate-700 hover:bg-sky-600 text-slate-100 text-xs px-3 py-1.5 rounded-md font-semibold transition-colors flex items-center gap-1.5"
-        title="별도 창으로 분리 (P)"
+        class="bg-slate-700 hover:bg-sky-600 text-slate-100 p-1.5 rounded-md transition-colors flex items-center justify-center"
+        title="새 창으로 분리 (P)"
       >
-        <span>↗</span>
-        <span>Pop out</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
       </button>
       <button
         onclick={() => deck.toggleSidebar(false)}
-        class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-2.5 py-1.5 rounded-md font-bold transition-colors"
+        class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-2 py-1.5 rounded-md font-bold transition-colors"
         title="사이드바 닫기 (N)"
       >
         ✕
@@ -198,34 +196,33 @@ ${themeStylesCSS}
     </button>
   </div>
 
-  <!-- Timer Bar (Prominent Stopwatch) -->
-  <div class="px-4 py-3 bg-slate-800/90 border-b border-slate-700 flex items-center gap-3 flex-shrink-0">
-    <span class="font-mono text-3xl font-black text-white tracking-wider tabular-nums min-w-[130px] drop-shadow">
+  <!-- Timer Bar (Single Clean Stopwatch) -->
+  <div class="px-4 py-3 bg-slate-800/90 border-b border-slate-700 flex flex-col items-center gap-2 flex-shrink-0">
+    <span class="font-mono text-3xl font-black text-white tracking-wider tabular-nums whitespace-nowrap drop-shadow text-center">
       {deck.formatTimer()}
     </span>
-    <div class="flex items-center gap-1.5">
+    <div class="flex items-center justify-center gap-2 w-full">
       <button
+        type="button"
         onclick={() => deck.toggleTimer()}
-        class="bg-slate-700 hover:bg-sky-400 hover:text-slate-950 text-slate-100 font-bold px-3 py-1.5 text-xs rounded transition-colors"
+        class="flex-1 max-w-[130px] bg-slate-700 hover:bg-sky-400 hover:text-slate-950 text-slate-100 font-bold py-1.5 text-xs rounded transition-colors text-center"
       >
         {deck.isTimerRunning ? '일시정지' : (deck.timerSeconds > 0 ? '재개' : '시작')}
       </button>
       <button
+        type="button"
         onclick={() => deck.resetTimer()}
-        class="bg-slate-700 hover:bg-rose-500 hover:text-white text-slate-300 font-bold px-2.5 py-1.5 text-xs rounded transition-colors"
+        class="flex-1 max-w-[90px] bg-slate-700 hover:bg-rose-500 hover:text-white text-slate-300 font-bold py-1.5 text-xs rounded transition-colors text-center"
       >
         리셋
       </button>
     </div>
-    <span class="ml-auto font-mono text-sm text-slate-400 font-semibold tabular-nums">
-      {deck.currentTime}
-    </span>
   </div>
 
   <!-- Next Slide Preview (448px x 252px 16:9 Card) -->
   <div class="p-4 border-b border-slate-700 flex-shrink-0">
     <div class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex justify-between items-center">
-      <span>다음 슬라이드 미리보기</span>
+      <span>Next</span>
       <span class="text-sky-400 font-mono">
         {deck.currentIndex + 1 < deck.totalSlides ? `Slide ${deck.currentIndex + 2}` : 'END'}
       </span>
@@ -245,7 +242,7 @@ ${themeStylesCSS}
   <div class="flex-1 p-4 flex flex-col min-h-0">
     <div class="flex justify-between items-center mb-2 flex-shrink-0">
       <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">
-        발표자 메모 (Notes)
+        Notes
       </span>
       <div class="flex items-center gap-1 bg-slate-800 rounded px-1.5 py-0.5 border border-slate-700">
         <button
