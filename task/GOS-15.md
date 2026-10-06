@@ -69,6 +69,32 @@ sequenceDiagram
     Tool-->>Main: 실시간 펜/레이저 스타일 갱신 및 시각적 반영
 ```
 
+### 2.2 판서 레이어 생명주기 (Presentation ↔ Annotation Mode Lifecycle)
+
+판서 모드를 위한 최상위 투명 레이어는 **오직 판서 모드에서만 올려져야 하며, 평상시에는 완전히 숨겨져(display: none) 마우스 판정에 일절 관여하지 않습니다.** 판서 모드가 켜지면 단일 레이어가 화면 전체의 마우스 이벤트를 독점(Exclusive Capture)하고, 종료 시 즉시 내려갑니다.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Presenter as 발표자
+    participant App as Goslide 앱
+    participant Canvas as 판서 캔버스 (최상위 투명 레이어)
+
+    Note over Presenter,Canvas: 1. 프리젠테이션 모드 (평상시)
+    Canvas->>Canvas: 숨김 (display: none / 마우스 완전 배제)
+    Presenter->>App: 슬라이드 넘김 및 일반 발표
+
+    Note over Presenter,Canvas: 2. 판서 모드 (D 입력)
+    Presenter->>App: 판서 켜기 (D)
+    App->>Canvas: 캔버스 올림 (display: block, pointer-events: auto)
+    Presenter->>Canvas: 화면에 판서 그리기 (마우스 이벤트 100% 흡수)
+
+    Note over Presenter,Canvas: 3. 프리젠테이션 모드 복귀 (ESC 입력)
+    Presenter->>App: 판서 끄기 (ESC)
+    App->>Canvas: 캔버스 내림 (display: none)
+    Presenter->>App: 일반 슬라이드 발표 재개
+```
+
 ---
 
 ## 3. 세부 설계 명세 (Specification)
@@ -199,3 +225,25 @@ export class DeckStore {
 | **Phase 3** | **사이드바 모드용 왼쪽 슬라이드 하단 툴바 컴포넌트 개발**<br>• `PresenterToolbar.svelte` UI 구현<br>• 좌측 슬라이드 하단 정렬 스타일링 및 단축키 인디케이터 매핑 | `web/src/components/PresenterToolbar.svelte`<br>`web/src/App.svelte` |
 | **Phase 4** | **새창 콘솔(Pop-out Window) 툴바 연동 및 양방향 동기화**<br>• 새창 템플릿 내 툴바 UI 배치<br>• 새창 ↔ 메인 창 간 실시간 `BroadcastChannel` 이벤트 송수신 | `web/src/components/PresenterSidebar.svelte` |
 | **Phase 5** | **프론트엔드 번들 빌드 및 최종 연동 검증**<br>• `npm run build`로 `goslide-core.js` 빌드<br>• 사이드바 모드 및 새창 모드 동작 확인 및 완료 처리 | `internal/theme/assets/js/goslide-core.js` |
+
+---
+
+## 6. [KISS / YAGNI] 판서 레이어 아키텍처 단순화 및 버그 수정 계획
+
+### 6.1 문제 정의 및 원칙 재정립
+* **기존 결함**: 판서 모드가 아님에도 화면 전체(1920×1080)를 덮는 투명 캔버스 레이어가 DOM 최상위에 항상 상주하며 `pointer-events-none`으로 아래를 억지로 투과시키려다 브라우저 Hit-testing 충돌(커서 깜빡임)을 유발함.
+* **핵심 원칙 (KISS / YAGNI)**:
+  1. **평상시**: 캔버스 레이어는 완전히 숨김(`display: none` / `hidden`) 처리하여 브라우저 마우스 판정에서 100% 배제.
+  2. **판서 모드**: 단일 최상위 투명 레이어 1장만 화면에 올리고(`display: block`), 마우스 이벤트를 온전히 독점(`pointer-events: auto`).
+  3. **도구 전환**: 펜 ↔ 포인터 간 전환 시 레이어를 껐다 켜지 않고 내부 브러시/커서 속성만 변경.
+  4. **무상태 버튼**: 툴바 버튼은 단발성 이벤트만 트리거하고 DOM 포커스를 일체 남기지 않음.
+
+### 6.2 대상 파일별 세부 수정 계획
+
+| 순번 | 대상 파일 | 수정 항목 및 세부 작업 내용 |
+| :---: | :--- | :--- |
+| **1** | `web/src/components/DrawingCanvas.svelte` | **평상시 캔버스 완전 숨김 및 도구 모드 시 독점 레이어 활성화**<br>• `class`에 `!deck.isToolActive` 시 `hidden`(`display: none`) 강제 부여<br>• 판서 모드 활성화(`deck.isToolActive`) 시 `pointer-events-auto` 및 단일 레이어 마우스 이벤트 독점<br>• 커서 스타일: 펜(`cursor-crosshair`), 포인터(`cursor-none`) 분기 |
+| **2** | `web/src/stores/deck.svelte.js` | **단일 상태 머신 간소화 및 포커스 해제 보장**<br>• `activeTool`: `'none' \| 'pen' \| 'laser' \| 'spotlight'` 상태 머신 기반 토글 간소화<br>• 모든 도구/프리셋 변경 함수에서 `document.activeElement?.blur?.()` 호출로 브라우저 포커스 잔여 방지<br>• `ESC` 키 입력 시 `activeTool = 'none'`으로 단일 레이어 즉시 해제 |
+| **3** | `web/src/components/PresenterToolbar.svelte` | **버튼 무상태(Stateless) 트리거 고정**<br>• 모든 `<button>` 태그에 `onmousedown={(e) => e.preventDefault()}` 적용하여 클릭 시 브라우저 포커스 획득 원천 차단 |
+| **4** | `web/src/components/LaserSpotlight.svelte` | **레이저 포인터 딜레이 제거**<br>• `transform` 트랜지션 지연(40ms) 제거로 마우스 좌표 1:1 즉시 반응 보장 |
+| **5** | 번들 빌드 및 검증 | **`npm run build` & `demo.html` 재생성**<br>• 프론트엔드 번들 빌드 후 데모 HTML 빌드<br>• [시작 시 커서 깜빡임 없음] ➔ [D 입력 시 판서 정상] ➔ [L 입력 시 포인터 정상] ➔ [ESC 입력 시 복귀] 시퀀스 검증 |

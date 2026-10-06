@@ -14,6 +14,7 @@
     <!-- Tool Toggle Buttons -->
     <div class="flex items-center gap-1.5">
       <button
+        onmousedown={(e) => e.preventDefault()}
         onclick={() => deck.toggleDrawMode()}
         class="px-2.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all {deck.isDrawMode ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'}"
         title="펜 판서 모드 토글 (D)"
@@ -23,6 +24,7 @@
       </button>
 
       <button
+        onmousedown={(e) => e.preventDefault()}
         onclick={() => deck.toggleLaser()}
         class="px-2.5 py-1.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all {deck.isLaserActive ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'}"
         title="레이저 포인터 토글 (L)"
@@ -32,6 +34,7 @@
       </button>
 
       <button
+        onmousedown={(e) => e.preventDefault()}
         onclick={handleClear}
         class="px-2 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-rose-400 transition-all flex items-center gap-1"
         title="현재 슬라이드 판서 지우기 (C)"
@@ -48,6 +51,7 @@
     <div class="flex items-center gap-2" title="색상 선택 (단축키: 1~4)">
       {#each COLOR_PRESETS as preset, idx}
         <button
+          onmousedown={(e) => e.preventDefault()}
           onclick={() => deck.setPresetColor(preset.hex)}
           class="relative w-6 h-6 rounded-full transition-all flex items-center justify-center {deck.activeColor.toLowerCase() === preset.hex.toLowerCase() ? 'ring-2 ring-white scale-110 shadow-md shadow-black/40' : 'opacity-70 hover:opacity-100 hover:scale-105'}"
           style="background-color: {preset.hex};"
@@ -66,6 +70,7 @@
     <!-- 3 Width Presets -->
     <div class="flex items-center bg-slate-800/90 rounded-lg p-0.5 border border-slate-700/60" title="굵기 선택 (단축키: - / +)">
       <button
+        onmousedown={(e) => e.preventDefault()}
         onclick={() => deck.setPresetWidth('thin')}
         class="px-2.5 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1 {deck.activeWidthPreset === 'thin' ? 'bg-slate-700 text-sky-400 font-bold shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
         title="얇게 (펜 2px / 레이저 8px)"
@@ -74,6 +79,7 @@
         <span>얇게</span>
       </button>
       <button
+        onmousedown={(e) => e.preventDefault()}
         onclick={() => deck.setPresetWidth('medium')}
         class="px-2.5 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1 {deck.activeWidthPreset === 'medium' ? 'bg-slate-700 text-sky-400 font-bold shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
         title="보통 (펜 4px / 레이저 14px)"
@@ -82,6 +88,7 @@
         <span>보통</span>
       </button>
       <button
+        onmousedown={(e) => e.preventDefault()}
         onclick={() => deck.setPresetWidth('thick')}
         class="px-2.5 py-1 text-xs rounded-md font-medium transition-all flex items-center gap-1 {deck.activeWidthPreset === 'thick' ? 'bg-slate-700 text-sky-400 font-bold shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
         title="굵게 (펜 8px / 레이저 22px)"

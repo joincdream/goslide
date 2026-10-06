@@ -269,10 +269,12 @@ flowchart LR
   4. 최종 통합 회귀 테스트 및 메모리 누수 점검:
      - 50장 슬라이드 일괄 빌드 (`--format=html,pdf,pptx`) 메모리 피크 100MB 이하 검증.
      - 동시성 데이터 레이스 점검 (`go test -race ./...`).
-  5. **공식 v1.0.0 태그 릴리즈 및 릴리즈 노트 배포**.
+  5. **공식 v1.0.0 태그 릴리즈 및 크로스 플랫폼 E2E 검증** ([GOS-18](https://joincdream.atlassian.net/browse/GOS-18) 참조):
+     - `v1.0.0-rc.1` 릴리즈 후보(RC) 발행 및 3대 OS(Linux, macOS, Windows) 실기기 E2E 스모크 테스트.
+     - MS PowerPoint / Apple Keynote 호환성 및 공식 릴리즈 노트 배포.
 - **완료 기준 (DoD)**:
   - 단일 명령 `goslide build talk.md -f html,pdf,pptx -o dist/`로 3종 산출물 동시 생성 확인.
-  - GitHub Releases에 5개 플랫폼 단일 바이너리 자동 업로드 확인.
+  - GitHub Releases에 5개 플랫폼 단일 바이너리 및 아카이브 자동 업로드 확인.
 
 ---
 

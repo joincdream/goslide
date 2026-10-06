@@ -69,7 +69,9 @@ footer: "푸터 문구"  # 전체 하단 공통 푸터
 ```
 
 ### 2.5 지원 마크다운 컴포넌트
-* **코드 블록**: ```` ```go ```` (Chroma 구문 강조 지원, 8~10줄 이내)
+* **코드 블록 및 라인 포커스**: ````go {2-4,7}```` (Chroma 구문 강조 및 특정 행 포커스 강조, 미선택 라인은 35% 딤 처리)
+* **단계적 빌드 (Fragments)**: `<!-- pause -->` (스페이스/화살표 키로 불릿 항목이나 단락을 하나씩 순차 노출)
+* **단계적 빌드 딤 스타일**: `<!-- _fragmentStyle: dim -->` (노출 전 항목을 25% 반투명으로 유지하다가 자기 차례에 선명해짐)
 * **수식(KaTeX)**: 인라인 `$E=mc^2$`, 블록 `$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$`
 * **콜아웃 박스**: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!IMPORTANT]`
 * **체크리스트**: `- [x] 완료 항목`, `- [ ] 예정 항목`
@@ -159,5 +161,28 @@ footer: "© 2026 Cloit Tech Architecture. All rights reserved."
 <!-- note:
 - 배경 이미지가 적용된 하이라이트 슬라이드입니다.
 - 단일 바이너리 Go 아키텍처의 리소스 효율성을 어필합니다.
+-->
+
+---
+
+## Go 스트리밍 프록시 핵심 구현
+
+- **초저지연 스트리밍**: 표준 `http.Flusher`를 활용한 즉각적인 토큰 전달
+<!-- pause -->
+- **안전한 컨텍스트 취소**: 클라이언트 연결 종료 시 서버 고루틴 즉각 해제
+
+```go {3-5}
+func StreamHandler(w http.ResponseWriter, r *http.Request) {
+    flusher, _ := w.(http.Flusher)
+    for token := range stream.Tokens() {
+        fmt.Fprintf(w, "data: %s\n\n", token)
+        flusher.Flush()
+    }
+}
+```
+
+<!-- note:
+- 3~5번 라인의 토큰 플러시 루프를 설명합니다.
+- 코드 라인 포커스와 단계적 빌드가 청중의 시선을 유도하는 효과를 보여줍니다.
 -->
 ````

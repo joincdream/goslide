@@ -116,7 +116,7 @@ ${themeStylesCSS}
   </footer>
   <script>
     const ch = new BroadcastChannel('${channelName}');
-    let curIdx = 0, total = 1, sData = [];
+    let curIdx = 0, total = 1, sData = [], curFragIdx = 0;
     let timerSec = 0;
     let activeColor = '#ef4444';
     let activeWidthPreset = 'medium';
@@ -143,9 +143,11 @@ ${themeStylesCSS}
     }
 
     function syncToolSettings() {
+      const activeTool = isDrawMode ? 'pen' : (isLaserActive ? 'laser' : 'none');
       ch.postMessage({
         type: 'TOOL_SETTINGS_SYNC',
         payload: {
+          activeTool: activeTool,
           activeColor: activeColor,
           activeWidthPreset: activeWidthPreset,
           isLaserActive: isLaserActive,
@@ -195,6 +197,7 @@ ${themeStylesCSS}
         curIdx = m.payload.currentIndex;
         total = m.payload.totalSlides;
         sData = m.payload.slidesData;
+        curFragIdx = m.payload.currentFragmentIndex || 0;
         if (m.payload.activeColor) activeColor = m.payload.activeColor;
         if (m.payload.activeWidthPreset) activeWidthPreset = m.payload.activeWidthPreset;
         if (typeof m.payload.isDrawMode === 'boolean') isDrawMode = m.payload.isDrawMode;
@@ -203,15 +206,31 @@ ${themeStylesCSS}
         render();
       } else if (m.type === 'SLIDE_CHANGE') {
         curIdx = m.payload.index;
+        curFragIdx = m.payload.currentFragmentIndex || 0;
         render();
+      } else if (m.type === 'FRAGMENT_CHANGE') {
+        curFragIdx = m.payload.currentFragmentIndex || 0;
+        updateCurFragments();
       } else if (m.type === 'TOOL_SETTINGS_SYNC') {
         if (m.payload.activeColor) activeColor = m.payload.activeColor;
         if (m.payload.activeWidthPreset) activeWidthPreset = m.payload.activeWidthPreset;
-        if (typeof m.payload.isDrawMode === 'boolean') isDrawMode = m.payload.isDrawMode;
-        if (typeof m.payload.isLaserActive === 'boolean') isLaserActive = m.payload.isLaserActive;
+        if (m.payload.activeTool) {
+          isDrawMode = m.payload.activeTool === 'pen';
+          isLaserActive = m.payload.activeTool === 'laser';
+        } else {
+          if (typeof m.payload.isDrawMode === 'boolean') isDrawMode = m.payload.isDrawMode;
+          if (typeof m.payload.isLaserActive === 'boolean') isLaserActive = m.payload.isLaserActive;
+        }
         updateToolbarUI();
       }
     };
+
+    function updateCurFragments() {
+      const curBox = document.getElementById('p-cur-frame');
+      if (!curBox) return;
+      const frags = curBox.querySelectorAll('.fragment');
+      frags.forEach((f, i) => f.classList.toggle('visible', i < curFragIdx));
+    }
 
     function scaleFrames() {
       const curBox = document.getElementById('p-cur-frame');
@@ -233,6 +252,7 @@ ${themeStylesCSS}
       if (sData[curIdx]) {
         document.getElementById('p-notes').textContent = sData[curIdx].notes;
         document.getElementById('p-cur-frame').innerHTML = sData[curIdx].html;
+        updateCurFragments();
       }
       if (curIdx + 1 < total) {
         document.getElementById('p-next-num').textContent = 'Slide ' + (curIdx + 2);
@@ -409,23 +429,30 @@ ${themeStylesCSS}
   <!-- Footer Navigation & Progress -->
   <div class="px-4 py-3 bg-slate-800 border-t border-slate-700 flex flex-col gap-2 flex-shrink-0">
     <div class="flex justify-between items-center">
-      <span class="text-sm font-bold text-slate-200">
-        Slide {deck.currentIndex + 1} <span class="text-slate-400 font-normal">/ {deck.totalSlides}</span>
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-bold text-slate-200">
+          Slide {deck.currentIndex + 1} <span class="text-slate-400 font-normal">/ {deck.totalSlides}</span>
+        </span>
+        {#if deck.totalFragments > 0}
+          <span class="text-[11px] bg-sky-950 text-sky-400 border border-sky-800/60 px-1.5 py-0.5 rounded font-mono font-semibold">
+            Step {deck.currentFragmentIndex}/{deck.totalFragments}
+          </span>
+        {/if}
+      </div>
       <div class="flex items-center gap-1.5">
         <button
-          onclick={() => deck.prevSlide()}
-          disabled={deck.currentIndex === 0}
+          onclick={() => deck.prevStep()}
+          disabled={deck.currentIndex === 0 && deck.currentFragmentIndex === 0}
           class="bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded font-semibold transition-colors"
-          title="이전 슬라이드 (PageUp / ←)"
+          title="이전 단계 / 슬라이드 (PageUp / ←)"
         >
           ← 이전
         </button>
         <button
-          onclick={() => deck.nextSlide()}
-          disabled={deck.currentIndex >= deck.totalSlides - 1}
+          onclick={() => deck.nextStep()}
+          disabled={deck.currentIndex >= deck.totalSlides - 1 && deck.currentFragmentIndex >= deck.totalFragments}
           class="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:hover:bg-sky-600 text-white text-xs px-2.5 py-1 rounded font-semibold transition-colors"
-          title="다음 슬라이드 (PageDown / → / Space)"
+          title="다음 단계 / 슬라이드 (PageDown / → / Space)"
         >
           다음 →
         </button>

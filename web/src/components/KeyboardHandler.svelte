@@ -15,8 +15,8 @@
       return;
     }
 
-    // Number jump buffer (0-9)
-    if (e.key >= '0' && e.key <= '9' && !deck.isDrawMode) {
+    // Number jump buffer (0-9): only active when no interactive tool is in use
+    if (e.key >= '0' && e.key <= '9' && !deck.isToolActive) {
       numberBuffer += e.key;
       clearTimeout(numberTimeout);
       numberTimeout = setTimeout(() => { numberBuffer = ''; }, 1500);
@@ -35,8 +35,8 @@
       return;
     }
 
-    // Tool controls (Drawing or Laser mode)
-    if (deck.isDrawMode || deck.isLaserActive) {
+    // Tool controls (Active tool: Drawing, Laser, Spotlight)
+    if (deck.isToolActive) {
       switch (e.key) {
         case '1': deck.setPresetColor('#ef4444'); return;
         case '2': deck.setPresetColor('#3b82f6'); return;
@@ -56,7 +56,7 @@
       case 'PageDown':
       case 'j':
         e.preventDefault();
-        deck.nextSlide();
+        deck.nextStep();
         break;
       case 'ArrowLeft':
       case 'Backspace':
@@ -64,7 +64,7 @@
       case 'k':
       case 'h':
         e.preventDefault();
-        deck.prevSlide();
+        deck.prevStep();
         break;
       case 'Home':
         e.preventDefault();
@@ -129,12 +129,10 @@
         e.preventDefault();
         if (deck.isOverviewMode) {
           deck.toggleOverview(false);
+        } else if (deck.isToolActive) {
+          deck.setTool('none');
         } else if (deck.isSidebarOpen) {
           deck.toggleSidebar(false);
-        } else if (deck.isLaserActive) {
-          deck.toggleLaser(false);
-        } else if (deck.isSpotlightActive) {
-          deck.toggleSpotlight(false);
         } else if (deck.isBlackout || deck.isWhiteout) {
           deck.toggleBlackout(false);
           deck.toggleWhiteout(false);

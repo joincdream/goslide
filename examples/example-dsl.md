@@ -69,7 +69,9 @@ Placed at the bottom of the slide; visible only in presenter view (`P` key) and 
 ```
 
 ### 2.5 Supported Markdown Extensions
-* **Fenced Code Blocks**: ```` ```go ```` (Native Chroma syntax highlighting; keep to 8–10 lines)
+* **Fenced Code Blocks & Line Highlighting**: ````go {2-4,7}```` (Native Chroma syntax highlighting with line focus; dims unselected lines)
+* **Incremental Reveal (Fragments)**: `<!-- pause -->` (Steps through bullets or paragraphs one-by-one with space/arrow keys)
+* **Fragment Dim Style**: `<!-- _fragmentStyle: dim -->` (Pre-renders unrevealed bullets at 25% opacity before focus)
 * **LaTeX Math (KaTeX)**: Inline `$E=mc^2$` or block `$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$`
 * **GFM Callouts**: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!IMPORTANT]`
 * **Task Checklists**: `- [x] Completed task`, `- [ ] Planned task`
@@ -159,5 +161,28 @@ footer: "© 2026 Cloit Tech Architecture. All rights reserved."
 <!-- note:
 - Showcase production architectural wins on this highlighted visual slide.
 - Highlight the memory efficiency of Go over heavier alternatives.
+-->
+
+---
+
+## Go Streaming Core Implementation
+
+- **Low-Latency Streaming**: Immediate token flushing using standard `http.Flusher`
+<!-- pause -->
+- **Graceful Context Cancellation**: Client disconnects immediately release server resources
+
+```go {3-5}
+func StreamHandler(w http.ResponseWriter, r *http.Request) {
+    flusher, _ := w.(http.Flusher)
+    for token := range stream.Tokens() {
+        fmt.Fprintf(w, "data: %s\n\n", token)
+        flusher.Flush()
+    }
+}
+```
+
+<!-- note:
+- Walk through lines 3 to 5 where the token flush occurs.
+- Show how code line highlighting and incremental reveal direct audience attention.
 -->
 ````

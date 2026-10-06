@@ -423,4 +423,85 @@ img.img-center {
   margin: 0.5rem auto;
 }
 
+/* ==========================================================================
+   Incremental Reveal (Fragments) & Presentation Dynamics
+   ========================================================================== */
+
+/* [Default Mode] Hidden -> Smooth Reveal */
+.fragment {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  pointer-events: none;
+}
+
+.fragment.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* [Dim Mode] Dim -> Focus */
+.slide-card.dim-fragments .fragment,
+.dim-fragments .fragment {
+  opacity: 0.25;
+  transform: none;
+}
+
+.slide-card.dim-fragments .fragment.visible,
+.dim-fragments .fragment.visible {
+  opacity: 1;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Code Block Line Highlighting (Chroma Extension)
+   ========================================================================== */
+
+.highlight-container {
+  position: relative;
+}
+
+/* Dim standard lines when highlights are present */
+.highlight-container.has-highlights .line {
+  opacity: 0.35;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+/* Focused lines: full opacity, highlighted background and accent left border */
+.highlight-container.has-highlights .line.hl {
+  opacity: 1.0;
+  font-weight: 600;
+  background-color: rgba(56, 189, 248, 0.15); /* Sky blue tint */
+  border-left: 3px solid #38bdf8;
+  padding-left: 6px;
+  margin-left: -9px;
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Enterprise Print & Deterministic PDF/PPTX Export
+   ========================================================================== */
+@media print {
+  .fragment {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+  .highlight-container.has-highlights .line {
+    opacity: 1 !important;
+  }
+}
+
+.print-mode .fragment {
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+.print-mode .highlight-container.has-highlights .line {
+  opacity: 1 !important;
+}
+
+
 

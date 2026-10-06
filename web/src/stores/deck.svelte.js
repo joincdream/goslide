@@ -21,20 +21,28 @@ export class DeckStore {
   totalSlides = $state(0);
   slides = $state([]);
 
+  // Incremental Reveal (Fragments) State
+  currentFragmentIndex = $state(0);
+  totalFragments = $state(0);
+
   isSidebarOpen = $state(false);
   isLock1080p = $state(false);
   isOverviewMode = $state(false);
 
-  // Tools (Mutually exclusive: Laser, Spotlight, Draw)
-  isLaserActive = $state(false);
+  // Presentation Tools Single State Machine: 'none' | 'pen' | 'laser' | 'spotlight'
+  activeTool = $state('none');
+
+  get isDrawMode() { return this.activeTool === 'pen'; }
+  get isLaserActive() { return this.activeTool === 'laser'; }
+  get isSpotlightActive() { return this.activeTool === 'spotlight'; }
+  get isToolActive() { return this.activeTool !== 'none'; }
+
   laserPos = $state({ x: 0, y: 0 });
-  isSpotlightActive = $state(false);
   spotlightPos = $state({ x: 0, y: 0 });
 
   isBlackout = $state(false);
   isWhiteout = $state(false);
 
-  isDrawMode = $state(false);
   penColor = $state('#ef4444');
   penWidth = $state(4);
 
@@ -103,7 +111,7 @@ export class DeckStore {
     return 0;
   }
 
-  goToSlide(index, updateHash = true) {
+  goToSlide(index, updateHash = true, fromPrev = false) {
     if (this.totalSlides === 0) return;
     const target = Math.max(0, Math.min(index, this.totalSlides - 1));
     this.currentIndex = target;
@@ -117,19 +125,80 @@ export class DeckStore {
       window.location.hash = '#' + (target + 1);
     }
 
+    this.updateFragments(this.slides[target], fromPrev);
     this.applyAutofit(this.slides[target]);
     this.broadcastSlideChange();
   }
 
-  nextSlide() {
-    if (this.currentIndex < this.totalSlides - 1) {
-      this.goToSlide(this.currentIndex + 1);
+  updateFragments(slideEl, fromPrev = false) {
+    if (!slideEl) {
+      this.totalFragments = 0;
+      this.currentFragmentIndex = 0;
+      return;
+    }
+    const fragments = slideEl.querySelectorAll('.fragment');
+    this.totalFragments = fragments.length;
+    if (fromPrev) {
+      // Coming back from the next slide: reveal all fragments
+      fragments.forEach(f => f.classList.add('visible'));
+      this.currentFragmentIndex = this.totalFragments;
+    } else {
+      // Going forward or jumping: hide all fragments
+      fragments.forEach(f => f.classList.remove('visible'));
+      this.currentFragmentIndex = 0;
     }
   }
 
-  prevSlide() {
+  nextStep() {
+    const currentSlide = this.slides[this.currentIndex];
+    if (currentSlide) {
+      const fragments = currentSlide.querySelectorAll('.fragment');
+      if (this.currentFragmentIndex < fragments.length) {
+        fragments[this.currentFragmentIndex].classList.add('visible');
+        this.currentFragmentIndex++;
+        this.broadcastFragmentChange();
+        return;
+      }
+    }
+    this.nextSlide();
+  }
+
+  prevStep() {
+    const currentSlide = this.slides[this.currentIndex];
+    if (currentSlide) {
+      const fragments = currentSlide.querySelectorAll('.fragment');
+      if (this.currentFragmentIndex > 0) {
+        this.currentFragmentIndex--;
+        if (fragments[this.currentFragmentIndex]) {
+          fragments[this.currentFragmentIndex].classList.remove('visible');
+        }
+        this.broadcastFragmentChange();
+        return;
+      }
+    }
+    this.prevSlide(true);
+  }
+
+  setFragmentIndex(targetIdx) {
+    const currentSlide = this.slides[this.currentIndex];
+    if (!currentSlide) return;
+    const fragments = currentSlide.querySelectorAll('.fragment');
+    this.totalFragments = fragments.length;
+    this.currentFragmentIndex = Math.max(0, Math.min(targetIdx, this.totalFragments));
+    fragments.forEach((f, idx) => {
+      f.classList.toggle('visible', idx < this.currentFragmentIndex);
+    });
+  }
+
+  nextSlide() {
+    if (this.currentIndex < this.totalSlides - 1) {
+      this.goToSlide(this.currentIndex + 1, true, false);
+    }
+  }
+
+  prevSlide(fromPrev = true) {
     if (this.currentIndex > 0) {
-      this.goToSlide(this.currentIndex - 1);
+      this.goToSlide(this.currentIndex - 1, true, fromPrev);
     }
   }
 
@@ -141,24 +210,34 @@ export class DeckStore {
     }
   }
 
-  // --- Interactive Tools ---
-  toggleLaser(force) {
-    this.isLaserActive = typeof force === 'boolean' ? force : !this.isLaserActive;
-    if (this.isLaserActive) {
-      if (this.isDrawMode) this.toggleDrawMode(false);
-      if (this.isSpotlightActive) this.toggleSpotlight(false);
-    }
-    document.body.classList.toggle('laser-mode', this.isLaserActive);
+  // --- Interactive Tools (State Machine: 'none' | 'pen' | 'laser' | 'spotlight') ---
+  setTool(tool) {
+    this.activeTool = (this.activeTool === tool) ? 'none' : tool;
+    this.syncBodyToolClasses();
     this.broadcastToolSettings();
+    document.activeElement?.blur?.();
+  }
+
+  toggleLaser(force) {
+    if (typeof force === 'boolean') {
+      this.activeTool = force ? 'laser' : (this.activeTool === 'laser' ? 'none' : this.activeTool);
+    } else {
+      this.activeTool = (this.activeTool === 'laser') ? 'none' : 'laser';
+    }
+    this.syncBodyToolClasses();
+    this.broadcastToolSettings();
+    document.activeElement?.blur?.();
   }
 
   toggleSpotlight(force) {
-    this.isSpotlightActive = typeof force === 'boolean' ? force : !this.isSpotlightActive;
-    if (this.isSpotlightActive) {
-      if (this.isDrawMode) this.toggleDrawMode(false);
-      if (this.isLaserActive) this.toggleLaser(false);
+    if (typeof force === 'boolean') {
+      this.activeTool = force ? 'spotlight' : (this.activeTool === 'spotlight' ? 'none' : this.activeTool);
+    } else {
+      this.activeTool = (this.activeTool === 'spotlight') ? 'none' : 'spotlight';
     }
+    this.syncBodyToolClasses();
     this.broadcastToolSettings();
+    document.activeElement?.blur?.();
   }
 
   toggleBlackout(force) {
@@ -172,19 +251,26 @@ export class DeckStore {
   }
 
   toggleDrawMode(force) {
-    this.isDrawMode = typeof force === 'boolean' ? force : !this.isDrawMode;
-    if (this.isDrawMode) {
-      if (this.isLaserActive) this.toggleLaser(false);
-      if (this.isSpotlightActive) this.toggleSpotlight(false);
+    if (typeof force === 'boolean') {
+      this.activeTool = force ? 'pen' : (this.activeTool === 'pen' ? 'none' : this.activeTool);
+    } else {
+      this.activeTool = (this.activeTool === 'pen') ? 'none' : 'pen';
     }
-    document.body.classList.toggle('drawing-mode', this.isDrawMode);
+    this.syncBodyToolClasses();
     this.broadcastToolSettings();
+    document.activeElement?.blur?.();
+  }
+
+  syncBodyToolClasses() {
+    document.body.classList.toggle('drawing-mode', this.isDrawMode);
+    document.body.classList.toggle('laser-mode', this.isLaserActive);
   }
 
   setPenColor(color) {
     this.penColor = color;
     this.activeColor = color;
     this.broadcastToolSettings();
+    document.activeElement?.blur?.();
   }
 
   adjustPenWidth(delta) {
@@ -195,6 +281,7 @@ export class DeckStore {
     this.activeColor = color;
     this.penColor = color;
     this.broadcastToolSettings();
+    document.activeElement?.blur?.();
   }
 
   setPresetWidth(presetKey) {
@@ -202,6 +289,7 @@ export class DeckStore {
       this.activeWidthPreset = presetKey;
       this.penWidth = WIDTH_PRESETS[presetKey].pen;
       this.broadcastToolSettings();
+      document.activeElement?.blur?.();
     }
   }
 
@@ -217,6 +305,7 @@ export class DeckStore {
     this.channel.postMessage({
       type: 'TOOL_SETTINGS_SYNC',
       payload: {
+        activeTool: this.activeTool,
         activeColor: this.activeColor,
         activeWidthPreset: this.activeWidthPreset,
         isLaserActive: this.isLaserActive,
@@ -325,9 +414,20 @@ export class DeckStore {
         if (msg.type === 'REQUEST_INIT') {
           this.broadcastInit();
         } else if (msg.type === 'NAV_NEXT') {
-          this.nextSlide();
+          this.nextStep();
         } else if (msg.type === 'NAV_PREV') {
-          this.prevSlide();
+          this.prevStep();
+        } else if (msg.type === 'SLIDE_CHANGE') {
+          if (msg.payload?.index !== this.currentIndex) {
+            this.goToSlide(msg.payload.index, false);
+          }
+          if (typeof msg.payload?.currentFragmentIndex === 'number') {
+            this.setFragmentIndex(msg.payload.currentFragmentIndex);
+          }
+        } else if (msg.type === 'FRAGMENT_CHANGE') {
+          if (typeof msg.payload?.currentFragmentIndex === 'number') {
+            this.setFragmentIndex(msg.payload.currentFragmentIndex);
+          }
         } else if (msg.type === 'TOOL_SETTINGS_SYNC') {
           const p = msg.payload;
           if (p.activeColor) {
@@ -338,11 +438,23 @@ export class DeckStore {
             this.activeWidthPreset = p.activeWidthPreset;
             this.penWidth = WIDTH_PRESETS[p.activeWidthPreset].pen;
           }
-          if (typeof p.isLaserActive === 'boolean' && p.isLaserActive !== this.isLaserActive) {
-            this.toggleLaser(p.isLaserActive);
-          }
-          if (typeof p.isDrawMode === 'boolean' && p.isDrawMode !== this.isDrawMode) {
-            this.toggleDrawMode(p.isDrawMode);
+          if (p.activeTool) {
+            if (this.activeTool !== p.activeTool) {
+              this.activeTool = p.activeTool;
+              this.syncBodyToolClasses();
+            }
+          } else {
+            // Fallback for legacy messages
+            if (p.isLaserActive && this.activeTool !== 'laser') {
+              this.activeTool = 'laser';
+              this.syncBodyToolClasses();
+            } else if (p.isDrawMode && this.activeTool !== 'pen') {
+              this.activeTool = 'pen';
+              this.syncBodyToolClasses();
+            } else if (!p.isLaserActive && !p.isDrawMode && this.activeTool !== 'none') {
+              this.activeTool = 'none';
+              this.syncBodyToolClasses();
+            }
           }
         } else if (msg.type === 'TOOL_ACTION') {
           if (msg.payload?.action === 'clear-canvas') {
@@ -374,6 +486,8 @@ export class DeckStore {
       payload: {
         currentIndex: this.currentIndex,
         totalSlides: this.totalSlides,
+        currentFragmentIndex: this.currentFragmentIndex,
+        totalFragments: this.totalFragments,
         slidesData: slidesData,
         activeColor: this.activeColor,
         activeWidthPreset: this.activeWidthPreset,
@@ -387,7 +501,23 @@ export class DeckStore {
     if (!this.channel) return;
     this.channel.postMessage({
       type: 'SLIDE_CHANGE',
-      payload: { index: this.currentIndex }
+      payload: {
+        index: this.currentIndex,
+        currentFragmentIndex: this.currentFragmentIndex,
+        totalFragments: this.totalFragments
+      }
+    });
+  }
+
+  broadcastFragmentChange() {
+    if (!this.channel) return;
+    this.channel.postMessage({
+      type: 'FRAGMENT_CHANGE',
+      payload: {
+        index: this.currentIndex,
+        currentFragmentIndex: this.currentFragmentIndex,
+        totalFragments: this.totalFragments
+      }
     });
   }
 

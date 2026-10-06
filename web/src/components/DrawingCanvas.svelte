@@ -59,9 +59,12 @@
   }
 
   $effect(() => {
-    // Re-restore canvas whenever current slide changes
+    // Re-restore canvas whenever current slide changes or tool becomes active
     const _idx = deck.currentIndex;
-    restoreCanvas();
+    const _active = deck.isToolActive;
+    if (deck.isToolActive) {
+      resizeCanvas();
+    }
   });
 
   $effect(() => {
@@ -113,7 +116,7 @@
 <canvas
   bind:this={canvasEl}
   id="goslide-canvas"
-  class="fixed inset-0 w-screen h-screen z-[2000] {deck.isDrawMode ? 'pointer-events-auto cursor-crosshair' : 'pointer-events-none'}"
+  class="{deck.isToolActive ? 'fixed inset-0 w-screen h-screen z-[2000] pointer-events-auto' : 'hidden'} {deck.isDrawMode ? 'cursor-crosshair' : (deck.isLaserActive ? 'cursor-none' : '')}"
   onmousedown={handleMouseDown}
   onmousemove={handleMouseMove}
 ></canvas>

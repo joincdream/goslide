@@ -56,7 +56,19 @@ func (r *chromaRenderer) renderFencedCodeBlock(
 	if !ok {
 		return ast.WalkContinue, nil
 	}
-	language := string(n.Language(source))
+
+	var infoStr string
+	if n.Info != nil {
+		infoStr = string(n.Info.Text(source))
+		if infoStr == "" {
+			infoStr = string(n.Info.Segment.Value(source))
+		}
+	}
+	if infoStr == "" {
+		infoStr = string(n.Language(source))
+	}
+
+	language, highlightRanges := parseCodeInfo(infoStr)
 
 	var buf bytes.Buffer
 	lines := n.Lines()
@@ -72,7 +84,7 @@ func (r *chromaRenderer) renderFencedCodeBlock(
 		return ast.WalkSkipChildren, nil
 	}
 
-	return r.formatCode(w, language, buf.String())
+	return r.formatCode(w, language, buf.String(), highlightRanges)
 }
 
 func (r *chromaRenderer) renderCodeBlock(
@@ -93,11 +105,11 @@ func (r *chromaRenderer) renderCodeBlock(
 		buf.Write(line.Value(source))
 	}
 
-	return r.formatCode(w, "", buf.String())
+	return r.formatCode(w, "", buf.String(), nil)
 }
 
 func (r *chromaRenderer) formatCode(
-	w util.BufWriter, language, code string,
+	w util.BufWriter, language, code string, highlightRanges [][2]int,
 ) (ast.WalkStatus, error) {
 	lexer := lexers.Get(language)
 	if lexer == nil {
@@ -113,19 +125,28 @@ func (r *chromaRenderer) formatCode(
 		style = styles.Fallback
 	}
 
-	formatter := chromahtml.New(
+	options := []chromahtml.Option{
 		chromahtml.WithClasses(false),
 		chromahtml.TabWidth(4),
-	)
+	}
+	if len(highlightRanges) > 0 {
+		options = append(options, chromahtml.HighlightLines(highlightRanges))
+	}
+
+	formatter := chromahtml.New(options...)
 
 	iterator, err := lexer.Tokenise(nil, code)
 	if err != nil {
 		return ast.WalkContinue, err
 	}
 
-	if err := formatter.Format(w, style, iterator); err != nil {
+	var buf bytes.Buffer
+	if err := formatter.Format(&buf, style, iterator); err != nil {
 		return ast.WalkContinue, err
 	}
+
+	formatted := postProcessHighlightedCode(buf.String(), len(highlightRanges) > 0)
+	_, _ = w.WriteString(formatted)
 
 	return ast.WalkSkipChildren, nil
 }

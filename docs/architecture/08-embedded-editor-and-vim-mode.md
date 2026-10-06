@@ -74,27 +74,149 @@ flowchart TD
     SSEHub -->|"SSE reload 신호"| UI
 ```
 
+### 2.1 사용자 E2E 시퀀스 (Deck Hub & Starter Onboarding Sequence)
+
+사용자가 `goslide serve`를 실행하여 기존 데크(Deck)를 탐색하거나 새 데크를 생성해 편집으로 진입하는 전체 흐름입니다:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 사용자 (브라우저)
+    participant UI as Web Frontend (Svelte 5)
+    participant API as Go Server (internal/server)
+    participant FS as 로컬 파일 시스템 (Local Disk)
+
+    Note over User, FS: 1. 초기 진입 (인자 없이 goslide serve 구동)
+    User->>UI: http://localhost:8080 접속
+    UI->>API: GET /api/v1/files (현재 폴더의 *.md Deck 목록 요청)
+    API->>FS: 디렉토리 스캔
+    FS-->>API: ["talk.md", "arch.md"] 반환
+    API-->>UI: Deck 파일 목록 JSON 반환
+    UI-->>User: [Deck Hub 화면]<br>• Slot 1: ➕ "+ New Deck" 카드<br>• 기존 Deck 카드 그리드 목록
+
+    Note over User, FS: 2. 신규 Deck 생성 & 테마 선택
+    User->>UI: "+ New Deck" 카드 클릭
+    UI->>API: GET /api/v1/themes (사용 가능한 테마 목록)
+    API-->>UI: ["clean", "dark", "default"]
+    UI-->>User: [Theme Selection 모달 표시]<br>• 테마 카드 캐러셀<br>• [Skip: Clean] 빠른 생성 버튼<br>• Filename 입력창 (예: presentation.md)
+
+    User->>UI: 테마 선택 ("clean") 및 "Create" 클릭
+    
+    Note over UI, FS: 3. 온보딩 템플릿(Starter Deck) 주입 및 파일 생성
+    UI->>API: POST /api/v1/files<br>{ filename: "presentation.md", theme: "clean", template: "starter" }
+    API->>FS: starter 템플릿 마크다운 파일 원자적 생성
+    FS-->>API: 파일 생성 완료
+    API-->>UI: 201 Created { file: "presentation.md" }
+
+    Note over User, FS: 4. 3-Pane Studio 전환 및 즉시 렌더링
+    UI->>UI: Studio 모드로 자동 라우팅 (/studio?file=presentation.md)
+    UI->>API: GET /api/v1/content?file=presentation.md
+    API-->>UI: 온보딩 마크다운 원문 반환
+    UI-->>User: [3-Pane Studio 화면 오픈]<br>• 좌측: Slide Navigator (3 Slides 썸네일)<br>• 중앙: CodeMirror(Vim 모드) 에디터<br>• 우측: 16:9 슬라이드 프리뷰 실시간 렌더링
+```
+
 ---
 
 ## 3. 세부 설계 명세 (Specification)
+
+### 3.0 덱 허브 & 온보딩 스타터 (Deck Hub & Starter Template)
+
+`goslide serve` 실행 시 특정 마크다운 파일을 지정하지 않은 경우, 사용자가 마주하게 되는 **덱 허브(Deck Hub Dashboard)** 및 **새 덱 생성 모달(New Deck Modal)**의 UI 레이아웃 설계입니다.
+
+> [!NOTE] 도메인 용어 체계 (Ubiquitous Language)
+> * **`Deck` (프레젠테이션 파일 단위)**: 마크다운 파일 1개 전체 (`talk.md`). 생성 버튼은 `+ New Deck`, 목록은 `Decks`로 통일합니다.
+> * **`Slide` (낱장 페이지 단위)**: 데크 내부에서 `---` 구분자로 나뉘는 개별 슬라이드 (`12 Slides`, `Slide 1 / 12`).
+
+#### 3.0.1 덱 허브 대시보드 레이아웃 (Deck Hub Layout)
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ GOSLIDE HUB            [ Search decks... (Ctrl+K) ]          Dir: ~/workspace/slides   │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ Decks                                                                                  │
+│ ┌────────────────────────┐ ┌────────────────────────┐ ┌────────────────────────┐       │
+│ │ ....................   │ │ ┌────────────────────┐ │ │ ┌────────────────────┐ │       │
+│ │ :                  :   │ │ │ 16:9 Mini Preview  │ │ │ │ 16:9 Mini Preview  │ │       │
+│ │ :        +         :   │ │ └────────────────────┘ │ │ └────────────────────┘ │       │
+│ │ :     New Deck     :   │ │ talk.md                │ │ architecture.md        │       │
+│ │ :                  :   │ │ Microservices Core     │ │ Pipeline Decoupling    │       │
+│ │ :  (Choose Theme)  :   │ │ 12 slides - 10m ago    │ │ 24 slides - 2h ago     │       │
+│ │ :..................:   │ │ [ Edit ]   [ Present ] │ │ [ Edit ]   [ Present ] │       │
+│ └────────────────────────┘ └────────────────────────┘ └────────────────────────┘       │
+│                                                                                        │
+│ Themes (Click to Start New Deck)                                                       │
+│ ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐ │
+│ │ ┌──────────────┐ │  │ ┌──────────────┐ │  │ ┌──────────────┐ │  │ ┌──────────────┐ │ │
+│ │ │ Aa Bb Cc     │ │  │ │ Aa Bb Cc     │ │  │ │ Aa Bb Cc     │ │  │ │ Aa Bb Cc     │ │ │
+│ │ └──────────────┘ │  │ └──────────────┘ │  │ └──────────────┘ │  │ └──────────────┘ │ │
+│ │ Clean (Default)  │  │ Dark (Developer) │  │ Dracula (High)   │  │ Minimal (Simple) │ │
+│ │ [ Start Deck ]   │  │ [ Start Deck ]   │  │ [ Start Deck ]   │  │ [ Start Deck ]   │ │
+│ └──────────────────┘  └──────────────────┘  └──────────────────┘  └──────────────────┘ │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **상단 글로벌 헤더**:
+   * 작업 디렉토리 경로 표기 및 실시간 덱 검색창(`Ctrl + K` / `Cmd + K` 단축키 바인딩).
+2. **Slot 1: `+ New Deck` 카드**:
+   * 그리드의 첫 번째 카드에 점선 테두리 점보 카드로 배치. 클릭 시 즉시 테마 선택 모달 호출.
+3. **덱 카드 그리드 (Decks Grid)**:
+   * 디렉토리 내 `*.md` 파일 목록을 16:9 미니 썸네일 카드로 렌더링.
+   * `[ Edit ]`: 3-Pane Studio 에디터로 진입하여 편집 시작.
+   * `[ Present ]`: 에디터를 거치지 않고 전체화면 발표 뷰로 직행.
+4. **하단 테마 갤러리 (Themes Section)**:
+   * 시스템 내장 및 `themes/` 폴더에 설치된 테마 목록을 폰트/컬러 팔레트 미리보기 카드로 상시 노출.
+   * 원하는 테마 카드의 `[ Start Deck ]`을 클릭하거나 카드를 더블클릭하면, **별도 모달을 거치지 않고 해당 테마가 적용된 새 데크가 즉시 생성되어 3-Pane Studio로 직행** (원클릭 테마 기반 데크 생성: 1-Click Theme-to-Deck).
+
+---
+
+#### 3.0.2 신규 덱 생성 모달 레이아웃 (New Deck Modal Layout)
+
+```
+┌────────────────────────────────────────────────────────┐
+│  + Create New Deck                                     │
+├────────────────────────────────────────────────────────┤
+│  Filename                                              │
+│  [ presentation.md                                   ] │
+│                                                        │
+│  Select Theme                                          │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐    │
+│  │ [Selected]   │ │              │ │              │    │
+│  │   Clean      │ │    Dark      │ │   Dracula    │    │
+│  │  (Default)   │ │ (Engineering)│ │ (High-Dark)  │    │
+│  └──────────────┘ └──────────────┘ └──────────────┘    │
+├────────────────────────────────────────────────────────┤
+│             [ Cancel ]   [ Skip: Clean ]   [  Create ] │
+└────────────────────────────────────────────────────────┘
+```
+
+1. **테마 선택 캐러셀 (Theme Selection)**:
+   * 시스템 내장 및 `themes/` 디렉토리에 존재하는 커스텀 테마 목록을 시각적 카드로 제공.
+   * `Skip: Clean` 버튼을 누르면 기본 `clean` 테마가 자동 적용되어 초고속 생성 보장.
+2. **온보딩 스타터 덱 주입 (Starter Deck)**:
+   * 생성되는 파일은 빈 문서가 아닌, Goslide 핵심 기능을 즉시 학습할 수 있는 **3장의 인터랙티브 온보딩 슬라이드**로 구성됩니다:
+     * **Slide 1 (Cover)**: 프론트매터 메타데이터(`title`, `theme`) 시연 및 커버 슬라이드.
+     * **Slide 2 (Feature)**: 2단 컬럼(`layout: two-cols`), 코드 블록 구문 강조, 불릿 포인트 예제.
+     * **Slide 3 (Tips & Shortcuts)**: `:w` 저장 단축키, `F` 키 전체화면, `P` 키 발표자 뷰 등 핵심 사용 팁.
+
+---
 
 ### 3.1 UI 레이아웃 구조 (3-Pane Studio Layout)
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│ 🖥️ GOSLIDE STUDIO     [Theme: Clean ▾] [Vim: ON/OFF]   [ 👁️ Fullscreen ] [ 💾 Export ▾]│
+│ GOSLIDE STUDIO       [Theme: Clean v] [Vim: ON/OFF]    [ Fullscreen ]    [ Export v ] │
 ├─────────────────────────┬─────────────────────────────────┬────────────────────────────┤
-│ [ 슬라이드 썸네일 바 ]  │ [ 마크다운 에디터 (CodeMirror) ]│ [ 16:9 슬라이드 프리뷰 ]   │
+│ [ Slide Navigator ]     │ [ Markdown Editor (CodeMirror) ]│ [ 16:9 Slide Preview ]     │
 │                         │                                 │                            │
 │ ┌─────────────────────┐ │ 1: ---                          │ ┌────────────────────────┐ │
 │ │ 1. Cover Slide      │ │ 2: theme: clean                 │ │                        │ │
 │ └─────────────────────┘ │ 3: ---                          │ │   Microservices Core   │ │
 │ ┌─────────────────────┐ │ 4: # Microservices Core         │ │                        │ │
 │ │ 2. Architecture     │ │ 5:                              │ └────────────────────────┘ │
-│ └─────────────────────┘ │ 6: • Pipeline Decoupling        │ [ 툴바: 슬라이드 하단 ]    │
-│ ┌─────────────────────┐ │ 7: • Zero-Node Portability      │ [🔴][🔵][🟢] [얇게][보통]  │
-│ │ 3. Deployment       │ │ 8:                              │                            │
-│ └─────────────────────┘ │ 9: <!-- note: 발표 대본 메모 -->│ Slide 1 / 12  [Next Slide] │
+│ └─────────────────────┘ │ 6: - Pipeline Decoupling        │                            │
+│ ┌─────────────────────┐ │ 7: - Zero-Node Portability      │                            │
+│ │ 3. Deployment       │ │ 8:                              │ [ < Prev ]   Slide 1 / 12  │
+│ └─────────────────────┘ │ 9: <!-- note: Speaker Notes --> │ [ Next > ]                 │
 └─────────────────────────┴─────────────────────────────────┴────────────────────────────┘
 ```
 
@@ -106,7 +228,8 @@ flowchart TD
    * 우측 상단 토글로 Vim 모드 즉시 ON/OFF 전환.
 3. **우측 슬라이드 프리뷰**:
    * 에디터에서 타이핑하는 내용이 메모리 상에서 실시간 렌더링.
-   * 앞서 개발된 [GOS-15](https://joincdream.atlassian.net/browse/GOS-15)의 하단 플로팅 툴바(판서/레이저)가 슬라이드 아래 여백에 배치되어 즉시 시연 가능.
+   * 편집 집중도를 위해 판서/레이저 도구는 에디터 프리뷰 영역에서 숨기며, 순수 슬라이드 네비게이션 컨트롤(`Prev / Next / Index`)만 배치합니다.
+   * 펜 판서 및 레이저 포인터는 상단의 `[ Fullscreen ]` 버튼 또는 단축키(`F`)로 **전체화면 발표 모드**에 진입했을 때만 활성화됩니다.
 
 ---
 
@@ -169,8 +292,11 @@ Goslide의 내장 HTTP 서버에 다음 경량 엔드포인트를 추가합니�
 
 | 엔드포인트 | 메서드 | 설명 | 요청/응답 페이로드 |
 | :--- | :---: | :--- | :--- |
-| `/api/v1/content` | `GET` | 현재 슬라이드 마크다운 원문 스트림 반환 | `text/markdown` 원문 텍스트 |
-| `/api/v1/content` | `POST` | 에디터에서 수정한 마크다운 원자적 저장 | Body: `text/markdown`, Resp: `{"status":"ok","bytes":1420}` |
+| `/api/v1/files` | `GET` | 현재 디렉토리 내 마크다운 슬라이드 목록 반환 | JSON: `[{ name: "talk.md", title: "Microservices", updatedAt: 1728172800 }]` |
+| `/api/v1/files` | `POST` | 템플릿 기반 신규 슬라이드 파일 생성 | JSON: `{ filename: "demo.md", theme: "clean", template: "starter" }` |
+| `/api/v1/content` | `GET` | 슬라이드 마크다운 원문 스트림 반환 (`?file=talk.md`) | `text/markdown` 원문 텍스트 |
+| `/api/v1/content` | `POST` | 에디터에서 수정한 마크다운 원자적 저장 (`?file=talk.md`) | Body: `text/markdown`, Resp: `{"status":"ok","bytes":1420}` |
+| `/api/v1/themes` | `GET` | 내장 및 로컬 커스텀 테마 목록 반환 | JSON: `["clean", "dark", "default"]` |
 | `/api/v1/status` | `GET` | 서버 상태, 파일 경로, 테마 목록 정보 | JSON: `{ filePath: "talk.md", theme: "clean" }` |
 
 #### 원자적 파일 쓰기 보장 (Atomic File Write)
@@ -223,8 +349,8 @@ func (s *Server) handleSaveContent(w http.ResponseWriter, r *http.Request) {
 
 | 단계 | 작업 내용 | 대상 파일 |
 | :---: | :--- | :--- |
-| **Phase 1** | **백엔드 REST API 구현**<br>• `GET/POST /api/v1/content` 엔드포인트 구현<br>• 원자적 파일 쓰기 및 watcher 연쇄 감지 억제 플래그 추가 | `internal/server/server.go`<br>`internal/server/api.go` |
+| **Phase 1** | **백엔드 REST API 구현**<br>• 파일 목록/생성 API (`GET/POST /api/v1/files`)<br>• `GET/POST /api/v1/content` 엔드포인트 구현<br>• 원자적 파일 쓰기 및 watcher 연쇄 감지 억제 플래그 추가 | `internal/server/server.go`<br>`internal/server/api.go` |
 | **Phase 2** | **CodeMirror 6 및 Vim 모드 컴포넌트 개발**<br>• `@replit/codemirror-vim` 연동 및 `:w` 커맨드 인터셉트<br>• Vim/Normal 모드 토글 상태 관리 | `web/src/components/studio/EditorPane.svelte`<br>`web/package.json` |
-| **Phase 3** | **Studio 3-Pane 레이아웃 구축**<br>• 썸네일 네비게이터, 에디터, 16:9 슬라이드 프리뷰 통합<br>• 반응형 스플릿 바(Splitter) 리사이즈 지원 | `web/src/components/studio/StudioLayout.svelte`<br>`web/src/stores/studio.svelte.js` |
+| **Phase 3** | **Studio 3-Pane 레이아웃 및 슬라이드 허브 구축**<br>• 슬라이드 허브(파일 목록 카드 + 새 슬라이드 생성 모달)<br>• 썸네일 네비게이터, 에디터, 16:9 슬라이드 프리뷰 통합<br>• 반응형 스플릿 바(Splitter) 리사이즈 지원 | `web/src/components/studio/SlideHub.svelte`<br>`web/src/components/studio/StudioLayout.svelte`<br>`web/src/stores/studio.svelte.js` |
 | **Phase 4** | **메모리 직결 반응형 렌더링 & 커서 동기화**<br>• 디스크 안 거치는 인-메모리 실시간 파싱 및 뷰포트 바인딩<br>• 에디터 커서 라인 $\leftrightarrow$ 슬라이드 인덱스 양방향 동기화 | `web/src/stores/deck.svelte.js` |
 | **Phase 5** | **번들 빌드 및 E2E 기능 검증**<br>• `npm run build`로 바이너리 임베드 및 `goslide serve` 구동 검증 | `internal/theme/assets/js/goslide-core.js` |

@@ -150,9 +150,20 @@ func Parse(ctx context.Context, r io.Reader) (*model.Deck, error)
 
 ---
 
-### 2.4 GoReleaser 크로스 컴파일 및 배포 자동화
+### 2.4 GoReleaser 크로스 컴파일 및 듀얼 패키징 배포 자동화
 
-#### 1) `.goreleaser.yaml` 설정 사양
+상세 아키텍처 및 릴리즈 런북 명세는 [cross-compilation-plan.md](file:///home/yundream/myjob/cloit/Goslide/task/cross-compilation-plan.md)를 참조합니다.
+
+#### 1) 버전 관리 및 메타데이터 주입
+* Git Tag(`v1.0.0`) 기반의 SemVer 2.0.0 라이프사이클 준수.
+* `pkg/goslide/goslide.go`에 `var Version, Commit, Date`를 정의하고 빌드 시점에 `-ldflags`를 통해 주입.
+* `goslide --version`으로 커밋 해시, 빌드 일시, OS/Arch 상세 진단 정보 출력.
+
+#### 2) 단일 바이너리 + 압축 아카이브 듀얼 배포 (Dual Distribution)
+* **단일 독립 바이너리**: CI/CD 컨테이너 및 `curl -Lo` 단 한 줄 설치용 무압축 실행파일 배포 (`goslide-linux-amd64`, `goslide-windows-amd64.exe` 등).
+* **압축 아카이브**: 문서(`README.md`, `LICENSE`, `examples/`) 동봉, Unix 실행 권한(`chmod +x`) 유지, Homebrew/Scoop 패키지 매니저 배포용 (`.tar.gz`, `.zip`).
+
+#### 3) `.goreleaser.yaml` 설정 사양
 * **프로젝트명**: `goslide`
 * **빌드 바이너리 매트릭스**:
   * `linux/amd64`, `linux/arm64`
@@ -160,12 +171,12 @@ func Parse(ctx context.Context, r io.Reader) (*model.Deck, error)
   * `windows/amd64`
 * **빌드 플래그**:
   * `CGO_ENABLED=0` (엄격한 Pure Go 정적 링크)
-  * `-ldflags="-s -w -X github.com/yundream/goslide/pkg/goslide.Version={{.Version}}"`
+  * `-ldflags="-s -w -X github.com/yundream/goslide/pkg/goslide.Version={{.Version}} -X github.com/yundream/goslide/pkg/goslide.Commit={{.Commit}} -X github.com/yundream/goslide/pkg/goslide.Date={{.Date}}"`
 * **아카이브 및 체크섬**:
   * `.tar.gz` (Linux, macOS), `.zip` (Windows)
   * `checksums.txt` SHA-256 자동 계산 및 동봉
 
-#### 2) `.github/workflows/release.yml` GitHub Actions 워크플로우
+#### 4) `.github/workflows/release.yml` GitHub Actions 워크플로우
 * **트리거**: `git push origin v*.*.*` 태그 푸시 시 자동 실행.
 * **작업 단계**:
   1. `actions/checkout@v4` (전체 태그 페치)
@@ -177,13 +188,13 @@ func Parse(ctx context.Context, r io.Reader) (*model.Deck, error)
 
 ## 3. 단계별 개발 일정 및 세부 태스크 (Execution Plan)
 
-| 단계 | 작업 내용 | 담당 파일 | 예상 산출물 |
-| :---: | :--- | :--- | :--- |
-| **Phase 1** | **스타터 덱 임베딩 & `goslide init` 커맨드 구현**<br>• `assets/templates/starter.md` 독립 템플릿 파일 생성 및 `embed.FS` 바인딩<br>• `theme.Manager.GetStarterTemplate(theme)` 메서드 구현<br>• `initCmd` 선언, 파일 덮어쓰기 방지 및 `--force` 옵션 테스트 | `internal/theme/assets/templates/starter.md`<br>`internal/theme/embed.go`<br>`internal/theme/theme.go`<br>`cmd/goslide/init.go`<br>`cmd/goslide/init_test.go` | `goslide init` 및 임베딩 템플릿 완성 |
-| **Phase 2** | **Public Facade API 확립**<br>• 서드파티 연동용 `goslide.Build`, `goslide.Parse` 구현<br>• 함수형 옵션 패턴(`With...`) 정의<br>• 라이브러리 임포트 통합 단위 테스트 | `pkg/goslide/goslide.go`<br>`pkg/goslide/goslide_test.go` | `pkg/goslide` 공개 API |
-| **Phase 3** | **다중 포맷 일괄 빌드 파이프라인 연동**<br>• `-f html,pdf,pptx` 쉼표 구분 파싱 로직 추가<br>• `Deck` 1회 파싱 후 각 익스포터 순차 파이프라인 체이닝<br>• 디렉토리 대상 출력 경로 자동 매핑 | `cmd/goslide/build.go`<br>`cmd/goslide/build_test.go` | 일괄 빌드 기능 |
-| **Phase 4** | **GoReleaser 및 CI/CD 워크플로우 구축**<br>• 5개 플랫폼 타겟 `.goreleaser.yaml` 작성<br>• `.github/workflows/release.yml` 생성<br>• `goreleaser check` 정적 문법 유효성 검증 | `.goreleaser.yaml`<br>`.github/workflows/release.yml` | 크로스 배포 자동화 |
-| **Phase 5** | **종합 회귀 테스트 & v1.0.0 릴리즈**<br>• 50장 슬라이드 일괄 빌드 메모리/성능 검증 (< 100MB)<br>• `go test -race ./...` 동시성 안전성 검증<br>• v1.0.0 릴리즈 노트 작성 및 태그 발행 준비 | 전체 패키지<br>`docs/release-notes-v1.0.0.md` | v1.0.0 정식 릴리즈 완료 |
+| 단계 | 작업 내용 | 담당 파일 | 예상 산출물 | 상태 |
+| :---: | :--- | :--- | :--- | :---: |
+| **Phase 1** | **스타터 덱 임베딩 & `goslide init` 커맨드 구현**<br>• `assets/templates/demo.md` 독립 템플릿 파일 생성 및 `embed.FS` 바인딩<br>• `theme.Manager.GetStarterTemplate(theme)` 메서드 구현<br>• `initCmd` 선언, 파일 덮어쓰기 방지 및 `--force` 옵션 테스트<br>• Next Steps 온보딩 가이드 안내 | `internal/theme/assets/templates/demo.md`<br>`internal/theme/embed.go`<br>`internal/theme/theme.go`<br>`cmd/goslide/init.go`<br>`cmd/goslide/init_test.go` | `goslide init` 및 임베딩 템플릿 완성 | **완료 (Done)** |
+| **Phase 2** | **Public Facade API 확립**<br>• 서드파티 연동용 `goslide.Build`, `goslide.Parse` 구현<br>• 함수형 옵션 패턴(`With...`) 정의<br>• 라이브러리 임포트 통합 단위 테스트 | `pkg/goslide/goslide.go`<br>`pkg/goslide/goslide_test.go` | `pkg/goslide` 공개 API | 대기 |
+| **Phase 3** | **다중 포맷 일괄 빌드 파이프라인 연동**<br>• `-f all` 및 `-f html,pdf,pptx` 쉼표 구분 파싱 로직 추가<br>• `Deck` 1회 파싱 후 각 익스포터 순차 파이프라인 체이닝<br>• 디렉토리 대상 출력 경로 자동 매핑 | `cmd/goslide/build.go`<br>`cmd/goslide/build_test.go` | 일괄 빌드 기능 | **완료 (Done)** |
+| **Phase 4** | **GoReleaser 및 크로스 컴파일 파이프라인 구축**<br>• 5개 플랫폼 타겟 `.goreleaser.yaml` 작성<br>• `.github/workflows/release.yml` 생성<br>• `Makefile`에 `cross-build` 로컬 일괄 빌드 타겟 추가<br>• 상세 계획서: [cross-compilation-plan.md](file:///home/yundream/myjob/cloit/Goslide/task/cross-compilation-plan.md) | `.goreleaser.yaml`<br>`.github/workflows/release.yml`<br>`Makefile` | 크로스 배포 자동화 | **진행 예정** |
+| **Phase 5** | **종합 회귀 테스트 & v1.0.0 릴리즈**<br>• 50장 슬라이드 일괄 빌드 메모리/성능 검증 (< 100MB)<br>• `go test -race ./...` 동시성 안전성 검증<br>• v1.0.0 릴리즈 노트 작성 및 태그 발행 준비 | 전체 패키지<br>`docs/release-notes-v1.0.0.md` | v1.0.0 정식 릴리즈 완료 | 대기 |
 
 ---
 

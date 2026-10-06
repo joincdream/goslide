@@ -19,6 +19,7 @@ func postProcessHTML(html string) string {
 	html = transformMediaElements(html)
 	html = transformImages(html)
 	html = transformAlerts(html)
+	html = transformFragments(html)
 	return html
 }
 
