@@ -25,7 +25,7 @@ setup-tools:
 
 ## build-web: Build frontend Svelte 5 and Tailwind bundle
 build-web:
-	@if [ -d "web" ] && [ -x "$$(command -v npm)" ]; then \
+	@if [ -d "web/node_modules" ] && [ -x "$$(command -v npm)" ]; then \
 		echo "==> Building web frontend (Svelte 5 + Tailwind)..."; \
 		cd web && npm run build; \
 	fi
