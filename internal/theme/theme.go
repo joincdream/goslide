@@ -5,17 +5,21 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"regexp"
 	"strings"
 )
 
 // ErrThemeNotFound indicates that the requested theme name does not exist in built-in assets.
 var ErrThemeNotFound = errors.New("theme not found")
 
+var themeFrontmatterRegex = regexp.MustCompile(`(?m)^theme:\s*["']?[^"'\n]+["']?`)
+
 const (
 	// DefaultTheme is the fallback theme when none is specified.
 	DefaultTheme = "default"
 
-	coreJSPath = "assets/js/goslide-core.js"
+	coreJSPath          = "assets/js/goslide-core.js"
+	starterTemplatePath = "assets/templates/demo.md"
 )
 
 // baseCSSFiles defines the modular stylesheets that compose the foundational presentation styling.
@@ -122,3 +126,21 @@ func (m *Manager) ComposeFullCSS(themeName, customCSSPath, inlineCSS string) (st
 
 	return b.String(), nil
 }
+
+// GetStarterTemplate returns the embedded starter presentation Markdown template.
+// If themeName is provided, it replaces the theme property in the frontmatter.
+func (m *Manager) GetStarterTemplate(themeName string) (string, error) {
+	data, err := fs.ReadFile(m.fsys, starterTemplatePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read starter template %q: %w", starterTemplatePath, err)
+	}
+
+	content := string(data)
+	themeName = strings.TrimSpace(themeName)
+	if themeName != "" {
+		content = themeFrontmatterRegex.ReplaceAllString(content, fmt.Sprintf("theme: %q", themeName))
+	}
+
+	return content, nil
+}
+

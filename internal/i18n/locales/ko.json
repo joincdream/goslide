@@ -17,6 +17,13 @@
   "cli.build.flag.quiet": "정보성 빌드 메시지 출력 숨김",
   "cli.build.flag.verbose": "상세한 진단 빌드 로그 출력",
 
+  "cli.init.desc": "새로운 샘플 마크다운 프레젠테이션 파일 생성",
+  "cli.init.long": "Goslide의 다양한 핵심 기능(레이아웃, 코드 구문 강조, 수식, Mermaid 다이어그램, 단계적 빌드, 발표자 메모)을 망라한 샘플 마크다운 파일(.md)을 생성합니다.",
+  "cli.init.example": "  # 기본 presentation.md 파일 생성 (clean 테마)\n  goslide init\n\n  # 특정 파일명 및 dark 테마로 생성\n  goslide init talk.md --theme dark\n\n  # 기존 파일 강제 덮어쓰기\n  goslide init presentation.md --force",
+  "cli.init.flag.theme": "스타터 테마 이름 (default, clean, dark)",
+  "cli.init.flag.force": "기존 파일이 존재할 경우 확인 없이 덮어쓰기",
+  "cli.init.success": "✓ 샘플 프레젠테이션 파일이 생성되었습니다: %s\n\n🚀 다음 추천 작업:\n  1. 실시간 핫리로드 개발 서버 실행:\n     goslide serve %s\n\n  2. HTML, PDF, PPTX 슬라이드 빌드:\n     goslide build %s -f html,pdf,pptx -o dist/\n\n  3. 전체 기능 및 옵션 확인:\n     goslide --help\n\n📖 문서 및 공식 저장소:\n  https://github.com/joincdream/goslide",
+
   "cli.serve.desc": "실시간 핫 리로드를 지원하는 로컬 개발 서버 시작",
   "cli.serve.long": "마크다운 파일의 수정을 실시간으로 감지하여 브라우저를 자동 새로고침(Hot Reload)하는\n초고속 로컬 개발 서버를 구동합니다.\n\n표준 Server-Sent Events(SSE) 스트리밍을 통해 마크다운 저장 즉시 300ms 이내에 반영되며,\n작업 중이던 슬라이드 위치(인덱스)가 브라우저 해시(#)와 연동되어 안정적으로 보존됩니다.",
   "cli.serve.example": "  # 기본 개발 서버 시작 (http://localhost:8080)\n  goslide serve presentation.md\n\n  # 포트 변경 및 기본 브라우저 자동 실행\n  goslide serve presentation.md --port 3000 --open\n\n  # 외부 접속 허용 (0.0.0.0 바인드)\n  goslide serve talk.md --bind 0.0.0.0 -p 8080\n\n  # 다크 테마 및 커스텀 CSS 적용하여 프리뷰\n  goslide serve talk.md -t dark --theme-path ./custom.css",

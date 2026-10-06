@@ -202,3 +202,38 @@ func TestManager_GetCoreJS(t *testing.T) {
 		t.Errorf("core js missing toggleDrawMode function")
 	}
 }
+
+func TestManager_GetStarterTemplate(t *testing.T) {
+	t.Parallel()
+
+	mgr := theme.NewManager(nil)
+
+	t.Run("default template load", func(t *testing.T) {
+		tpl, err := mgr.GetStarterTemplate("")
+		if err != nil {
+			t.Fatalf("unexpected error getting starter template: %v", err)
+		}
+
+		if !strings.Contains(tpl, "theme: \"clean\"") {
+			t.Errorf("expected default template to contain theme: \"clean\", got:\n%s", tpl[:100])
+		}
+		if !strings.Contains(tpl, "<!-- _layout: cover -->") {
+			t.Errorf("expected starter template to contain cover layout")
+		}
+		if !strings.Contains(tpl, "flowchart LR") {
+			t.Errorf("expected starter template to contain mermaid diagram")
+		}
+	})
+
+	t.Run("custom theme override", func(t *testing.T) {
+		tpl, err := mgr.GetStarterTemplate("dark")
+		if err != nil {
+			t.Fatalf("unexpected error getting starter template: %v", err)
+		}
+
+		if !strings.Contains(tpl, "theme: \"dark\"") {
+			t.Errorf("expected overridden template to contain theme: \"dark\", got:\n%s", tpl[:100])
+		}
+	})
+}
+

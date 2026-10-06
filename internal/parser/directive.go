@@ -46,8 +46,8 @@ func (dm *directiveManager) processSlide(rawContent string) slideParseResult {
 		}
 		commentBody := strings.TrimSpace(submatches[1])
 
-		// Preserve 2-column split marker
-		if commentBody == "split" {
+		// Preserve 2-column split marker and incremental build pause marker
+		if strings.EqualFold(commentBody, "split") || strings.EqualFold(commentBody, "pause") {
 			return fullMatch
 		}
 
@@ -166,6 +166,9 @@ var directiveRegistry = map[string]directiveHandler{
 			}
 		}
 	},
+	"background": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		target.BackgroundColor = value
+	},
 	"backgroundColor": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
 		target.BackgroundColor = value
 	},
@@ -192,6 +195,11 @@ var directiveRegistry = map[string]directiveHandler{
 	},
 	"autofit": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
 		target.Autofit = (value == "true" || value == "1" || value == "on")
+	},
+	"fragmentStyle": func(value string, target *model.SlideDirectives, _ *model.LayoutType) {
+		if strings.EqualFold(value, "dim") {
+			target.Class = append(target.Class, "dim-fragments")
+		}
 	},
 }
 

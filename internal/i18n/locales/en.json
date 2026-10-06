@@ -17,6 +17,13 @@
   "cli.build.flag.quiet": "Suppress informational build messages",
   "cli.build.flag.verbose": "Enable detailed diagnostic build output",
 
+  "cli.init.desc": "Create a new starter presentation Markdown file",
+  "cli.init.long": "Initializes a rich sample presentation Markdown file (.md) showcasing Goslide features (layouts, code highlighting, math, mermaid diagrams, incremental fragments, and presenter notes).",
+  "cli.init.example": "  # Create default presentation.md with clean theme\n  goslide init\n\n  # Create presentation with specific filename and dark theme\n  goslide init talk.md --theme dark\n\n  # Overwrite existing file\n  goslide init presentation.md --force",
+  "cli.init.flag.theme": "Starter theme name (default, clean, dark)",
+  "cli.init.flag.force": "Overwrite existing file without confirmation",
+  "cli.init.success": "✓ Created sample presentation to %s\n\n🚀 Next Steps:\n  1. Live preview & presentation:\n     goslide serve %s\n\n  2. Build to HTML, PDF, or PPTX:\n     goslide build %s -f html,pdf,pptx -o dist/\n\n  3. Explore features & options:\n     goslide --help\n\n📖 Documentation & Source:\n  https://github.com/joincdream/goslide",
+
   "cli.serve.desc": "Start local development server with live reload",
   "cli.serve.long": "Starts an ultra-fast local development server that watches the Markdown file for changes\nand automatically refreshes the browser with live hot reload.\n\nPowered by standard Server-Sent Events (SSE), updates render in under 300ms while preserving\nyour active slide position via URL hash sync.",
   "cli.serve.example": "  # Start default development server (http://localhost:8080)\n  goslide serve presentation.md\n\n  # Change port and automatically open default browser\n  goslide serve presentation.md --port 3000 --open\n\n  # Allow remote access (bind to 0.0.0.0)\n  goslide serve talk.md --bind 0.0.0.0 -p 8080\n\n  # Preview with dark theme and custom CSS\n  goslide serve talk.md -t dark --theme-path ./custom.css",

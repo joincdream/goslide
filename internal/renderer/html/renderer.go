@@ -167,7 +167,17 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 	htmlContent := s.HTMLContent
 	leftHTML := s.LeftHTML
 	rightHTML := s.RightHTML
+	bgColor := s.Directives.BackgroundColor
 	bgImage := s.Directives.BackgroundImage
+	isBgGradient := false
+
+	if strings.Contains(bgImage, "-gradient(") {
+		isBgGradient = true
+	} else if strings.Contains(bgColor, "-gradient(") {
+		bgImage = bgColor
+		bgColor = ""
+		isBgGradient = true
+	}
 
 	if r.standalone {
 		var err error
@@ -175,7 +185,7 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		if err != nil {
 			return slideTemplateData{}, err
 		}
-		if bgImage != "" {
+		if bgImage != "" && !isBgGradient {
 			bgImage = r.bundler.BundleSingleImage(bgImage)
 		}
 	}
@@ -191,14 +201,15 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 	}
 
 	return slideTemplateData{
-		Index:       s.Index,
-		IsFirst:     i == 0,
-		Layout:      string(s.Layout),
-		Classes:     strings.Join(s.Directives.Class, " "),
-		BgColor:     s.Directives.BackgroundColor,
-		BgImage:     bgImage,
-		BgDim:       template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
-		Color:       s.Directives.Color,
+		Index:        s.Index,
+		IsFirst:      i == 0,
+		Layout:       string(s.Layout),
+		Classes:      strings.Join(s.Directives.Class, " "),
+		BgColor:      template.CSS(bgColor), // nolint:gosec
+		BgImage:      template.CSS(bgImage), // nolint:gosec
+		IsBgGradient: isBgGradient,
+		BgDim:        template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
+		Color:        template.CSS(s.Directives.Color),                                           // nolint:gosec
 		Header:      header,
 		TitleHTML:   template.HTML(s.TitleHTML), // nolint:gosec
 		Footer:      footer,

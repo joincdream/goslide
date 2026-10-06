@@ -30,8 +30,11 @@ footer: "© 2026 joinc edu AI 기술연구소. All rights reserved."
 오늘 다룰 4가지 핵심 엔지니어링 주제 및 세션 진행 현황입니다:
 
 - [x] **트랜스포머 코어**: Self-Attention과 인과적 언어 모델링(Causal LM)
+<!-- pause -->
 - [ ] **최신 모델 비교**: 파라미터 스케일링 법칙과 벤치마크 평가
+<!-- pause -->
 - [ ] **도구 연동과 에이전트**: Tool Calling 및 구조화된 JSON 출력
+<!-- pause -->
 - [ ] **프로덕션 서빙**: Go 기반 고성능 스트리밍 프록시 아키텍처
 
 > [!NOTE] 세션 구성 안내
@@ -132,8 +135,7 @@ flowchart LR
 
 <!--
 _class: lead
-_backgroundImage: ./hands-on-bg.jpeg
-_backgroundDim: 0.55
+_backgroundImage: linear-gradient(135deg, #0b192c 0%, #1e3e62 60%, #0073bb 100%)
 _color: #ffffff
 -->
 
@@ -156,7 +158,7 @@ _class: compact
 
 LLM이 정형화된 JSON 도구 스키마를 판별하여 외부 API를 실행하는 표준 패턴입니다:
 
-```python
+```python {5-19}
 import json
 from openai import OpenAI
 
@@ -276,7 +278,7 @@ _class: compact
 
 Go의 고루틴과 표준 `net/http` SSE를 결합한 무할당(Zero-Alloc) 토큰 스트리밍 아키텍처:
 
-```go
+```go {15-18,21-25}
 package main
 
 import (
@@ -316,12 +318,15 @@ func StreamTokenProxy(ctx context.Context, w http.ResponseWriter, upstreamBody i
 ---
 
 <!-- _layout: section -->
+<!-- _fragmentStyle: dim -->
 
 # 엔지니어링 결론 및 로드맵
 ### "단순 호출을 넘어 자율 에이전트와 도메인 최적화로"
 
 * **결정론적 검증 체계** — 엄격한 스키마 검증을 통한 환각(Hallucination) 방어
+<!-- pause -->
 * **엔터프라이즈 프라이빗 서빙** — 오픈 모델 기반 TCO 절감 및 데이터 주권 확보
+<!-- pause -->
 * **실시간 관측 가능성(Observability)** — TTFT 지연시간 및 토큰 처리량 실시간 계측
 
 <!-- note:

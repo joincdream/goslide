@@ -61,6 +61,9 @@ func initCLI() {
 	if !hasCommand(rootCmd, serveCmd.Name()) {
 		rootCmd.AddCommand(serveCmd)
 	}
+	if !hasCommand(rootCmd, initCmd.Name()) {
+		rootCmd.AddCommand(initCmd)
+	}
 }
 
 func hasCommand(root *cobra.Command, name string) bool {
@@ -84,6 +87,10 @@ func refreshCLITexts() {
 	serveCmd.Short = i18n.T("cli.serve.desc")
 	serveCmd.Long = i18n.T("cli.serve.long")
 	serveCmd.Example = i18n.T("cli.serve.example")
+
+	initCmd.Short = i18n.T("cli.init.desc")
+	initCmd.Long = i18n.T("cli.init.long")
+	initCmd.Example = i18n.T("cli.init.example")
 
 	updateFlagDescriptions()
 }
@@ -111,6 +118,8 @@ func updateFlagDescriptions() {
 		{serveCmd, "theme", "cli.serve.flag.theme"},
 		{serveCmd, "theme-path", "cli.serve.flag.theme_path"},
 		{serveCmd, "debounce", "cli.serve.flag.debounce"},
+		{initCmd, "theme", "cli.init.flag.theme"},
+		{initCmd, "force", "cli.init.flag.force"},
 	}
 
 	for _, s := range specs {
