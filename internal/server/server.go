@@ -169,6 +169,13 @@ func (s *Server) serveStaticAsset(w http.ResponseWriter, r *http.Request) {
 	cleanPath := filepath.Clean(strings.TrimPrefix(r.URL.Path, "/"))
 	targetPath := filepath.Join(s.baseDir, cleanPath)
 
+	// Prevent directory traversal outside of baseDir
+	rel, err := filepath.Rel(s.baseDir, targetPath)
+	if err != nil || strings.HasPrefix(rel, "..") || rel == ".." {
+		http.NotFound(w, r)
+		return
+	}
+
 	info, err := os.Stat(targetPath)
 	if err != nil || info.IsDir() {
 		http.NotFound(w, r)

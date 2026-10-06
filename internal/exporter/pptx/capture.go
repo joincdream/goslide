@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -55,6 +56,14 @@ html, body {
 #goslide-app, .goslide-canvas, .goslide-indicator, .slide-badge, .slide-controls {
 	display: none !important;
 }
+.fragment {
+	opacity: 1 !important;
+	transform: none !important;
+	pointer-events: auto !important;
+}
+.highlight-container.has-highlights .line {
+	opacity: 1 !important;
+}
 `
 
 // CaptureSlides launches headless Chrome, iterates through each slide in the intermediate HTML,
@@ -82,7 +91,11 @@ func CaptureSlides(ctx context.Context, htmlFilePath string, slideCount int, opt
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve absolute HTML path: %w", err)
 	}
-	fileURL := "file://" + absHTMLPath
+	slashPath := filepath.ToSlash(absHTMLPath)
+	if !strings.HasPrefix(slashPath, "/") {
+		slashPath = "/" + slashPath
+	}
+	fileURL := "file://" + slashPath
 
 	allocOpts := append(chromedp.DefaultExecAllocatorOptions[:],
 		chromedp.ExecPath(browserPath),

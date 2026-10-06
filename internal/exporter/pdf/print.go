@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -41,7 +42,11 @@ func PrintHTMLToPDF(ctx context.Context, htmlFilePath string, opts PrintOptions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve absolute HTML path: %w", err)
 	}
-	fileURL := "file://" + absHTMLPath
+	slashPath := filepath.ToSlash(absHTMLPath)
+	if !strings.HasPrefix(slashPath, "/") {
+		slashPath = "/" + slashPath
+	}
+	fileURL := "file://" + slashPath
 
 	// 1. Configure Allocator with headless Chrome flags
 	allocOpts := append(chromedp.DefaultExecAllocatorOptions[:],

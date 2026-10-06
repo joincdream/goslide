@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -177,6 +178,8 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		bgImage = bgColor
 		bgColor = ""
 		isBgGradient = true
+	} else if bgImage != "" {
+		bgImage = filepath.ToSlash(bgImage)
 	}
 
 	if r.standalone {
