@@ -48,8 +48,8 @@ var (
 )
 
 func init() {
-	buildCmd.Flags().StringVarP(&outputPathFlag, "output", "o", "", "Output file path (default: <input>.<ext>)")
-	buildCmd.Flags().StringVarP(&formatFlag, "format", "f", "html", "Output format: html, pdf, pptx (default: html)")
+	buildCmd.Flags().StringVarP(&outputPathFlag, "output", "o", "", "Output file path or directory (default: <input>.<ext>)")
+	buildCmd.Flags().StringVarP(&formatFlag, "format", "f", "html", "Output format: html, pdf, pptx, or all (comma-separated; default: html)")
 	buildCmd.Flags().StringVarP(&themeFlag, "theme", "t", "", "Theme name (default, clean, dark; overrides frontmatter)")
 	buildCmd.Flags().StringVar(&themePathFlag, "theme-path", "", "Path to custom external CSS stylesheet")
 	buildCmd.Flags().BoolVar(&standaloneFlag, "standalone", false, "Inline local image assets as Base64 Data URIs")
@@ -59,26 +59,66 @@ func init() {
 	buildCmd.RunE = runBuild
 }
 
-func validateBuildOptions(args []string) error {
+func parseAndValidateFormats(raw string) ([]string, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return []string{"html"}, nil
+	}
+
+	parts := strings.Split(raw, ",")
+	seen := make(map[string]bool)
+	var formats []string
+	hasAll := false
+
+	for _, p := range parts {
+		item := strings.TrimSpace(strings.ToLower(p))
+		if item == "" {
+			continue
+		}
+		if item == "all" {
+			hasAll = true
+			continue
+		}
+		if item != "html" && item != "pdf" && item != "pptx" {
+			return nil, newCLIError(model.ExitInvalidUsage, fmt.Errorf("unsupported output format %q: supported formats are 'html', 'pdf', 'pptx', or 'all'", p))
+		}
+		if !seen[item] {
+			seen[item] = true
+			formats = append(formats, item)
+		}
+	}
+
+	if hasAll {
+		return []string{"html", "pdf", "pptx"}, nil
+	}
+
+	if len(formats) == 0 {
+		return []string{"html"}, nil
+	}
+
+	return formats, nil
+}
+
+func validateBuildOptions(args []string) ([]string, error) {
 	if len(args) < 1 {
-		return newCLIError(model.ExitInvalidUsage, errors.New("input markdown file is required: goslide build <input.md>"))
+		return nil, newCLIError(model.ExitInvalidUsage, errors.New("input markdown file is required: goslide build <input.md>"))
 	}
 	if quietFlag && verboseFlag {
-		return newCLIError(model.ExitInvalidUsage, errors.New("cannot specify both --quiet and --verbose"))
+		return nil, newCLIError(model.ExitInvalidUsage, errors.New("cannot specify both --quiet and --verbose"))
 	}
-	fmtLower := strings.ToLower(formatFlag)
-	if fmtLower != "html" && fmtLower != "pdf" && fmtLower != "pptx" {
-		return newCLIError(model.ExitInvalidUsage, fmt.Errorf("unsupported output format %q: supported formats are 'html', 'pdf', 'pptx'", formatFlag))
+	formats, err := parseAndValidateFormats(formatFlag)
+	if err != nil {
+		return nil, err
 	}
 	if themePathFlag != "" {
 		if _, err := os.Stat(themePathFlag); err != nil {
 			if os.IsNotExist(err) {
-				return newCLIError(model.ExitFileNotFound, fmt.Errorf("custom CSS file %q not found", themePathFlag))
+				return nil, newCLIError(model.ExitFileNotFound, fmt.Errorf("custom CSS file %q not found", themePathFlag))
 			}
-			return newCLIError(model.ExitGeneralError, fmt.Errorf("failed to access custom CSS file %q: %w", themePathFlag, err))
+			return nil, newCLIError(model.ExitGeneralError, fmt.Errorf("failed to access custom CSS file %q: %w", themePathFlag, err))
 		}
 	}
-	return nil
+	return formats, nil
 }
 
 func openInputDeck(cmd *cobra.Command, inputPath string) (*model.Deck, error) {
@@ -166,13 +206,13 @@ func logBuildStatus(slidesCount int, inputPath, outputPath, chosenTheme string) 
 }
 
 func runBuild(cmd *cobra.Command, args []string) error {
-	if err := validateBuildOptions(args); err != nil {
+	formats, err := validateBuildOptions(args)
+	if err != nil {
 		return err
 	}
 
 	inputPath := args[0]
-	format := strings.ToLower(formatFlag)
-	outputPath := resolveOutputPath(inputPath, outputPathFlag, format)
+	outputPaths := resolveOutputPaths(inputPath, outputPathFlag, formats)
 
 	deck, err := openInputDeck(cmd, inputPath)
 	if err != nil {
@@ -180,22 +220,37 @@ func runBuild(cmd *cobra.Command, args []string) error {
 	}
 
 	chosenTheme := resolveThemeName(themeFlag, deck.GlobalAttrs.Theme)
-	switch format {
-	case "pdf":
-		if err := exportPDF(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-			return err
+
+	for _, format := range formats {
+		outputPath := outputPaths[format]
+		if outDir := filepath.Dir(outputPath); outDir != "" && outDir != "." {
+			if err := os.MkdirAll(outDir, 0755); err != nil {
+				return newCLIError(model.ExitGeneralError, fmt.Errorf("failed to create output directory %q: %w", outDir, err))
+			}
 		}
-	case "pptx":
-		if err := exportPPTX(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-			return err
+
+		switch format {
+		case "pdf":
+			if err := exportPDF(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+				return err
+			}
+		case "pptx":
+			if err := exportPPTX(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+				return err
+			}
+		default:
+			if err := renderAndWriteHTML(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+				return err
+			}
 		}
-	default:
-		if err := renderAndWriteHTML(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-			return err
-		}
+
+		logBuildStatus(len(deck.Slides), inputPath, outputPath, chosenTheme)
 	}
 
-	logBuildStatus(len(deck.Slides), inputPath, outputPath, chosenTheme)
+	if len(formats) > 1 && !quietFlag {
+		fmt.Printf("🎉 Successfully built %d formats [%s] from %s\n", len(formats), strings.Join(formats, ", "), inputPath)
+	}
+
 	return nil
 }
 
@@ -209,18 +264,53 @@ func resolveThemeName(cliTheme, frontmatterTheme string) string {
 	return theme.DefaultTheme
 }
 
-func resolveOutputPath(inputPath, outputFlag, format string) string {
-	if outputFlag != "" {
-		return outputFlag
+func isDirectoryPath(path string) bool {
+	if strings.HasSuffix(path, "/") || strings.HasSuffix(path, "\\") {
+		return true
 	}
+	if info, err := os.Stat(path); err == nil && info.IsDir() {
+		return true
+	}
+	return false
+}
+
+func resolveSingleOutputPath(inputPath, outputFlag, format string, isMulti bool) string {
 	ext := filepath.Ext(inputPath)
-	base := strings.TrimSuffix(inputPath, ext)
-	switch format {
-	case "pdf":
-		return base + ".pdf"
-	case "pptx":
-		return base + ".pptx"
-	default:
-		return base + ".html"
+	inputBase := strings.TrimSuffix(filepath.Base(inputPath), ext)
+	inputDir := filepath.Dir(inputPath)
+
+	if outputFlag == "" {
+		return filepath.Join(inputDir, fmt.Sprintf("%s.%s", inputBase, format))
 	}
+
+	if isDirectoryPath(outputFlag) {
+		return filepath.Join(outputFlag, fmt.Sprintf("%s.%s", inputBase, format))
+	}
+
+	if isMulti {
+		dir := filepath.Dir(outputFlag)
+		outExt := filepath.Ext(outputFlag)
+		outBase := strings.TrimSuffix(filepath.Base(outputFlag), outExt)
+		return filepath.Join(dir, fmt.Sprintf("%s.%s", outBase, format))
+	}
+
+	return outputFlag
+}
+
+func resolveOutputPaths(inputPath, outputFlag string, formats []string) map[string]string {
+	result := make(map[string]string, len(formats))
+
+	if len(formats) == 1 && outputFlag != "" && !isDirectoryPath(outputFlag) {
+		result[formats[0]] = outputFlag
+		return result
+	}
+
+	for _, f := range formats {
+		result[f] = resolveSingleOutputPath(inputPath, outputFlag, f, len(formats) > 1)
+	}
+	return result
+}
+
+func resolveOutputPath(inputPath, outputFlag, format string) string {
+	return resolveSingleOutputPath(inputPath, outputFlag, format, false)
 }

@@ -430,3 +430,146 @@ func TestResolveOutputPath_Formats(t *testing.T) {
 		}
 	}
 }
+
+func TestParseAndValidateFormats(t *testing.T) {
+	tests := []struct {
+		input   string
+		want    []string
+		wantErr bool
+	}{
+		{"", []string{"html"}, false},
+		{"html", []string{"html"}, false},
+		{"pdf", []string{"pdf"}, false},
+		{"pptx", []string{"pptx"}, false},
+		{"all", []string{"html", "pdf", "pptx"}, false},
+		{"ALL", []string{"html", "pdf", "pptx"}, false},
+		{"html,pdf", []string{"html", "pdf"}, false},
+		{"pdf, pptx", []string{"pdf", "pptx"}, false},
+		{"HTML, PDF, PPTX", []string{"html", "pdf", "pptx"}, false},
+		{"html, all", []string{"html", "pdf", "pptx"}, false},
+		{"docx", nil, true},
+		{"html, docx", nil, true},
+	}
+
+	for _, tt := range tests {
+		got, err := parseAndValidateFormats(tt.input)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("parseAndValidateFormats(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
+			continue
+		}
+		if !tt.wantErr {
+			if len(got) != len(tt.want) {
+				t.Errorf("parseAndValidateFormats(%q) len = %d, want %d", tt.input, len(got), len(tt.want))
+				continue
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("parseAndValidateFormats(%q)[%d] = %q, want %q", tt.input, i, got[i], tt.want[i])
+				}
+			}
+		}
+	}
+}
+
+func TestResolveOutputPaths_Multi(t *testing.T) {
+	formats := []string{"html", "pdf", "pptx"}
+
+	t.Run("directory output flag", func(t *testing.T) {
+		got := resolveOutputPaths("docs/talk.md", "dist/", formats)
+		if got["html"] != filepath.Join("dist", "talk.html") {
+			t.Errorf("expected dist/talk.html, got: %s", got["html"])
+		}
+		if got["pdf"] != filepath.Join("dist", "talk.pdf") {
+			t.Errorf("expected dist/talk.pdf, got: %s", got["pdf"])
+		}
+		if got["pptx"] != filepath.Join("dist", "talk.pptx") {
+			t.Errorf("expected dist/talk.pptx, got: %s", got["pptx"])
+		}
+	})
+
+	t.Run("custom filename output flag with multiple formats", func(t *testing.T) {
+		got := resolveOutputPaths("talk.md", "out/final.pdf", formats)
+		if got["html"] != filepath.Join("out", "final.html") {
+			t.Errorf("expected out/final.html, got: %s", got["html"])
+		}
+		if got["pdf"] != filepath.Join("out", "final.pdf") {
+			t.Errorf("expected out/final.pdf, got: %s", got["pdf"])
+		}
+		if got["pptx"] != filepath.Join("out", "final.pptx") {
+			t.Errorf("expected out/final.pptx, got: %s", got["pptx"])
+		}
+	})
+
+	t.Run("empty output flag default path", func(t *testing.T) {
+		got := resolveOutputPaths("docs/talk.md", "", formats)
+		if got["html"] != filepath.Join("docs", "talk.html") {
+			t.Errorf("expected docs/talk.html, got: %s", got["html"])
+		}
+		if got["pdf"] != filepath.Join("docs", "talk.pdf") {
+			t.Errorf("expected docs/talk.pdf, got: %s", got["pdf"])
+		}
+		if got["pptx"] != filepath.Join("docs", "talk.pptx") {
+			t.Errorf("expected docs/talk.pptx, got: %s", got["pptx"])
+		}
+	})
+}
+
+func TestBuildCommand_MultiFormat_Batch(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
+	tempDir := t.TempDir()
+	sampleMD := filepath.Join(tempDir, "talk.md")
+	distDir := filepath.Join(tempDir, "dist")
+
+	content := `---
+title: "Multi-Format Test"
+theme: "clean"
+---
+# First Slide
+<!-- note: Notes test -->
+---
+## Second Slide
+`
+	if err := os.WriteFile(sampleMD, []byte(content), 0600); err != nil {
+		t.Fatalf("failed to write test md: %v", err)
+	}
+
+	// Test -f all with directory output
+	buildCmd.SetArgs([]string{sampleMD, "-f", "all", "-o", distDir + "/"})
+	if err := buildCmd.Execute(); err != nil {
+		t.Fatalf("build command with -f all failed: %v", err)
+	}
+
+	htmlFile := filepath.Join(distDir, "talk.html")
+	pdfFile := filepath.Join(distDir, "talk.pdf")
+	pptxFile := filepath.Join(distDir, "talk.pptx")
+
+	if _, err := os.Stat(htmlFile); err != nil {
+		t.Errorf("expected %s to be created: %v", htmlFile, err)
+	}
+	if _, err := os.Stat(pdfFile); err != nil {
+		t.Errorf("expected %s to be created: %v", pdfFile, err)
+	}
+	if _, err := os.Stat(pptxFile); err != nil {
+		t.Errorf("expected %s to be created: %v", pptxFile, err)
+	}
+
+	// Test subset -f html,pdf
+	resetFlags()
+	subsetDir := filepath.Join(tempDir, "subset")
+	buildCmd.SetArgs([]string{sampleMD, "-f", "html,pdf", "-o", subsetDir + "/"})
+	if err := buildCmd.Execute(); err != nil {
+		t.Fatalf("build command with -f html,pdf failed: %v", err)
+	}
+
+	if _, err := os.Stat(filepath.Join(subsetDir, "talk.html")); err != nil {
+		t.Errorf("expected subset talk.html to be created")
+	}
+	if _, err := os.Stat(filepath.Join(subsetDir, "talk.pdf")); err != nil {
+		t.Errorf("expected subset talk.pdf to be created")
+	}
+	if _, err := os.Stat(filepath.Join(subsetDir, "talk.pptx")); err == nil {
+		t.Errorf("talk.pptx should NOT be created when only html,pdf requested")
+	}
+}
