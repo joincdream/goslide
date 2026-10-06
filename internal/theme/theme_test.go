@@ -236,4 +236,3 @@ func TestManager_GetStarterTemplate(t *testing.T) {
 		}
 	})
 }
-

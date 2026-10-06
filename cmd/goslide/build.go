@@ -205,6 +205,23 @@ func logBuildStatus(slidesCount int, inputPath, outputPath, chosenTheme string) 
 	}
 }
 
+type formatBuilder func(cmd *cobra.Command, deck *model.Deck, inputPath, outputPath, chosenTheme string) error
+
+var formatBuilders = map[string]formatBuilder{
+	"html": renderAndWriteHTML,
+	"pdf":  exportPDF,
+	"pptx": exportPPTX,
+}
+
+func ensureOutputDir(outputPath string) error {
+	if outDir := filepath.Dir(outputPath); outDir != "" && outDir != "." {
+		if err := os.MkdirAll(outDir, 0755); err != nil {
+			return newCLIError(model.ExitGeneralError, fmt.Errorf("failed to create output directory %q: %w", outDir, err))
+		}
+	}
+	return nil
+}
+
 func runBuild(cmd *cobra.Command, args []string) error {
 	formats, err := validateBuildOptions(args)
 	if err != nil {
@@ -223,25 +240,17 @@ func runBuild(cmd *cobra.Command, args []string) error {
 
 	for _, format := range formats {
 		outputPath := outputPaths[format]
-		if outDir := filepath.Dir(outputPath); outDir != "" && outDir != "." {
-			if err := os.MkdirAll(outDir, 0755); err != nil {
-				return newCLIError(model.ExitGeneralError, fmt.Errorf("failed to create output directory %q: %w", outDir, err))
-			}
+		if err := ensureOutputDir(outputPath); err != nil {
+			return err
 		}
 
-		switch format {
-		case "pdf":
-			if err := exportPDF(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-				return err
-			}
-		case "pptx":
-			if err := exportPPTX(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-				return err
-			}
-		default:
-			if err := renderAndWriteHTML(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
-				return err
-			}
+		builder, ok := formatBuilders[format]
+		if !ok {
+			return newCLIError(model.ExitInvalidUsage, fmt.Errorf("unsupported output format %q", format))
+		}
+
+		if err := builder(cmd, deck, inputPath, outputPath, chosenTheme); err != nil {
+			return err
 		}
 
 		logBuildStatus(len(deck.Slides), inputPath, outputPath, chosenTheme)

@@ -13,10 +13,10 @@ type documentTemplateData struct {
 }
 
 type slideTemplateData struct {
-	Index       int
-	IsFirst     bool
-	Layout      string
-	Classes     string
+	Index        int
+	IsFirst      bool
+	Layout       string
+	Classes      string
 	BgColor      template.CSS
 	BgImage      template.CSS
 	IsBgGradient bool

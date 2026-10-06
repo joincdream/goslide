@@ -143,4 +143,3 @@ func (m *Manager) GetStarterTemplate(themeName string) (string, error) {
 
 	return content, nil
 }
-

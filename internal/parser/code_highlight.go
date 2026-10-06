@@ -10,9 +10,10 @@ var highlightRangeRegex = regexp.MustCompile(`\{([0-9\s,-]+)\}`)
 
 // parseCodeInfo parses language and highlight line ranges from fenced code block info.
 // Examples:
-//   "go" -> "go", nil
-//   "go {2,4-6}" -> "go", [][2]int{{2, 2}, {4, 6}}
-//   "python { 1-3, 5 }" -> "python", [][2]int{{1, 3}, {5, 5}}
+//
+//	"go" -> "go", nil
+//	"go {2,4-6}" -> "go", [][2]int{{2, 2}, {4, 6}}
+//	"python { 1-3, 5 }" -> "python", [][2]int{{1, 3}, {5, 5}}
 func parseCodeInfo(info string) (string, [][2]int) {
 	info = strings.TrimSpace(info)
 	if info == "" {
@@ -94,4 +95,3 @@ func postProcessHighlightedCode(html string, hasHighlights bool) string {
 
 	return html
 }
-
