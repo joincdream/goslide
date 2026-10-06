@@ -22,8 +22,11 @@
 * **Slide Boundary Rules**:
   * Slides must be separated by an isolated **`---` on its own line**.
   * Never insert `---` inside fenced code blocks (```` ``` ````).
+* **Two-Column Split Requirement**:
+  * When using `<!-- _layout: two-cols -->`, you **must insert `<!-- split -->` on its own line** between the left and right column contents.
+  * Left column: typically 3–4 concise bullet points. Right column: supporting code snippet, diagram, or image.
 * **Directive Scope Rule (`_`)**:
-  * Directives prefixed with an underscore (`_`) apply **locally to that single slide only** (e.g., `_layout`, `_backgroundImage`, `_paginate`).
+  * Directives prefixed with an underscore (`_`) apply **locally to that single slide only** (e.g., `_layout`, `_backgroundImage`, `_paginate`, `_fragmentStyle`).
   * Directives without an underscore are inherited by all subsequent slides.
 
 ---
@@ -54,7 +57,7 @@ footer: "Footer Text"  # Global bottom footer
 
 ### 2.3 Visual Styling Directives
 * **Background Image**: `<!-- _backgroundImage: url('images/bg.png') -->`
-* **Background Dim (Darkening Overlay)**: `<!-- _backgroundDim: 0.5 -->` (0.1 to 0.9, ensures high text legibility)
+* **Background Dim (Darkening Overlay)**: `<!-- _backgroundDim: 0.5 -->` (0.1 to 0.9, ensures high text legibility over busy photos)
 * **Background Color**: `<!-- _backgroundColor: #0f172a -->`
 * **Text Color**: `<!-- _color: #ffffff -->`
 * **Theme Inversion Class**: `<!-- _class: invert -->`
@@ -65,22 +68,85 @@ Placed at the bottom of the slide; visible only in presenter view (`P` key) and 
 ```markdown
 <!-- note:
 - Emphasize the latency benefits of item 2 in under 60 seconds.
+- Remind attendees about the Q&A session at the end.
 -->
 ```
 
-### 2.5 Supported Markdown Extensions
-* **Fenced Code Blocks & Line Highlighting**: ````go {2-4,7}```` (Native Chroma syntax highlighting with line focus; dims unselected lines)
-* **Incremental Reveal (Fragments)**: `<!-- pause -->` (Steps through bullets or paragraphs one-by-one with space/arrow keys)
-* **Fragment Dim Style**: `<!-- _fragmentStyle: dim -->` (Pre-renders unrevealed bullets at 25% opacity before focus)
-* **LaTeX Math (KaTeX)**: Inline `$E=mc^2$` or block `$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$`
-* **GFM Callouts**: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!IMPORTANT]`
-* **Task Checklists**: `- [x] Completed task`, `- [ ] Planned task`
+### 2.5 Supported Markdown Extensions & Interactive Directives
+
+#### 2.5.1 Incremental Reveal (Step-by-Step Animation)
+Use `<!-- pause -->` between bullet points or paragraphs. Each item following `<!-- pause -->` remains hidden until the presenter advances the slide with Space or Arrow keys:
+```markdown
+- First visible point
+<!-- pause -->
+- Second point (revealed on next keypress)
+<!-- pause -->
+- Third point (revealed on subsequent keypress)
+```
+* **Dim Fragment Style**: Add `<!-- _fragmentStyle: dim -->` to pre-render unrevealed items at 25% opacity instead of fully hiding them, guiding audience anticipation.
+
+#### 2.5.2 Code Blocks & Specific Line Highlighting
+Highlight key code lines while automatically dimming unselected lines using `{lines}` notation:
+````markdown
+```go {2,4-6}
+func main() {
+    ctx := context.Background() // Line 2: highlighted
+    client := NewClient()       // Line 3: dimmed
+    for token := range stream { // Lines 4-6: highlighted
+        fmt.Println(token)
+    }
+}
+```
+````
+
+#### 2.5.3 Image Sizing & Centering
+Control image dimensions and alignment directly within the alt-text attribute:
+```markdown
+![w:400 h:250](images/diagram.png)       <!-- Width 400px, height 250px -->
+![w:60% center](images/architecture.png)  <!-- 60% viewport width, centered horizontally -->
+![height:300px](images/screenshot.png)   <!-- Height 300px, auto aspect ratio -->
+```
+
+#### 2.5.4 Responsive YouTube Video Embed
+Embed YouTube videos with responsive 16:9 aspect ratios by pasting standard watch or shortened URLs inside markdown image syntax:
+```markdown
+![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+![](https://youtu.be/dQw4w9WgXcQ?t=1m30s) <!-- Supports start timestamps -->
+```
+
+#### 2.5.5 GFM Alerts / Callout Boxes
+Render visually distinct callout boxes with dedicated icons:
+```markdown
+> [!NOTE] Additional Context
+> Helpful background info or reference material.
+
+> [!TIP] Performance Optimization
+> Best practice recommendations for optimal throughput.
+
+> [!WARNING] Breaking Change
+> Critical notices, deprecated parameters, or risk warnings.
+```
+*(Supported types: `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, `[!CAUTION]`)*
+
+#### 2.5.6 Mermaid Diagrams & LaTeX Math (KaTeX)
+* **Mermaid Diagrams**: Native declarative flowcharts and sequence diagrams:
+  ````markdown
+  ```mermaid
+  graph LR
+      A[Markdown Source] --> B[Goslide Engine]
+      B --> C[HTML]
+      B --> D[PDF]
+      B --> E[PPTX]
+  ```
+  ````
+* **LaTeX Math**: Inline `$E=mc^2$` or display equation blocks `$$\sum_{i=1}^n x_i$$`.
+* **Task Checklists**: `- [x] Completed milestone`, `- [ ] Pending item`.
 
 ---
 
 ## 3. Golden Example Deck
 
-Below is a complete, production-ready 4-slide deck adhering to all rules and directives above. Replicate this exact structure, density, and formatting style when generating slides.
+Below is a complete, production-ready 5-slide deck adhering to all rules and directives above. Replicate this exact structure, density, and formatting style when generating slides.
 
 ````markdown
 ---
@@ -164,6 +230,8 @@ footer: "© 2026 Cloit Tech Architecture. All rights reserved."
 -->
 
 ---
+
+<!-- _fragmentStyle: dim -->
 
 ## Go Streaming Core Implementation
 

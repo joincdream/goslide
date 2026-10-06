@@ -62,6 +62,11 @@ func TestTransformAlerts(t *testing.T) {
 			shouldMatch: false,
 		},
 		{
+			name:        "unregistered alert tag fallbacks to plain blockquote",
+			input:       "<blockquote>\n<p>[!UNKNOWN] Not supported<br>Content</p>\n</blockquote>",
+			shouldMatch: false,
+		},
+		{
 			name:        "note alert default title",
 			input:       "<blockquote>\n<p>[!NOTE]\nThis is a note content.</p>\n</blockquote>",
 			wantType:    "note",

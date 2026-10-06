@@ -18,6 +18,7 @@
 3. **사용자 여정 중심 시나리오 테스트**: 실제 발표자의 사용 흐름을 반영한 4대 E2E 시나리오 수립.
 4. **브라우저 자동화 E2E 구현**: Go 내장 `chromedp`를 활용한 프론트엔드 UI 인터랙션 자동 검증 파이프라인 확립.
 5. **3대 OS 실기기 스모크 테스트**: 실제 Microsoft PowerPoint 및 Apple Keynote 호환성 검증.
+6. **문서화 및 릴리즈 에셋 무결성**: README.md(영/한), 공식 예제, 릴리즈 바이너리 다운로드 경로 및 CLI 가이드라인 최신화 검증.
 
 ---
 
@@ -203,7 +204,36 @@ func TestE2E_BrowserSlideInteraction(t *testing.T) {
 
 ---
 
-## 7. 출시 판정 게이트 (Release Gate / Definition of Done)
+## 7. 문서화 및 릴리즈 에셋 정비 계획 (Documentation & Release Readiness)
+
+성공적인 v1.0.0 출시와 개발자 온보딩 경험(DX)을 극대화하기 위해 코드 외적인 문서와 릴리즈 에셋을 체계적으로 정비합니다.
+
+### 7.1 README.md (영문) & README.ko.md (한글) 전면 리뉴얼
+| 구분 | 점검 및 정비 항목 | 세부 개선 내용 | 상태 |
+| :--- | :--- | :--- | :---: |
+| **릴리즈 다운로드** | OS별 사전 빌드 바이너리 링크 | GitHub Releases 최신 다운로드 링크 및 뱃지 전면 배치, Linux/macOS/Windows 원클릭 다운로드 표 제공 | [ ] |
+| **빠른 시작 워크플로우** | `goslide init` 기반 개편 | 빈 파일 수동 복사 대신 `goslide init presentation.md --theme clean` 명령어 중심의 3단계 가이드로 개편 | [ ] |
+| **다중 포맷 일괄 빌드** | `-f all` 파이프라인 반영 | 포맷별 3회 분할 빌드 예시를 `goslide build presentation.md -f all -o dist/` 단일 명령어로 교체 | [ ] |
+| **단축키 & 툴킷 테이블** | 최신 인터랙션 도구 반영 | `B`(화면 암전), `W`(백색 전환), `N`(사이드바), `?`(단축키 도움말), 판서 펜 툴바 안내 갱신 | [ ] |
+| **지시어 문법 정합성** | 로컬 지시어 표기 통일 | 본문 예제의 지시어를 실제 파서 표준인 `<!-- _layout: cover -->` (언더스코어 포함)로 일괄 동기화 | [ ] |
+
+### 7.2 공식 예제 및 DSL 사양서 동기화
+- [ ] **`examples/example-dsl.md` & `examples/example-dsl.ko.md`**:
+  - v1.0.0 스펙에 맞춰 라인 하이라이트(`{1,3-5}`), 스텝 애니메이션(`dim-fragments`), 미디어 임베드 등 신규 DSL 문법 반영 확인.
+- [ ] **공식 데모 슬라이드 (`testdata/demo.md` & `testdata/demo.ko.md`)**:
+  - `goslide build testdata/demo.md -f all` 실행 시 오류 없이 3종 포맷(HTML, PDF, PPTX)이 완벽히 생성되는지 회귀 검증.
+
+### 7.3 GitHub Releases 배포 자동화 및 설치 스크립트 점검
+- [ ] **OS별 아카이브 구조**:
+  - `goslide_1.0.0_linux_amd64.tar.gz`, `goslide_1.0.0_darwin_arm64.tar.gz`, `goslide_1.0.0_windows_amd64.zip` 패키징 무결성.
+- [ ] **무결성 검증 파일**:
+  - 각 바이너리의 SHA-256 해시를 담은 `checksums.txt` 자동 생성 및 검증.
+- [ ] **빠른 설치 스크립트 지원 검토**:
+  - `curl -sSL https://raw.githubusercontent.com/joincdream/goslide/main/install.sh | sh` 형태의 원라이너 설치 지원 여부 검토.
+
+---
+
+## 8. 출시 판정 게이트 (Release Gate / Definition of Done)
 
 공식 `v1.0.0` 태그를 발행하기 위한 최종 통과 기준:
 
@@ -216,3 +246,8 @@ func TestE2E_BrowserSlideInteraction(t *testing.T) {
    * 50장 복합 슬라이드 일괄 빌드 시 메모리 피크 100MB 이하, 빌드 소요 시간 3초 이내.
 4. **배포 게이트**:
    * GitHub Actions 가상머신에서 Linux, macOS, Windows 5개 바이너리 및 아카이브, `checksums.txt` 정상 업로드 확인.
+5. **문서화 및 온보딩 게이트 (Documentation & Onboarding Gate)**:
+   * `README.md` 및 `README.ko.md`에 최신 CLI 워크플로우(`init`, `-f all`) 및 단축키 표 100% 반영 확인.
+   * GitHub Releases 공식 다운로드 링크(`https://github.com/joincdream/goslide/releases/latest`) 유효성 확인.
+   * README에 기재된 예제 코드 및 데모 파일 빌드 실행 시 에러 0건 확인.
+

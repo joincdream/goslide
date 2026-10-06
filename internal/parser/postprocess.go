@@ -12,8 +12,21 @@ var (
 	heightDirective  = regexp.MustCompile(`(?i)\b(?:height|h):([0-9]+%|[0-9]+(?:px|em|rem|vw|vh)?\b)`)
 	centerDirective  = regexp.MustCompile(`(?i)\bcenter\b`)
 	blockquoteRegex  = regexp.MustCompile(`(?s)<blockquote>(.*?)</blockquote>`)
-	alertHeaderRegex = regexp.MustCompile(`(?s)^\s*<p>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\s+([^\n<]+?))?(?:<br\s*/?>|\n|$)(.*?)(?:</p>)?$`)
+	alertHeaderRegex = regexp.MustCompile(`(?s)^\s*<p>\s*\[!([a-zA-Z0-9_-]+)\](?:\s+([^\n<]+?))?(?:<br\s*/?>|\n|$)(.*?)(?:</p>)?$`)
 )
+
+type alertDefinition struct {
+	Icon         string
+	DefaultTitle string
+}
+
+var defaultAlertRegistry = map[string]alertDefinition{
+	"note":      {Icon: "ℹ️", DefaultTitle: "Note"},
+	"tip":       {Icon: "💡", DefaultTitle: "Tip"},
+	"important": {Icon: "📌", DefaultTitle: "Important"},
+	"warning":   {Icon: "⚠️", DefaultTitle: "Warning"},
+	"caution":   {Icon: "🚨", DefaultTitle: "Caution"},
+}
 
 func postProcessHTML(html string) string {
 	html = transformMediaElements(html)
@@ -139,76 +152,64 @@ func isPureDigits(s string) bool {
 }
 
 func transformAlerts(html string) string {
-	return blockquoteRegex.ReplaceAllStringFunc(html, func(fullBQ string) string {
-		sub := blockquoteRegex.FindStringSubmatch(fullBQ)
-		if len(sub) < 2 {
-			return fullBQ
-		}
-		bqContent := strings.TrimSpace(sub[1])
-
-		// Look for [!NOTE], etc. in the first paragraph
-		pStart := strings.Index(bqContent, "<p>")
-		if pStart == -1 {
-			return fullBQ
-		}
-		pEnd := strings.Index(bqContent, "</p>")
-		var firstP string
-		var restBQ string
-		if pEnd != -1 {
-			firstP = bqContent[pStart : pEnd+4]
-			restBQ = strings.TrimSpace(bqContent[pEnd+4:])
-		} else {
-			firstP = bqContent[pStart:]
-			restBQ = ""
-		}
-
-		headerMatch := alertHeaderRegex.FindStringSubmatch(firstP)
-		if len(headerMatch) < 4 {
-			return fullBQ
-		}
-
-		alertType := strings.ToLower(headerMatch[1])
-		customTitle := strings.TrimSpace(headerMatch[2])
-		firstPRest := strings.TrimSpace(headerMatch[3])
-
-		title := customTitle
-		if title == "" {
-			title = strings.ToUpper(alertType[:1]) + alertType[1:]
-		}
-
-		icon := getAlertIcon(alertType)
-
-		var bodyBuilder strings.Builder
-		if firstPRest != "" {
-			bodyBuilder.WriteString(fmt.Sprintf("<p>%s</p>\n", firstPRest))
-		}
-		if restBQ != "" {
-			bodyBuilder.WriteString(restBQ)
-		}
-
-		return fmt.Sprintf(
-			`<div class="markdown-alert markdown-alert-%s"><div class="markdown-alert-title"><span class="markdown-alert-icon">%s</span> %s</div>%s</div>`,
-			alertType,
-			icon,
-			title,
-			bodyBuilder.String(),
-		)
-	})
+	return blockquoteRegex.ReplaceAllStringFunc(html, renderSingleAlert)
 }
 
-func getAlertIcon(alertType string) string {
-	switch alertType {
-	case "note":
-		return "ℹ️"
-	case "tip":
-		return "💡"
-	case "important":
-		return "📌"
-	case "warning":
-		return "⚠️"
-	case "caution":
-		return "🚨"
-	default:
-		return "ℹ️"
+func renderSingleAlert(fullBQ string) string {
+	sub := blockquoteRegex.FindStringSubmatch(fullBQ)
+	if len(sub) < 2 {
+		return fullBQ
 	}
+	bqContent := strings.TrimSpace(sub[1])
+
+	// Look for [!NOTE], etc. in the first paragraph
+	pStart := strings.Index(bqContent, "<p>")
+	if pStart == -1 {
+		return fullBQ
+	}
+	pEnd := strings.Index(bqContent, "</p>")
+	var firstP string
+	var restBQ string
+	if pEnd != -1 {
+		firstP = bqContent[pStart : pEnd+4]
+		restBQ = strings.TrimSpace(bqContent[pEnd+4:])
+	} else {
+		firstP = bqContent[pStart:]
+		restBQ = ""
+	}
+
+	headerMatch := alertHeaderRegex.FindStringSubmatch(firstP)
+	if len(headerMatch) < 4 {
+		return fullBQ
+	}
+
+	alertType := strings.ToLower(headerMatch[1])
+	alertDef, exists := defaultAlertRegistry[alertType]
+	if !exists {
+		return fullBQ
+	}
+
+	customTitle := strings.TrimSpace(headerMatch[2])
+	firstPRest := strings.TrimSpace(headerMatch[3])
+
+	title := customTitle
+	if title == "" {
+		title = alertDef.DefaultTitle
+	}
+
+	var bodyBuilder strings.Builder
+	if firstPRest != "" {
+		bodyBuilder.WriteString(fmt.Sprintf("<p>%s</p>\n", firstPRest))
+	}
+	if restBQ != "" {
+		bodyBuilder.WriteString(restBQ)
+	}
+
+	return fmt.Sprintf(
+		`<div class="markdown-alert markdown-alert-%s"><div class="markdown-alert-title"><span class="markdown-alert-icon">%s</span> %s</div>%s</div>`,
+		alertType,
+		alertDef.Icon,
+		title,
+		bodyBuilder.String(),
+	)
 }
