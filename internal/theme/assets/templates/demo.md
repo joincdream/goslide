@@ -270,6 +270,28 @@ flowchart LR
 
 ---
 
+<!-- _layout: two-cols -->
+## Media & Image Sizing Control
+
+### Landscape Image (PNG)
+`w:500` width directive:
+
+![w:500 Landscape Image](testdata/sample-img-01.png)
+
+<!-- split -->
+
+### Portrait Image (JPG)
+`w:300 center` width & center directive:
+
+![w:300 center Portrait Image](testdata/sample-img-02.jpg)
+
+<!-- note:
+- Media & Image sizing verification slide (Checklist 7.6).
+- Verifies w:500 and w:300 center directives with sample PNG and JPG images.
+-->
+
+---
+
 <!--
 _class: compact
 -->
