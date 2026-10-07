@@ -25,10 +25,34 @@ ${themeStylesCSS}
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
     header { background: #1e293b; border-bottom: 1px solid #334155; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-    .timer-box { font-family: monospace; font-size: 1.2rem; font-weight: bold; }
-    main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; padding: 12px; overflow: hidden; min-height: 0; }
+    .timer-box { font-family: monospace; font-size: 1.25rem; font-weight: bold; color: #38bdf8; background: #0f172a; padding: 4px 14px; border-radius: 6px; border: 1px solid #334155; }
+    
+    /* 2-Column Professional Layout */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 48fr 52fr;
+      gap: 14px;
+      padding: 12px 18px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .slides-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+      min-height: 0;
+    }
+
     .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
-    .card-hdr { padding: 6px 12px; font-size: 0.8rem; color: #94a3b8; border-bottom: 1px solid #334155; font-weight: 600; display: flex; justify-content: space-between; flex-shrink: 0; }
+    .cur-slide-card { flex: 62 1 0; }
+    .next-slide-card { flex: 38 1 0; opacity: 0.9; }
+
+    .card-hdr { padding: 6px 14px; font-size: 0.8rem; color: #94a3b8; border-bottom: 1px solid #334155; font-weight: 600; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: #182234; }
+    .live-indicator { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; margin-right: 6px; box-shadow: 0 0 8px #ef4444; }
+
     .frame-box { flex: 1; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
     .frame-box .slide-card {
       position: absolute !important;
@@ -44,11 +68,31 @@ ${themeStylesCSS}
       transform-origin: center center !important;
       pointer-events: none !important;
     }
-    .notes-card { grid-column: 1 / -1; }
-    .notes-box { flex: 1; padding: 14px; overflow-y: auto; font-size: 1.15rem; line-height: 1.6; user-select: text; white-space: pre-wrap; background: #1e293b; color: #e2e8f0; }
+
+    /* Speaker Notes Column */
+    .notes-card { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+    .font-controls { display: flex; align-items: center; gap: 4px; background: #0f172a; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; }
+    .font-btn { background: #334155; color: #e2e8f0; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 0.75rem; font-weight: 700; transition: background 0.15s; }
+    .font-btn:hover { background: #0284c7; color: #fff; }
+    .font-val { font-size: 0.75rem; font-family: monospace; color: #38bdf8; min-width: 36px; text-align: center; }
+
+    .notes-box {
+      flex: 1;
+      padding: 18px 22px;
+      overflow-y: auto;
+      font-size: 18px;
+      line-height: 1.75;
+      user-select: text;
+      white-space: pre-wrap;
+      background: #090d16;
+      color: #f1f5f9;
+      word-break: keep-all;
+      letter-spacing: 0.01em;
+    }
     .notes-box:empty::before { content: "작성된 발표자 메모가 없습니다."; color: #64748b; font-style: italic; }
+
     footer { background: #1e293b; border-top: 1px solid #334155; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 12px; }
-    .btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
     .btn:hover { background: #0284c7; }
     .pop-toolbar { display: flex; align-items: center; gap: 10px; background: #0f172a; padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; }
     .tool-btn { background: #334155; color: #cbd5e1; border: 1px solid #475569; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s; }
@@ -68,16 +112,31 @@ ${themeStylesCSS}
     <div class="timer-box" id="p-timer">00:00:00</div>
   </header>
   <main>
-    <div class="card">
-      <div class="card-hdr"><span>현재 슬라이드</span><span id="p-cur-num">Slide 1</span></div>
-      <div class="frame-box" id="p-cur-frame"></div>
-    </div>
-    <div class="card">
-      <div class="card-hdr"><span>다음 슬라이드</span><span id="p-next-num">Slide 2</span></div>
-      <div class="frame-box" id="p-next-frame"></div>
+    <div class="slides-col">
+      <div class="card cur-slide-card">
+        <div class="card-hdr">
+          <span style="display:flex;align-items:center;"><span class="live-indicator"></span>현재 슬라이드 (Live)</span>
+          <span id="p-cur-num" style="color:#38bdf8;">Slide 1</span>
+        </div>
+        <div class="frame-box" id="p-cur-frame"></div>
+      </div>
+      <div class="card next-slide-card">
+        <div class="card-hdr">
+          <span>다음 슬라이드 (Next)</span>
+          <span id="p-next-num">Slide 2</span>
+        </div>
+        <div class="frame-box" id="p-next-frame"></div>
+      </div>
     </div>
     <div class="card notes-card">
-      <div class="card-hdr"><span>발표자 메모 (Notes)</span></div>
+      <div class="card-hdr">
+        <span style="font-weight:700;color:#f8fafc;">📝 발표자 대본 / 메모 (Notes)</span>
+        <div class="font-controls">
+          <button class="font-btn" id="p-font-dec" title="글자 축소">A-</button>
+          <span class="font-val" id="p-font-val">18px</span>
+          <button class="font-btn" id="p-font-inc" title="글자 확대">A+</button>
+        </div>
+      </div>
       <div class="notes-box" id="p-notes"></div>
     </div>
   </main>
@@ -123,6 +182,7 @@ ${themeStylesCSS}
     let activeWidthPreset = 'medium';
     let isDrawMode = false;
     let isLaserActive = false;
+    let notesFontSize = 18;
 
     setInterval(() => {
       timerSec++;
@@ -142,6 +202,23 @@ ${themeStylesCSS}
       document.getElementById('p-tool-pen')?.classList.toggle('active', isDrawMode);
       document.getElementById('p-tool-laser')?.classList.toggle('active', isLaserActive);
     }
+
+    function updateNotesFontSize() {
+      const box = document.getElementById('p-notes');
+      const val = document.getElementById('p-font-val');
+      if (box) box.style.fontSize = notesFontSize + 'px';
+      if (val) val.textContent = notesFontSize + 'px';
+    }
+
+    document.getElementById('p-font-dec')?.addEventListener('click', () => {
+      notesFontSize = Math.max(13, notesFontSize - 2);
+      updateNotesFontSize();
+    });
+
+    document.getElementById('p-font-inc')?.addEventListener('click', () => {
+      notesFontSize = Math.min(36, notesFontSize + 2);
+      updateNotesFontSize();
+    });
 
     function syncToolSettings() {
       const activeTool = isDrawMode ? 'pen' : (isLaserActive ? 'laser' : 'none');
@@ -203,6 +280,10 @@ ${themeStylesCSS}
         if (m.payload.activeWidthPreset) activeWidthPreset = m.payload.activeWidthPreset;
         if (typeof m.payload.isDrawMode === 'boolean') isDrawMode = m.payload.isDrawMode;
         if (typeof m.payload.isLaserActive === 'boolean') isLaserActive = m.payload.isLaserActive;
+        if (m.payload.notesFontSize) {
+          notesFontSize = m.payload.notesFontSize;
+          updateNotesFontSize();
+        }
         updateToolbarUI();
         render();
       } else if (m.type === 'SLIDE_CHANGE') {
@@ -382,7 +463,7 @@ ${themeStylesCSS}
     </div>
     <div class="w-full h-[252px] bg-black border border-slate-700 rounded-lg overflow-hidden relative flex items-center justify-center shadow-lg">
       {#if deck.currentIndex + 1 < deck.totalSlides}
-        <div class="w-[1920px] h-[1080px] absolute top-0 left-0 origin-top-left scale-[0.2333] pointer-events-none p-10 bg-slate-900">
+        <div class="next-preview-slot w-[1920px] h-[1080px] absolute top-0 left-0 origin-top-left scale-[0.2333] pointer-events-none">
           {@html deck.getNextSlideHTML()}
         </div>
       {:else}
@@ -467,3 +548,20 @@ ${themeStylesCSS}
     </div>
   </div>
 </aside>
+
+<style>
+  .next-preview-slot :global(.slide-card) {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 1920px !important;
+    height: 1080px !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    pointer-events: none !important;
+    transform-origin: top left !important;
+  }
+</style>

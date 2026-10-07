@@ -91,13 +91,25 @@ export class DeckStore {
     this.totalSlides = this.slides.length;
 
     // Read initial index from URL hash
-    const hashIdx = this.getIndexFromHash();
-    this.goToSlide(hashIdx, false);
+    const raw = window.location.hash.replace('#', '').toLowerCase();
+    if (raw === 'overview') {
+      this.goToSlide(0, false);
+      this.toggleOverview(true, false);
+    } else {
+      const hashIdx = this.getIndexFromHash();
+      this.goToSlide(hashIdx, false);
+    }
 
     window.addEventListener('hashchange', () => {
-      const idx = this.getIndexFromHash();
-      if (idx !== this.currentIndex) {
-        this.goToSlide(idx, false);
+      const currentRaw = window.location.hash.replace('#', '').toLowerCase();
+      if (currentRaw === 'overview') {
+        if (!this.isOverviewMode) this.toggleOverview(true, false);
+      } else {
+        if (this.isOverviewMode) this.toggleOverview(false, false);
+        const idx = this.getIndexFromHash();
+        if (idx !== this.currentIndex) {
+          this.goToSlide(idx, false);
+        }
       }
     });
   }
@@ -314,9 +326,16 @@ export class DeckStore {
     });
   }
 
-  toggleOverview(force) {
+  toggleOverview(force, updateHash = true) {
     this.isOverviewMode = typeof force === 'boolean' ? force : !this.isOverviewMode;
     document.body.classList.toggle('overview-mode', this.isOverviewMode);
+    if (updateHash) {
+      if (this.isOverviewMode) {
+        window.location.hash = '#overview';
+      } else {
+        window.location.hash = '#' + (this.currentIndex + 1);
+      }
+    }
     window.dispatchEvent(new Event('resize'));
   }
 
@@ -492,7 +511,8 @@ export class DeckStore {
         activeColor: this.activeColor,
         activeWidthPreset: this.activeWidthPreset,
         isLaserActive: this.isLaserActive,
-        isDrawMode: this.isDrawMode
+        isDrawMode: this.isDrawMode,
+        notesFontSize: this.notesFontSize
       }
     });
   }
@@ -529,7 +549,7 @@ export class DeckStore {
 
   getNextSlideHTML() {
     if (this.currentIndex + 1 < this.totalSlides) {
-      return this.slides[this.currentIndex + 1].innerHTML;
+      return this.slides[this.currentIndex + 1].outerHTML;
     }
     return '';
   }
