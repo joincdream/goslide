@@ -179,14 +179,78 @@ func TestServer_SSE_BroadcastReload(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error reading SSE stream: %v", err)
 		}
-		if strings.TrimSpace(line) == "data: reload" {
+		if strings.Contains(line, `"type":"reload"`) || strings.TrimSpace(line) == "data: reload" {
 			receivedReload = true
 			break
 		}
 	}
 
 	if !receivedReload {
-		t.Fatal("expected 'data: reload' message from SSE stream")
+		t.Fatal("expected reload message from SSE stream")
+	}
+}
+
+func TestServer_SSE_BroadcastError(t *testing.T) {
+	tempDir := t.TempDir()
+	mdPath := createSampleDeck(t, tempDir)
+
+	s, err := NewServer(Config{
+		MarkdownPath: mdPath,
+	})
+	if err != nil {
+		t.Fatalf("failed to create server: %v", err)
+	}
+	defer func() { _ = s.Close() }()
+
+	ts := httptest.NewServer(s.Handler())
+	defer ts.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", ts.URL+"/events", nil)
+	if err != nil {
+		t.Fatalf("failed to create SSE request: %v", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to connect to SSE stream: %v", err)
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	reader := bufio.NewReader(res.Body)
+
+	// Read handshake comment
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		t.Fatalf("failed to read handshake: %v", err)
+	}
+	if !strings.HasPrefix(line, ": connected") {
+		t.Errorf("expected connected handshake, got %q", line)
+	}
+
+	// Trigger error broadcast
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		s.BroadcastError("Markdown Syntax Error", "yaml: line 4: mapping values not allowed", "test.md")
+	}()
+
+	// Wait for error message
+	var receivedError bool
+	for i := 0; i < 5; i++ {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			t.Fatalf("error reading SSE stream: %v", err)
+		}
+		if strings.Contains(line, `"type":"error"`) && strings.Contains(line, "Markdown Syntax Error") && strings.Contains(line, "test.md") {
+			receivedError = true
+			break
+		}
+	}
+
+	if !receivedError {
+		t.Fatal("expected structured error message from SSE stream")
 	}
 }
 

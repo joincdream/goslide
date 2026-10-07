@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -21,15 +22,69 @@ import (
 )
 
 const sseScript = `
-  <!-- Goslide Live Reload Engine -->
+  <!-- Goslide Live Reload & Error Overlay Engine -->
   <script id="goslide-live-reload">
   (function() {
     if (!window.EventSource) return;
     const es = new EventSource('/events');
+
+    function removeOverlay() {
+      var el = document.getElementById('goslide-error-overlay');
+      if (el) el.remove();
+    }
+
+    function showOverlay(title, message, file) {
+      removeOverlay();
+      var overlay = document.createElement('div');
+      overlay.id = 'goslide-error-overlay';
+      overlay.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);width:min(900px, 92vw);z-index:999999;background:rgba(24, 24, 27, 0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid #ef4444;border-radius:10px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);padding:20px;color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;box-sizing:border-box;';
+
+      var header = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid rgba(239,68,68,0.3);padding-bottom:10px;">' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:20px;">⚠️</span>' +
+        '<span style="font-weight:700;font-size:16px;color:#fca5a5;">' + (title || 'Build Error') + '</span>' +
+        (file ? '<span style="font-size:12px;background:rgba(239,68,68,0.2);color:#fca5a5;padding:2px 8px;border-radius:4px;font-family:monospace;">' + file + '</span>' : '') +
+        '</div>' +
+        '<button id="goslide-err-close" style="background:transparent;border:none;color:#9ca3af;font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px;" title="Dismiss">&times;</button>' +
+        '</div>';
+
+      var body = '<pre style="margin:0;padding:14px;background:rgba(0,0,0,0.55);border-radius:6px;color:#f87171;font-family:ui-monospace,Menlo,Monaco,Consolas,monospace;font-size:13px;line-height:1.5;overflow-x:auto;max-height:45vh;white-space:pre-wrap;word-break:break-word;">' + (message || 'Unknown error occurred') + '</pre>';
+
+      var footer = '<div style="margin-top:12px;font-size:12px;color:#9ca3af;display:flex;align-items:center;justify-content:space-between;">' +
+        '<span>💡 Fix the syntax error in your editor and save to resume live preview.</span>' +
+        '<span style="font-size:11px;color:#6b7280;">Goslide Live Resilience Engine</span>' +
+        '</div>';
+
+      overlay.innerHTML = header + body + footer;
+      document.body.appendChild(overlay);
+
+      var closeBtn = document.getElementById('goslide-err-close');
+      if (closeBtn) {
+        closeBtn.onclick = function() { removeOverlay(); };
+      }
+    }
+
     es.onmessage = function(e) {
-      if (e.data === 'reload') {
+      var data = e.data;
+      if (!data) return;
+      var payload;
+      try {
+        payload = JSON.parse(data);
+      } catch (err) {
+        if (data === 'reload') {
+          payload = { type: 'reload' };
+        }
+      }
+
+      if (!payload) return;
+
+      if (payload.type === 'reload') {
+        removeOverlay();
         console.log('[goslide] Live reload triggered');
         location.reload();
+      } else if (payload.type === 'error') {
+        console.error('[goslide] Build error:', payload.message);
+        showOverlay(payload.title, payload.message, payload.file);
       }
     };
     es.onerror = function() {
@@ -38,6 +93,22 @@ const sseScript = `
   })();
   </script>
 `
+
+// EventType defines the category of SSE message sent to clients.
+type EventType string
+
+const (
+	EventReload EventType = "reload"
+	EventError  EventType = "error"
+)
+
+// SSEMessage represents a structured payload broadcasted via Server-Sent Events.
+type SSEMessage struct {
+	Type    EventType `json:"type"`
+	Title   string    `json:"title,omitempty"`
+	Message string    `json:"message,omitempty"`
+	File    string    `json:"file,omitempty"`
+}
 
 // Config holds options for running the development server.
 type Config struct {
@@ -263,18 +334,40 @@ func (s *Server) handleEvents(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// BroadcastReload sends a reload command to all connected SSE clients.
-func (s *Server) BroadcastReload() {
+// BroadcastMessage sends a structured SSEMessage (marshaled to JSON) to all connected SSE clients.
+func (s *Server) BroadcastMessage(msg SSEMessage) {
+	dataBytes, err := json.Marshal(msg)
+	if err != nil {
+		log.Printf("[goslide] Failed to marshal SSE message: %v", err)
+		return
+	}
+	payload := string(dataBytes)
+
 	s.clientsMu.RLock()
 	defer s.clientsMu.RUnlock()
 
 	for ch := range s.clients {
 		select {
-		case ch <- "reload":
+		case ch <- payload:
 		default:
 			// Client buffer full or slow; skip without blocking
 		}
 	}
+}
+
+// BroadcastReload sends a reload command to all connected SSE clients.
+func (s *Server) BroadcastReload() {
+	s.BroadcastMessage(SSEMessage{Type: EventReload})
+}
+
+// BroadcastError sends an error payload to all connected SSE clients to display an error overlay.
+func (s *Server) BroadcastError(title, msg, file string) {
+	s.BroadcastMessage(SSEMessage{
+		Type:    EventError,
+		Title:   title,
+		Message: msg,
+		File:    file,
+	})
 }
 
 // URL returns the addressable base URL for this server (e.g. http://localhost:8080).
@@ -313,10 +406,11 @@ func (s *Server) Start(ctx context.Context) error {
 				_, renderErr := s.renderMarkdown(ctx)
 				if renderErr != nil {
 					log.Printf("[goslide] Warning: rebuild failed on file change: %v", renderErr)
+					s.BroadcastError("Markdown Syntax Error", renderErr.Error(), filepath.Base(s.absFile))
 				} else {
 					log.Printf("[goslide] Rebuild completed in %v. Broadcasting reload...", time.Since(start))
+					s.BroadcastReload()
 				}
-				s.BroadcastReload()
 			case err, ok := <-s.watcher.Errors():
 				if !ok {
 					return

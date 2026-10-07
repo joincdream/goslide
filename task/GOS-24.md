@@ -2,7 +2,7 @@
 
 > **티켓 번호**: [GOS-24](https://joincdream.atlassian.net/browse/GOS-24)  
 > **마일스톤**: 개발 서버(`goslide serve`) 회복력(Resilience) 및 개발자 경험(DX) 고도화  
-> **상태**: 계획 수립 (Planned)  
+> **상태**: 구현 완료 (Implemented)  
 > **담당 패키지**: `internal/server/`, `docs/release/`  
 > **연관 소스 파일**:  
 > - [`internal/server/server.go`](file:///home/yundream/myjob/cloit/Goslide/internal/server/server.go)  
