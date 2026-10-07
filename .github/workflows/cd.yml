@@ -1,0 +1,98 @@
+name: CD Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Release Binaries
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            artifact_name: goslide_linux_amd64
+          - os: linux
+            arch: arm64
+            artifact_name: goslide_linux_arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache: true
+
+      - name: Set up Node.js for Web Bundle
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Web Assets (Svelte 5)
+        run: |
+          cd web
+          npm ci
+          npm run build
+
+      - name: Compile Static Binary
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 0
+        run: |
+          mkdir -p release-build/${{ matrix.artifact_name }}
+          go build -trimpath -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o release-build/${{ matrix.artifact_name }}/goslide ./cmd/goslide
+          
+          # 패키징 디렉토리에 주요 문서 포함
+          cp README.md release-build/${{ matrix.artifact_name }}/ 2>/dev/null || true
+          
+          # tar.gz 압축
+          cd release-build
+          tar -czvf ../${{ matrix.artifact_name }}.tar.gz -C ${{ matrix.artifact_name }} .
+
+      - name: Upload Artifact to Job
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_name }}.tar.gz
+
+  publish:
+    name: Publish to GitHub Releases
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all built binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Generate SHA256 Checksums
+        run: |
+          cd release-artifacts
+          sha256sum *.tar.gz > checksums.txt
+          cat checksums.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-artifacts/*.tar.gz
+            release-artifacts/checksums.txt
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
