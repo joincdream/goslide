@@ -109,6 +109,9 @@ Goslide/
 │   ├── theme/                        # 테마 및 정적 에셋 로더 (embed.FS, CSS 컴포지션)
 │   │   └── assets/                   # 내장 CSS/JS 에셋 (deck-canvas.css, deck-content.css, presenter.css)
 │   ├── renderer/                     # 슬라이드 HTML 렌더러 (html/template)
+│   │   └── html/
+│   │       ├── golden_test.go        # 골든 파일 회귀 검증 테스트
+│   │       └── testdata/             # 회귀 테스트 픽스처 (golden, slides)
 │   ├── exporter/                     # 외부 포맷 익스포터 (pdf: chromedp, pptx: capture+zip)
 │   ├── server/                       # 로컬 개발 서버 및 SSE 핫 리로드 (fsnotify)
 │   ├── browser/                      # 크로스 플랫폼 Headless Chrome/Chromium 탐색기
@@ -119,7 +122,6 @@ Goslide/
 ├── examples/                         # 공식 사용자 데모 슬라이드 및 DSL 사양서
 │   ├── demo/                         # 공식 데모 마크다운 및 이미지 에셋
 │   └── dsl/                          # DSL 문법 사양 및 골든 예제
-├── testdata/                         # 순수 자동화 회귀 테스트 픽스처 (golden, slides)
 ├── Makefile                          # 빌드, 테스트, 웹 번들링 자동화
 └── AGENTS.md                         # 엔지니어링 가이드라인 및 가드레일
 ```

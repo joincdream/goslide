@@ -9,7 +9,7 @@ on:
       - 'go.sum'
       - 'Makefile'
       - 'web/**'
-      - 'testdata/**'
+      - 'internal/renderer/html/testdata/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [ main ]
@@ -19,7 +19,7 @@ on:
       - 'go.sum'
       - 'Makefile'
       - 'web/**'
-      - 'testdata/**'
+      - 'internal/renderer/html/testdata/**'
       - '.github/workflows/ci.yml'
 
 jobs:

@@ -49,8 +49,8 @@ func TestGoldenRenderer(t *testing.T) {
 	r := htmlrenderer.NewRenderer()
 	ctx := context.Background()
 
-	slidesDir := filepath.Join("..", "..", "..", "testdata", "slides")
-	goldenDir := filepath.Join("..", "..", "..", "testdata", "golden")
+	slidesDir := filepath.Join("testdata", "slides")
+	goldenDir := filepath.Join("testdata", "golden")
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
