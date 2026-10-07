@@ -1,7 +1,7 @@
 <script>
   import { deck } from '../stores/deck.svelte.js';
 
-  function openPopout() {
+  export function openPopout() {
     const popoutWin = window.open('', 'goslide-presenter-' + window.location.pathname, 'width=1100,height=750');
     if (!popoutWin) {
       alert('팝업 차단을 해제해주세요.');
@@ -37,6 +37,7 @@ ${themeStylesCSS}
       width: 1920px !important;
       height: 1080px !important;
       display: flex !important;
+      visibility: visible !important;
       opacity: 1 !important;
       box-shadow: none !important;
       border-radius: 0 !important;
