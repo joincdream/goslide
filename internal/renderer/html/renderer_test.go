@@ -245,3 +245,91 @@ func TestHTMLRenderer_Render_BackgroundDim(t *testing.T) {
 		t.Errorf("expected default dim rgba(0, 0, 0, 0.5) for dim class in output")
 	}
 }
+
+func TestHTMLRenderer_Render_BackgroundImage_Standalone(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	testImagePath := filepath.Join(tmpDir, "test-bg.png")
+	pngBytes := []byte{
+		0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+		0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+		0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4, 0x89, 0x00, 0x00, 0x00,
+		0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+		0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49,
+		0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+	}
+	if err := os.WriteFile(testImagePath, pngBytes, 0600); err != nil {
+		t.Fatalf("failed to write test image: %v", err)
+	}
+
+	deck := &model.Deck{
+		Title: "Standalone Background Deck",
+		Slides: []*model.Slide{
+			{
+				Index:  1,
+				Layout: model.LayoutDefault,
+				Directives: model.SlideDirectives{
+					BackgroundImage: "test-bg.png",
+				},
+				HTMLContent: "<p>Slide 1</p>",
+			},
+			{
+				Index:  2,
+				Layout: model.LayoutDefault,
+				Directives: model.SlideDirectives{
+					BackgroundImage: "url('test-bg.png')",
+				},
+				HTMLContent: "<p>Slide 2</p>",
+			},
+			{
+				Index:  3,
+				Layout: model.LayoutDefault,
+				Directives: model.SlideDirectives{
+					BackgroundImage: "linear-gradient(to right, #111, #222)",
+				},
+				HTMLContent: "<p>Slide 3</p>",
+			},
+			{
+				Index:  4,
+				Layout: model.LayoutDefault,
+				Directives: model.SlideDirectives{
+					BackgroundImage: "my'pic.png",
+				},
+				HTMLContent: "<p>Slide 4</p>",
+			},
+		},
+	}
+
+	renderer := htmlrenderer.NewRenderer(
+		htmlrenderer.WithStandalone(true),
+		htmlrenderer.WithBaseDir(tmpDir),
+	)
+	var buf bytes.Buffer
+	if err := renderer.Render(context.Background(), deck, &buf); err != nil {
+		t.Fatalf("standalone render failed: %v", err)
+	}
+
+	output := buf.String()
+
+	// Must NOT contain #ZgotmplZ
+	if strings.Contains(output, "#ZgotmplZ") {
+		t.Errorf("rendered output contains #ZgotmplZ sanitization failure")
+	}
+
+	// Slide 1 & 2 must contain base64 data uri
+	if !strings.Contains(output, "data:image/png;base64,") {
+		t.Errorf("expected base64 data URI in background-image, got:\n%s", output)
+	}
+
+	// Slide 3 must contain gradient without url()
+	if !strings.Contains(output, "background-image: linear-gradient(to right, #111, #222);") {
+		t.Errorf("expected linear gradient in background-image")
+	}
+
+	// Slide 4 must escape single quotes as %27
+	if !strings.Contains(output, "my%27pic.png") {
+		t.Errorf("expected single quote to be escaped as %%27 in background-image")
+	}
+}
+

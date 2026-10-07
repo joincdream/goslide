@@ -51,7 +51,7 @@ const masterHTMLTemplate = `<!DOCTYPE html>
       <section class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}{{ if .IsFirst }} active{{ end }}{{ if .BgDim }} has-bg-dim{{ end }}{{ if .Autofit }} has-autofit{{ end }}"
                data-slide="{{ .Index }}"
                {{ if .Autofit }}data-autofit="true"{{ end }}
-               style="{{ if .BgColor }}background-color: {{ .BgColor }};{{ end }}{{ if .BgImage }}{{ if .IsBgGradient }}background-image: {{ .BgImage }};{{ else }}background-image: url('{{ .BgImage }}'); background-size: cover; background-position: center;{{ end }}{{ end }}{{ if .Color }}color: {{ .Color }};{{ end }}">
+               style="{{ if .BgColor }}background-color: {{ .BgColor }};{{ end }}{{ if .BgImage }}background-image: {{ .BgImage }};{{ if not .IsBgGradient }} background-size: cover; background-position: center;{{ end }}{{ end }}{{ if .Color }}color: {{ .Color }};{{ end }}">
         {{ if .BgDim }}<div class="slide-bg-dim" style="background-color: {{ .BgDim }};"></div>{{ end }}
         <div class="slide-header slide-tracker">{{ .Header }}</div>
         {{ if .TitleHTML }}

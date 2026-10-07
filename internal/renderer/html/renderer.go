@@ -169,7 +169,7 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 	leftHTML := s.LeftHTML
 	rightHTML := s.RightHTML
 	bgColor := s.Directives.BackgroundColor
-	bgImage := s.Directives.BackgroundImage
+	bgImage := cleanBackgroundImagePath(s.Directives.BackgroundImage)
 	isBgGradient := false
 
 	if strings.Contains(bgImage, "-gradient(") {
@@ -193,6 +193,8 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		}
 	}
 
+	bgImageCSS := formatBackgroundImageCSS(bgImage, isBgGradient)
+
 	header := s.Directives.Header
 	if header == "" {
 		header = deck.GlobalAttrs.Header
@@ -208,8 +210,8 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		IsFirst:      i == 0,
 		Layout:       string(s.Layout),
 		Classes:      strings.Join(s.Directives.Class, " "),
-		BgColor:      template.CSS(bgColor), // nolint:gosec
-		BgImage:      template.CSS(bgImage), // nolint:gosec
+		BgColor:      template.CSS(bgColor),    // nolint:gosec
+		BgImage:      bgImageCSS,               // nolint:gosec
 		IsBgGradient: isBgGradient,
 		BgDim:        template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
 		Color:        template.CSS(s.Directives.Color),                                           // nolint:gosec
@@ -254,4 +256,32 @@ func resolveBgDim(rawDim string, classes []string) string {
 	}
 
 	return rawDim
+}
+
+func cleanBackgroundImagePath(src string) string {
+	trimmed := strings.TrimSpace(src)
+	lower := strings.ToLower(trimmed)
+	if strings.HasPrefix(lower, "url(") && strings.HasSuffix(lower, ")") {
+		inner := strings.TrimSpace(trimmed[4 : len(trimmed)-1])
+		if len(inner) >= 2 {
+			first := inner[0]
+			last := inner[len(inner)-1]
+			if (first == '\'' && last == '\'') || (first == '"' && last == '"') {
+				inner = strings.TrimSpace(inner[1 : len(inner)-1])
+			}
+		}
+		return inner
+	}
+	return trimmed
+}
+
+func formatBackgroundImageCSS(bgImage string, isBgGradient bool) template.CSS {
+	if bgImage == "" {
+		return ""
+	}
+	if isBgGradient {
+		return template.CSS(bgImage) // nolint:gosec
+	}
+	safePath := strings.ReplaceAll(bgImage, "'", "%27")
+	return template.CSS(fmt.Sprintf("url('%s')", safePath)) // nolint:gosec
 }

@@ -135,7 +135,8 @@ flowchart LR
 
 <!--
 _class: lead
-_backgroundImage: linear-gradient(135deg, #0b192c 0%, #1e3e62 60%, #0073bb 100%)
+_backgroundImage: "hands-on-bg.jpeg"
+_backgroundDim: 0.5
 _color: #ffffff
 -->
 
