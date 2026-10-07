@@ -111,7 +111,7 @@ check: fmt lint complexity test-race
 ## clean: Remove build artifacts and temporary files
 clean:
 	@echo "==> Cleaning build artifacts..."
-	@rm -rf $(BIN_DIR) dist *.out *.test coverage.*
+	@rm -rf $(BIN_DIR) dist *.out *.test coverage.* *.pdf *.pptx *_out.html *-standalone.html error.txt testdata/*.pdf testdata/*.pptx testdata/demo-*.html testdata/demo_out.html
 
 ## help: Display this help menu
 help:

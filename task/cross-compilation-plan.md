@@ -15,14 +15,14 @@
 특히 사용자의 설치 환경과 사용 목적에 맞추어 **단일 독립 실행파일(Raw Standalone Binary)**과 **문서/예제가 동봉된 압축 아카이브(Compressed Archive)**를 동시에 배포하는 **듀얼 패키징(Dual Packaging) 전략**을 채택하고, 컴파일 타임 메타데이터 주입 기반의 **시맨틱 버저닝(Semantic Versioning)** 체계를 정립합니다.
 
 ### 핵심 지원 플랫폼 매트릭스 (Target Matrix)
-| 운영체제 (OS) | 아키텍처 (Arch) | 단일 바이너리 산출물 (Raw) | 배포 아카이브 (Archive) | 주요 타겟 환경 |
-| :--- | :--- | :--- | :--- | :--- |
-| **Linux** | `amd64` | `goslide-linux-amd64` | `goslide_linux_amd64.tar.gz` | 일반 x86_64 서버, Ubuntu/Debian/RHEL 데스크톱, WSL2 |
-| **Linux** | `arm64` | `goslide-linux-arm64` | `goslide_linux_arm64.tar.gz` | AWS Graviton, Raspberry Pi 4/5, Linux ARM 서버 |
-| **macOS** | `arm64` | `goslide-darwin-arm64` | `goslide_darwin_arm64.tar.gz` | Apple Silicon (M1/M2/M3/M4) Mac |
-| **macOS** | `amd64` | `goslide-darwin-amd64` | `goslide_darwin_amd64.tar.gz` | Intel 기반 레거시 Mac |
-| **macOS (Universal)** | `universal` | `goslide-darwin-universal` | `goslide_darwin_all.tar.gz` | `lipo`로 통합된 macOS 단일 범용 바이너리 |
-| **Windows** | `amd64` | `goslide-windows-amd64.exe` | `goslide_windows_amd64.zip` | 64비트 Windows 10/11 데스크톱 및 워크스테이션 |
+| 운영체제 (OS)             | 아키텍처 (Arch) | 단일 바이너리 산출물 (Raw)           | 배포 아카이브 (Archive)             | 주요 타겟 환경                                     |     |
+| :-------------------- | :---------- | :-------------------------- | :---------------------------- | :------------------------------------------- | --- |
+| **Linux**             | `amd64`     | `goslide-linux-amd64`       | `goslide_linux_amd64.tar.gz`  | 일반 x86_64 서버, Ubuntu/Debian/RHEL 데스크톱, WSL2  |     |
+| **Linux**             | `arm64`     | `goslide-linux-arm64`       | `goslide_linux_arm64.tar.gz`  | AWS Graviton, Raspberry Pi 4/5, Linux ARM 서버 |     |
+| **macOS**             | `arm64`     | `goslide-darwin-arm64`      | `goslide_darwin_arm64.tar.gz` | Apple Silicon (M1/M2/M3/M4) Mac              |     |
+| **macOS**             | `amd64`     | `goslide-darwin-amd64`      | `goslide_darwin_amd64.tar.gz` | Intel 기반 레거시 Mac                             |     |
+| **macOS (Universal)** | `universal` | `goslide-darwin-universal`  | `goslide_darwin_all.tar.gz`   | `lipo`로 통합된 macOS 단일 범용 바이너리                 |     |
+| **Windows**           | `amd64`     | `goslide-windows-amd64.exe` | `goslide_windows_amd64.zip`   | 64비트 Windows 10/11 데스크톱 및 워크스테이션             |     |
 
 ---
 

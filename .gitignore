@@ -3,6 +3,13 @@
 /goslide.exe
 /bin/
 /dist/
+*.pdf
+*.pptx
+*-standalone.html
+*.standalone.html
+demo-standalone.html
+testdata/demo.html
+testdata/demo-*.html
 
 # Go artifacts & test coverage
 *.test
@@ -37,3 +44,5 @@ Thumbs.db
 tmp/
 *.tmp
 *.log
+error.txt
+.error.*

@@ -111,10 +111,15 @@ Goslide/
 │   ├── renderer/                     # 슬라이드 HTML 렌더러 (html/template)
 │   ├── exporter/                     # 외부 포맷 익스포터 (pdf: chromedp, pptx: capture+zip)
 │   ├── server/                       # 로컬 개발 서버 및 SSE 핫 리로드 (fsnotify)
+│   ├── browser/                      # 크로스 플랫폼 Headless Chrome/Chromium 탐색기
+│   ├── i18n/                         # CLI 및 런타임 영/한 다국어 메시지 카탈로그
 │   └── testutil/                     # 골든 파일 회귀 검증 헬퍼
 │
 ├── web/                              # 발표자 런타임 프런트엔드 (Svelte 5 + Tailwind + Vite)
-├── testdata/                         # 테스트 픽스처 및 골든 파일
+├── examples/                         # 공식 사용자 데모 슬라이드 및 DSL 사양서
+│   ├── demo/                         # 공식 데모 마크다운 및 이미지 에셋
+│   └── dsl/                          # DSL 문법 사양 및 골든 예제
+├── testdata/                         # 순수 자동화 회귀 테스트 픽스처 (golden, slides)
 ├── Makefile                          # 빌드, 테스트, 웹 번들링 자동화
 └── AGENTS.md                         # 엔지니어링 가이드라인 및 가드레일
 ```
@@ -133,6 +138,8 @@ Goslide/
 | **`internal/renderer`** | Go `html/template` 기반 단일 HTML 슬라이드 생성 및 에셋 합성 | `HTMLRenderer` | Go 표준 (`html/template`) |
 | **`internal/exporter`** | chromedp 무마진 벡터 PDF 인쇄 및 뷰포트 캡처 기반 PPTX zip 패키징 | `PDFExporter`, `PPTXExporter` | `chromedp/chromedp`, 표준 `archive/zip` |
 | **`internal/server`** | 로컬 정적 HTTP 호스팅, fsnotify 파일 감시 및 SSE 단방향 핫 리로드 | `DevServer`, `Watcher` | `fsnotify` |
+| **`internal/browser`** | OS별 표준 바이너리 경로 및 PATH 기반 Chrome/Chromium 실행 파일 자동 탐색 | `FindChrome(customPath)` | Go 표준 (`os`, `os/exec`, `runtime`) |
+| **`internal/i18n`** | CLI 및 에러 메시지 영/한(`en`, `ko`) 다국어 리소스 로드 및 번역 지원 | `T(key, args...)`, `SetLocale()` | Go 표준 (`embed`, `encoding/json`) |
 | **`internal/testutil`** | 골든 파일 회귀 검증 및 자동 갱신(`-update`) 헬퍼 | `AssertGolden()` | Go 표준 (`testing`) |
 
 ---

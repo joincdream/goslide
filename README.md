@@ -90,33 +90,33 @@ func main() {
 You can instantly generate production-ready Goslide presentations using ChatGPT, Claude, or any LLM:
 
 > "Please create a slide deck about [Your Topic] in Markdown, referencing the specification at:  
-> https://raw.githubusercontent.com/joincdream/goslide/main/examples/example-dsl.md"
+> https://raw.githubusercontent.com/joincdream/goslide/main/examples/dsl/example-dsl.md"
 
-👉 For full semantic rules, directive catalogs, and golden samples, see the [Goslide DSL Specification & Example Guide](examples/example-dsl.md).
+👉 For full semantic rules, directive catalogs, and golden samples, see the [Goslide DSL Specification & Example Guide](examples/dsl/example-dsl.md).
 
 ### Build Slides
 
-You can build the included demo slide deck ([`testdata/demo.md`](testdata/demo.md)):
+You can build the included demo slide deck ([`examples/demo/demo.md`](examples/demo/demo.md)):
 
 ```bash
 # Generate standalone interactive HTML
-goslide build testdata/demo.md -o index.html
+goslide build examples/demo/demo.md -o index.html
 
 # Generate 16:9 Vector PDF
-goslide build testdata/demo.md -f pdf -o demo.pdf
+goslide build examples/demo/demo.md -f pdf -o demo.pdf
 
 # Generate Editable PPTX
-goslide build testdata/demo.md -f pptx -o demo.pptx
+goslide build examples/demo/demo.md -f pptx -o demo.pptx
 ```
 
 ### Start Live Preview Server
 
 ```bash
 # Start local development server with SSE hot-reload
-goslide serve testdata/demo.md --port 8080
+goslide serve examples/demo/demo.md --port 8080
 ```
 
-Open `http://localhost:8080` in your browser. Whenever you save `testdata/demo.md`, the browser automatically updates without losing your active slide index.
+Open `http://localhost:8080` in your browser. Whenever you save `examples/demo/demo.md`, the browser automatically updates without losing your active slide index.
 
 ---
 

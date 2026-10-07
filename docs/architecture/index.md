@@ -59,7 +59,7 @@ flowchart LR
 ## 3. 상황별 탐색 가이드 (Task-Oriented Reading Guide)
 
 ### 3.1 사람(엔지니어/기획자)
-* **새로운 슬라이드 문법이나 레이아웃 지시어를 추가할 때**: [`02-slide-spec-and-domain-model.md`](./02-slide-spec-and-domain-model.md)와 [`docs/layout-design.md`](../layout-design.md)를 참고하세요.
+* **새로운 슬라이드 문법이나 레이아웃 지시어를 추가할 때**: [`02-slide-spec-and-domain-model.md`](./02-slide-spec-and-domain-model.md)와 [`docs/planning/layout-design.md`](../planning/layout-design.md)를 참고하세요.
 * **패키지를 새로 만들거나 의존성을 연결할 때**: [`03-package-structure-and-c4.md`](./03-package-structure-and-c4.md)의 순환 참조 방지 규칙을 확인하세요.
 * **새로운 출력 포맷(예: Keynote, 이미지 번들)을 개발할 때**: [`04-interfaces-and-contracts.md`](./04-interfaces-and-contracts.md)의 `Exporter` 인터페이스와 [`05-rendering-and-export-pipelines.md`](./05-rendering-and-export-pipelines.md)의 파이프라인 패턴을 확인하세요.
 * **배포 및 CI/CD 워크플로우를 수정할 때**: [`07-operations-build-and-cicd.md`](./07-operations-build-and-cicd.md)를 확인하세요.
@@ -73,7 +73,7 @@ flowchart LR
 
 ## 4. 연관 핵심 문서 (Cross References)
 
-* **[`docs/layout-design.md`](../layout-design.md)**: 1920×1080 불변 캔버스 및 4-Tier 마스터 슬라이드 레이아웃 명세
-* **[`docs/functional_specification.md`](../functional_specification.md)**: 제품 기능 요구사항 명세서
-* **[`docs/development_roadmap.md`](../development_roadmap.md)**: 마일스톤 및 개발 로드맵
+* **[`docs/planning/layout-design.md`](../planning/layout-design.md)**: 1920×1080 불변 캔버스 및 4-Tier 마스터 슬라이드 레이아웃 명세
+* **[`docs/planning/functional_specification.md`](../planning/functional_specification.md)**: 제품 기능 요구사항 명세서
+* **[`docs/planning/development_roadmap.md`](../planning/development_roadmap.md)**: 마일스톤 및 개발 로드맵
 * **[`AGENTS.md`](../../AGENTS.md)**: AI 에이전트 행동 가드레일 및 엔지니어링 원칙

@@ -276,14 +276,14 @@ flowchart LR
 ### Landscape Image (PNG)
 `w:500` width directive:
 
-![w:500 Landscape Image](testdata/sample-img-01.png)
+![w:500 Landscape Image](examples/demo/sample-img-01.png)
 
 <!-- split -->
 
 ### Portrait Image (JPG)
 `w:300 center` width & center directive:
 
-![w:300 center Portrait Image](testdata/sample-img-02.jpg)
+![w:300 center Portrait Image](examples/demo/sample-img-02.jpg)
 
 <!-- note:
 - Media & Image sizing verification slide (Checklist 7.6).

@@ -218,10 +218,10 @@ func TestE2E_BrowserSlideInteraction(t *testing.T) {
 | **지시어 문법 정합성** | 로컬 지시어 표기 통일 | 본문 예제의 지시어를 실제 파서 표준인 `<!-- _layout: cover -->` (언더스코어 포함)로 일괄 동기화 | [ ] |
 
 ### 7.2 공식 예제 및 DSL 사양서 동기화
-- [ ] **`examples/example-dsl.md` & `examples/example-dsl.ko.md`**:
+- [ ] **`examples/dsl/example-dsl.md` & `examples/dsl/example-dsl.ko.md`**:
   - v1.0.0 스펙에 맞춰 라인 하이라이트(`{1,3-5}`), 스텝 애니메이션(`dim-fragments`), 미디어 임베드 등 신규 DSL 문법 반영 확인.
-- [ ] **공식 데모 슬라이드 (`testdata/demo.md` & `testdata/demo.ko.md`)**:
-  - `goslide build testdata/demo.md -f all` 실행 시 오류 없이 3종 포맷(HTML, PDF, PPTX)이 완벽히 생성되는지 회귀 검증.
+- [ ] **공식 데모 슬라이드 (`examples/demo/demo.md` & `examples/demo/demo.ko.md`)**:
+  - `goslide build examples/demo/demo.md -f all` 실행 시 오류 없이 3종 포맷(HTML, PDF, PPTX)이 완벽히 생성되는지 회귀 검증.
 
 ### 7.3 GitHub Releases 배포 자동화 및 설치 스크립트 점검
 - [ ] **OS별 아카이브 구조**:
