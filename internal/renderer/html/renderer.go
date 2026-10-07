@@ -210,8 +210,8 @@ func (r *HTMLRenderer) buildSlideView(i int, s *model.Slide, deck *model.Deck) (
 		IsFirst:      i == 0,
 		Layout:       string(s.Layout),
 		Classes:      strings.Join(s.Directives.Class, " "),
-		BgColor:      template.CSS(bgColor),    // nolint:gosec
-		BgImage:      bgImageCSS,               // nolint:gosec
+		BgColor:      template.CSS(bgColor), // nolint:gosec
+		BgImage:      bgImageCSS,            // nolint:gosec
 		IsBgGradient: isBgGradient,
 		BgDim:        template.CSS(resolveBgDim(s.Directives.BackgroundDim, s.Directives.Class)), // nolint:gosec
 		Color:        template.CSS(s.Directives.Color),                                           // nolint:gosec

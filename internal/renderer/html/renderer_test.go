@@ -332,4 +332,3 @@ func TestHTMLRenderer_Render_BackgroundImage_Standalone(t *testing.T) {
 		t.Errorf("expected single quote to be escaped as %%27 in background-image")
 	}
 }
-
