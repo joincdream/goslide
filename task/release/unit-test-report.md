@@ -5,7 +5,7 @@
 > **실행 일시**: 2026-10-06 16:45:49 (KST)  
 > **테스트 환경**: Linux 6.6 (x86_64), Go 1.23.x  
 > **연관 티켓**: [GOS-18](https://joincdream.atlassian.net/browse/GOS-18), [GOS-12](https://joincdream.atlassian.net/browse/GOS-12)  
-> **연관 계획**: [pre-release-qa-plan.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/pre-release-qa-plan.md)
+> **연관 계획**: [pre-release-qa-plan.md](pre-release-qa-plan.md)
 
 ---
 

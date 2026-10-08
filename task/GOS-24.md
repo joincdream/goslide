@@ -3,11 +3,11 @@
 > **티켓 번호**: [GOS-24](https://joincdream.atlassian.net/browse/GOS-24)  
 > **마일스톤**: 개발 서버(`goslide serve`) 회복력(Resilience) 및 개발자 경험(DX) 고도화  
 > **상태**: 구현 완료 (Implemented)  
-> **담당 패키지**: `internal/server/`, `docs/release/`  
+> **담당 패키지**: `internal/server/`, `task/release/`  
 > **연관 소스 파일**:  
-> - [`internal/server/server.go`](file:///home/yundream/myjob/cloit/Goslide/internal/server/server.go)  
-> - [`internal/server/server_test.go`](file:///home/yundream/myjob/cloit/Goslide/internal/server/server_test.go)  
-> - [`docs/release/linux-user-test-checklist.md`](file:///home/yundream/myjob/cloit/Goslide/docs/release/linux-user-test-checklist.md) (체크리스트 3.5 항목)  
+> - [`internal/server/server.go`](../internal/server/server.go)  
+> - [`internal/server/server_test.go`](../internal/server/server_test.go)  
+> - [`task/release/linux-user-test-checklist.md`](release/linux-user-test-checklist.md) (체크리스트 3.5 항목)  
 
 ---
 
@@ -28,7 +28,7 @@
 1. **Fail-Safe & Non-Crashing**: 문법 오류가 발생해도 `goslide serve` 프로세스는 절대 종료되거나 크래시되지 않음.
 2. **Real-time Visual Feedback (Error Overlay)**: Vite, Next.js 등 모던 웹 개발 서버와 같이, 문법 오류 발생 즉시 브라우저 화면 상단/중앙에 눈에 띄는 **에러 오버레이(Error Overlay) 카드**를 띄워 파일명과 구체적인 오류 원인(줄 번호 등)을 직관적으로 안내.
 3. **Seamless Self-Healing**: 사용자가 에디터에서 오타를 수정하고 저장하면, 핫 리로드가 동작하면서 에러 오버레이가 자동으로 걷히고 새 슬라이드로 즉시 정상 복원.
-4. **리눅스 사용자 테스트 체크리스트 (3.5 항목) 충족**: `docs/release/linux-user-test-checklist.md` 기준을 완벽하게 만족.
+4. **리눅스 사용자 테스트 체크리스트 (3.5 항목) 충족**: `task/release/linux-user-test-checklist.md` 기준을 완벽하게 만족.
 
 ---
 
@@ -157,7 +157,7 @@ type: "reload"       type: "error"
 3. `TestServer_Watcher_ErrorHandling` (신규 또는 보강):
    - 문법이 깨진 파일 저장 시 서버가 다운되지 않고 `error` 이벤트를 정상 송신하는지 검증.
 
-### 3.3 [`docs/release/linux-user-test-checklist.md`](file:///home/yundream/myjob/cloit/Goslide/docs/release/linux-user-test-checklist.md)
+### 3.3 [`task/release/linux-user-test-checklist.md`](release/linux-user-test-checklist.md)
 
 - 3.5 항목 기대 동작 문구 갱신:
   - 기존: "터미널에 에러 로그가 출력되지만 서버가 다운되지 않고, 브라우저에는 직전 유효 슬라이드가 안정적으로 유지되어야 함"
@@ -173,5 +173,5 @@ type: "reload"       type: "error"
 | **Step 2** | `sseScript`에 Error Overlay HTML/CSS DOM 렌더러 및 리로드 핸들러 추가 | 구문 오류 메시지 DOM 렌더링 및 복구 스크립트 무결성 |
 | **Step 3** | `server.go` Watcher 루프에 `BroadcastError` 연동 | 파일 저장 시 에러 브로드캐스트 동작 확인 |
 | **Step 4** | `internal/server/server_test.go` 단위 테스트 추가 및 `go test -v -race ./internal/server/...` 검증 | 100% 테스트 통과 |
-| **Step 5** | `docs/release/linux-user-test-checklist.md` 3.5 항목 갱신 | 체크리스트 기준 최신화 |
+| **Step 5** | `task/release/linux-user-test-checklist.md` 3.5 항목 갱신 | 체크리스트 기준 최신화 |
 | **Step 6** | Jira 티켓([GOS-24](https://joincdream.atlassian.net/browse/GOS-24)) 상태 업데이트 및 보고 | 완료 |

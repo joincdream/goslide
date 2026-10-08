@@ -5,7 +5,7 @@
 > **실행 일시**: 2026-10-07 07:45:00 (KST)  
 > **테스트 환경**: Linux 6.6 (x86_64), Go 1.27.1  
 > **측정 도구**: `gocognit` (Cognitive Complexity), `gocyclo` (Cyclomatic Complexity), `go vet`  
-> **연관 문서**: [unit-test-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/unit-test-report.md), [well-architected-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/well-architected-report.md)
+> **연관 문서**: [unit-test-report.md](unit-test-report.md), [well-architected-report.md](well-architected-report.md)
 
 ---
 

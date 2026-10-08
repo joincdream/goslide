@@ -9,7 +9,7 @@
 > - [`web/src/App.svelte`](file:///home/yundream/myjob/cloit/Goslide/web/src/App.svelte)  
 > - [`web/src/components/KeyboardHandler.svelte`](file:///home/yundream/myjob/cloit/Goslide/web/src/components/KeyboardHandler.svelte)  
 > - [`internal/theme/assets/js/goslide-core.js`](file:///home/yundream/myjob/cloit/Goslide/internal/theme/assets/js/goslide-core.js) (컴파일 번들 산출물)  
-> **연관 체크리스트**: [`docs/release/linux-user-test-checklist.md`](file:///home/yundream/myjob/cloit/Goslide/docs/release/linux-user-test-checklist.md) (섹션 6.3)
+> **연관 체크리스트**: [`task/release/linux-user-test-checklist.md`](../release/linux-user-test-checklist.md) (섹션 6.3)
 
 ---
 
@@ -100,7 +100,7 @@ sequenceDiagram
 | **Step 2** | Svelte 5 프론트엔드 빌드 및 Go 정적 에셋 동기화 | `cd web && npm run build` | `internal/theme/assets/js/goslide-core.js` 갱신 확인 |
 | **Step 3** | Goslide 바이너리 재빌드 | `go build -o bin/goslide ./cmd/goslide` | 빌드 성공 (종료 코드 0) |
 | **Step 4** | E2E 브라우저 동작 검증 | `goslide serve testdata/demo.md --port 8080` | 1) `P` 키 입력 시 팝업 창 즉시 오픈<br>2) 팝업 내 슬라이드 미리보기 정상 출력 |
-| **Step 5** | 체크리스트 업데이트 및 Jira 티켓 완료 전이 | [`docs/release/linux-user-test-checklist.md`](file:///home/yundream/myjob/cloit/Goslide/docs/release/linux-user-test-checklist.md) / Jira GOS-21 | 체크리스트 6.3 체크 및 티켓 완료 전이 |
+| **Step 5** | 체크리스트 업데이트 및 Jira 티켓 완료 전이 | [`task/release/linux-user-test-checklist.md`](../release/linux-user-test-checklist.md) / Jira GOS-21 | 체크리스트 6.3 체크 및 티켓 완료 전이 |
 
 ---
 

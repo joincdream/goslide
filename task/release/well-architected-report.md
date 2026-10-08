@@ -5,7 +5,7 @@
 > **평가 대상**: Goslide v1.0.0 Full Release (Git Commit: `4c43e70`)  
 > **최종 판정**: **최우수 (Well-Architected Pass / 100.0점 만점)**  
 > **평가 주체**: Goslide Core Architecture Team & QA Auditor  
-> **참조 문서**: [AGENTS.md](file:///home/yundream/myjob/cloit/Goslide/AGENTS.md), [unit-test-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/unit-test-report.md), [cognitive-complexity-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/cognitive-complexity-report.md), [ADR-001 (decisions-simplification.md)](file:///home/yundream/myjob/cloit/Goslide/docs/okf/decisions-simplification.md), [core-architecture.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/core-architecture.md), [contracts-interfaces.md](file:///home/yundream/myjob/cloit/Goslide/docs/okf/contracts-interfaces.md), [rubrics.md](file:///home/yundream/myjob/cloit/Goslide/.agents/skills/well-architected-review/references/rubrics.md)
+> **참조 문서**: [AGENTS.md](../../AGENTS.md), [unit-test-report.md](unit-test-report.md), [cognitive-complexity-report.md](cognitive-complexity-report.md), [ADR-001 (decisions-simplification.md)](../../docs/okf/decisions-simplification.md), [core-architecture.md](../../docs/okf/core-architecture.md), [contracts-interfaces.md](../../docs/okf/contracts-interfaces.md), [rubrics.md](../../.agents/skills/well-architected-review/references/rubrics.md)
 
 ---
 

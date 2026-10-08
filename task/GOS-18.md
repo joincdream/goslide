@@ -5,7 +5,7 @@
 > **마감일**: 2026-11-13  
 > **상태**: 진행 중 (In Progress)  
 > **담당 패키지**: `task/`, `docs/`, `cmd/goslide/`, `.goreleaser.yaml`, `.github/workflows/`  
-> **연관 문서**: [unit-test-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/unit-test-report.md), [pre-release-qa-plan.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/pre-release-qa-plan.md), [cross-compilation-plan.md](file:///home/yundream/myjob/cloit/Goslide/task/cross-compilation-plan.md), [GOS-12.md](file:///home/yundream/myjob/cloit/Goslide/task/GOS-12.md), [development_roadmap.md](file:///home/yundream/myjob/cloit/Goslide/docs/development_roadmap.md)
+> **연관 문서**: [unit-test-report.md](release/unit-test-report.md), [pre-release-qa-plan.md](release/pre-release-qa-plan.md), [cross-compilation-plan.md](cross-compilation-plan.md), [GOS-12.md](GOS-12.md), [development_roadmap.md](../docs/development_roadmap.md)
 
 ---
 

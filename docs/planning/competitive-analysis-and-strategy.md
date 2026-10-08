@@ -4,7 +4,7 @@
 > **최종 갱신일**: 2026-10-06  
 > **목적**: Marp 및 주요 프레젠테이션 도구 대비 Goslide의 정량적 메트릭 점수화, 비교우위(Moat), 타겟 고객 정의, 기능 갭(Gap Analysis), 개선 로드맵 수립  
 > **대상 도구**: Marp, Slidev, Reveal.js, Quarto, Lookatme / Present, Goslide  
-> **연관 문서**: [development_roadmap.md](file:///home/yundream/myjob/cloit/Goslide/docs/development_roadmap.md), [functional_specification.md](file:///home/yundream/myjob/cloit/Goslide/docs/functional_specification.md), [pre-release-qa-plan.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/pre-release-qa-plan.md), [unit-test-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/unit-test-report.md)
+> **연관 문서**: [development_roadmap.md](../development_roadmap.md), [functional_specification.md](../functional_specification.md), [pre-release-qa-plan.md](../../task/release/pre-release-qa-plan.md), [unit-test-report.md](../../task/release/unit-test-report.md)
 
 ---
 

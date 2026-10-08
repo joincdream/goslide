@@ -2,8 +2,8 @@
 
 > **문서 유형**: 사용자 수용 테스트 체크리스트 (User Acceptance Test / Manual QA Checklist)  
 > **테스트 대상**: Goslide v1.0.0 (Linux x86_64 / arm64)  
-> **문서 위치**: `docs/release/linux-user-test-checklist.md`  
-> **연관 문서**: [pre-release-qa-plan.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/pre-release-qa-plan.md), [unit-test-report.md](file:///home/yundream/myjob/cloit/Goslide/docs/release/unit-test-report.md)  
+> **문서 위치**: `task/release/linux-user-test-checklist.md`  
+> **연관 문서**: [pre-release-qa-plan.md](pre-release-qa-plan.md), [unit-test-report.md](unit-test-report.md)  
 > **작성 일자**: 2026-10-07  
 > **테스터 성명**: ____________________  
 > **테스트 일시**: 2026-____-____  
