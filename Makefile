@@ -1,9 +1,12 @@
-.PHONY: all build install test test-race lint complexity fmt clean help setup-tools golden-update bench check
+.PHONY: all build install test test-race lint complexity fmt clean help setup-tools golden-update bench check package cross-build
 
 BINARY_NAME=goslide
 BIN_DIR=bin
+DIST_DIR=dist
 INSTALL_DIR ?= $(HOME)/.local/bin
 GO=go
+VERSION ?= $(shell git describe --tags --always 2>/dev/null || echo "dev")
+BIN_EXT = $(if $(filter windows,$(GOOS)),.exe,)
 
 GOPATH ?= $(shell $(GO) env GOPATH)
 GOCYCLO ?= $(shell which gocyclo 2>/dev/null || echo $(GOPATH)/bin/gocyclo)
@@ -32,9 +35,42 @@ build-web:
 
 ## build: Build static single binary with CGO_ENABLED=0
 build: build-web
-	@echo "==> Building $(BINARY_NAME) (CGO_ENABLED=0)..."
+	@echo "==> Building $(BINARY_NAME)$(BIN_EXT) (CGO_ENABLED=0)..."
 	@mkdir -p $(BIN_DIR)
-	CGO_ENABLED=0 $(GO) build -trimpath -ldflags="-s -w" -o $(BIN_DIR)/$(BINARY_NAME) ./cmd/goslide
+	CGO_ENABLED=0 $(GO) build -trimpath -ldflags="-s -w -X 'main.version=$(VERSION)'" -o $(BIN_DIR)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
+
+## package: Compile and package binary for specified GOOS, GOARCH, ARTIFACT_NAME
+package: build-web
+	@if [ -z "$(GOOS)" ] || [ -z "$(GOARCH)" ] || [ -z "$(ARTIFACT_NAME)" ]; then \
+		echo "Usage: make package GOOS=<os> GOARCH=<arch> ARTIFACT_NAME=<name> [VERSION=<ver>]"; \
+		exit 1; \
+	fi
+	@echo "==> Packaging $(ARTIFACT_NAME) ($(GOOS)/$(GOARCH), version: $(VERSION))..."
+	@mkdir -p $(DIST_DIR)/$(ARTIFACT_NAME)
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -trimpath -ldflags="-s -w -X 'main.version=$(VERSION)'" -o $(DIST_DIR)/$(ARTIFACT_NAME)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
+	@cp README.md $(DIST_DIR)/$(ARTIFACT_NAME)/ 2>/dev/null || true
+	@if [ "$(GOOS)" = "windows" ]; then \
+		cd $(DIST_DIR) && rm -f $(ARTIFACT_NAME).zip && zip -r $(ARTIFACT_NAME).zip $(ARTIFACT_NAME) >/dev/null; \
+	else \
+		cd $(DIST_DIR) && rm -f $(ARTIFACT_NAME).tar.gz && tar -czvf $(ARTIFACT_NAME).tar.gz $(ARTIFACT_NAME) >/dev/null; \
+	fi
+	@rm -rf $(DIST_DIR)/$(ARTIFACT_NAME)
+	@echo "==> Successfully created $(DIST_DIR)/$(ARTIFACT_NAME)..."
+
+## cross-build: Build and package all 6 release targets (Linux, macOS, Windows) with checksums
+cross-build: build-web
+	@echo "==> Building all 6 cross-platform release targets (version: $(VERSION))..."
+	@mkdir -p $(DIST_DIR)
+	@$(MAKE) package GOOS=linux GOARCH=amd64 ARTIFACT_NAME=goslide_linux_amd64 VERSION=$(VERSION)
+	@$(MAKE) package GOOS=linux GOARCH=arm64 ARTIFACT_NAME=goslide_linux_arm64 VERSION=$(VERSION)
+	@$(MAKE) package GOOS=darwin GOARCH=amd64 ARTIFACT_NAME=goslide_darwin_amd64 VERSION=$(VERSION)
+	@$(MAKE) package GOOS=darwin GOARCH=arm64 ARTIFACT_NAME=goslide_darwin_arm64 VERSION=$(VERSION)
+	@$(MAKE) package GOOS=windows GOARCH=amd64 ARTIFACT_NAME=goslide_windows_amd64 VERSION=$(VERSION)
+	@$(MAKE) package GOOS=windows GOARCH=arm64 ARTIFACT_NAME=goslide_windows_arm64 VERSION=$(VERSION)
+	@echo "==> Generating SHA256 checksums..."
+	@cd $(DIST_DIR) && sha256sum *.tar.gz *.zip > checksums.txt
+	@cat $(DIST_DIR)/checksums.txt
+	@echo "==> Successfully completed cross-platform release build in $(DIST_DIR)/"
 
 ## install: Build and install binary to ~/.local/bin
 install: build

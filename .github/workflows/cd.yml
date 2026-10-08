@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -22,6 +23,18 @@ jobs:
           - os: linux
             arch: arm64
             artifact_name: goslide_linux_arm64
+          - os: darwin
+            arch: amd64
+            artifact_name: goslide_darwin_amd64
+          - os: darwin
+            arch: arm64
+            artifact_name: goslide_darwin_arm64
+          - os: windows
+            arch: amd64
+            artifact_name: goslide_windows_amd64
+          - os: windows
+            arch: arm64
+            artifact_name: goslide_windows_arm64
 
     steps:
       - name: Checkout code
@@ -40,33 +53,20 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build Web Assets (Svelte 5)
+      - name: Install Frontend Dependencies
         run: |
           cd web
           npm ci
-          npm run build
 
-      - name: Compile Static Binary
-        env:
-          GOOS: ${{ matrix.os }}
-          GOARCH: ${{ matrix.arch }}
-          CGO_ENABLED: 0
+      - name: Build and Package Binary via Makefile
         run: |
-          mkdir -p release-build/${{ matrix.artifact_name }}
-          go build -trimpath -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o release-build/${{ matrix.artifact_name }}/goslide ./cmd/goslide
-          
-          # 패키징 디렉토리에 주요 문서 포함
-          cp README.md release-build/${{ matrix.artifact_name }}/ 2>/dev/null || true
-          
-          # tar.gz 압축
-          cd release-build
-          tar -czvf ../${{ matrix.artifact_name }}.tar.gz -C ${{ matrix.artifact_name }} .
+          make package GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} ARTIFACT_NAME=${{ matrix.artifact_name }} VERSION=${{ github.ref_name }}
 
       - name: Upload Artifact to Job
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_name }}.tar.gz
+          path: dist/${{ matrix.artifact_name }}.*
 
   publish:
     name: Publish to GitHub Releases
@@ -85,7 +85,7 @@ jobs:
       - name: Generate SHA256 Checksums
         run: |
           cd release-artifacts
-          sha256sum *.tar.gz > checksums.txt
+          sha256sum *.tar.gz *.zip > checksums.txt
           cat checksums.txt
 
       - name: Publish GitHub Release
@@ -93,6 +93,7 @@ jobs:
         with:
           files: |
             release-artifacts/*.tar.gz
+            release-artifacts/*.zip
             release-artifacts/checksums.txt
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
