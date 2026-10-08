@@ -1,0 +1,542 @@
+/* ==========================================================================
+   Goslide Official External Theme: Academic
+   Repository: https://github.com/joincdream/goslide
+   
+   [사용법 / Usage]
+   1. 개발 서버 실행 시:
+      goslide serve presentation.md --theme-path themes/academic.css
+      (또는 Frontmatter에 theme: academic 선언)
+
+   2. HTML, PDF, PPTX 일괄 빌드 시:
+      goslide build presentation.md --theme-path themes/academic.css -f all
+
+   [디자인 철학 / Design Philosophy]
+   - 대학 강의, 학술 세미나, 연구 논문 및 수식/데이터 발표에 최적화된 클래식 테마입니다.
+   - 장시간 시청에도 눈의 피로를 최소화하는 따뜻한 아이보리 페이퍼(#fdfbf7)와 딥 차콜 잉크(#1c1917)를 사용합니다.
+   - 우아한 세리프 헤딩, KaTeX 수식 박스, 학술지 표준 Booktabs(3선 표) 서식을 완벽 지원합니다.
+
+   [커스터마이징 팁 / Customization Guide]
+   - 대학 또는 학회 상징 컬러로 변경하려면 아래 :root CSS 변수(--academic-accent)를 수정하세요.
+   - 영문 전용 발표 시 세리프 폰트로 Georgia, Times New Roman 등을 우선 지정할 수 있습니다.
+   ========================================================================== */
+
+:root {
+  /* Brand Primary & Accents */
+  --academic-primary: #1c1917;       /* Stone 900 (메인 딥 차콜/잉크) */
+  --academic-secondary: #44403c;     /* Stone 700 (서브 텍스트) */
+  --academic-accent: #991b1b;        /* Crimson / Oxford Red 800 (학술 버건디 악센트) */
+  --academic-accent-hover: #7f1d1d;  /* Red 900 */
+  --academic-accent-light: #fef2f2;  /* Red 50 */
+  --academic-accent-gold: #b45309;   /* Amber 700 (헤더/메타 앤틱 골드) */
+
+  /* Paper Canvas & Neutral Surfaces */
+  --academic-bg-card: #fdfbf7;       /* Warm Cream / Antique Paper (눈이 편안한 페이퍼) */
+  --academic-bg-stage: #eeebe3;      /* Muted Warm Stone (슬라이드 무대 배경) */
+  --academic-bg-subtle: #f5f2ea;     /* Ivory Tint (콜아웃, 박스 인용구 배경) */
+  --academic-text-main: #292524;     /* Stone 800 (본문 텍스트) */
+  --academic-text-muted: #78716c;    /* Stone 500 (주석 및 캡션) */
+  --academic-border: #e7e5e4;        /* Stone 200 (미세 구분선) */
+  --academic-border-strong: #292524; /* Booktabs 표 상단/하단 기준선 (2.5px stone) */
+
+  /* Typography Stacks (Offline Portability Invariant) */
+  --academic-font-serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, "Times New Roman", "Nanum Myeongjo", "Batang", serif;
+  --academic-font-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, "Helvetica Neue", "Malgun Gothic", sans-serif;
+  --academic-font-code: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Base Canvas & Body */
+body {
+  font-family: var(--academic-font-sans);
+  background-color: var(--academic-bg-stage);
+  color: var(--academic-text-main);
+}
+
+.slide-card {
+  background-color: var(--academic-bg-card);
+  color: var(--academic-text-main);
+  border: 1px solid #e2ded5;
+  box-shadow: 0 12px 36px rgba(41, 37, 36, 0.08);
+}
+
+/* Headings: Elegant Serif Hierarchy */
+.slide-card h1 {
+  font-family: var(--academic-font-serif);
+  color: var(--academic-primary);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.slide-card h2 {
+  font-family: var(--academic-font-serif);
+  color: var(--academic-primary);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  font-family: var(--academic-font-sans);
+  color: var(--academic-secondary);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Slide Header & Tracker (University / Course / Seminar Meta) */
+.slide-card .slide-header {
+  color: var(--academic-text-muted);
+  font-family: var(--academic-font-sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--academic-border);
+  padding-bottom: 4px;
+}
+
+.slide-card .slide-footer {
+  color: var(--academic-text-muted);
+  font-family: var(--academic-font-serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  border-top: 1px solid var(--academic-border);
+  padding-top: 4px;
+}
+
+/* Slide Title Box Accent: Classical Oxford Underline */
+.slide-card .slide-title-box {
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--academic-border);
+}
+
+.slide-card .slide-title-box .slide-title {
+  font-family: var(--academic-font-serif);
+  font-size: 2.15rem;
+  font-weight: 700;
+  color: var(--academic-primary);
+  margin-bottom: 0.2rem;
+}
+
+.slide-card .slide-title-box .slide-subtitle {
+  font-family: var(--academic-font-serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--academic-text-muted);
+  margin-top: 0;
+}
+
+/* Typography Enhancements */
+.slide-card p {
+  line-height: 1.7;
+  color: var(--academic-text-main);
+}
+
+.slide-card a {
+  color: var(--academic-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.slide-card a:hover {
+  color: var(--academic-accent-hover);
+}
+
+.slide-card strong {
+  color: var(--academic-primary);
+  font-weight: 700;
+}
+
+.slide-card em {
+  font-family: var(--academic-font-serif);
+}
+
+/* Lists */
+.slide-card ul {
+  list-style: none;
+  padding-left: 1.25rem;
+}
+
+.slide-card ul > li {
+  position: relative;
+  margin-bottom: 0.6rem;
+  line-height: 1.65;
+}
+
+.slide-card ul > li::before {
+  content: "—";
+  position: absolute;
+  left: -1.25rem;
+  top: 0;
+  line-height: inherit;
+  color: var(--academic-accent);
+  font-weight: 700;
+}
+
+.slide-card ul > li.task-list-item::before {
+  content: none;
+}
+
+.slide-card li p {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.slide-card ol {
+  padding-left: 1.5rem;
+}
+
+.slide-card ol > li {
+  margin-bottom: 0.6rem;
+  line-height: 1.65;
+}
+
+/* Blockquotes & Citations (Academic Paper Style) */
+.slide-card blockquote {
+  background-color: var(--academic-bg-subtle);
+  border-left: 4px solid var(--academic-accent);
+  border-radius: 0 6px 6px 0;
+  color: var(--academic-secondary);
+  font-family: var(--academic-font-serif);
+  font-style: italic;
+  padding: 1rem 1.4rem;
+  margin: 1.25rem 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.slide-card blockquote p {
+  margin: 0;
+  line-height: 1.75;
+}
+
+/* KaTeX Math Equations (Academic Highlight Box) */
+.slide-card .katex-display {
+  background-color: rgba(245, 242, 234, 0.75);
+  border: 1px solid var(--academic-border);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin: 1.25rem 0;
+  text-align: center;
+  overflow-x: auto;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Tables: Authentic Academic Booktabs (3-line Rule) Style */
+.slide-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.95em;
+  border-top: 2.5px solid var(--academic-border-strong);
+  border-bottom: 2.5px solid var(--academic-border-strong);
+}
+
+.slide-card th {
+  font-family: var(--academic-font-sans);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: var(--academic-primary);
+  border-bottom: 1.5px solid var(--academic-border-strong);
+}
+
+.slide-card td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--academic-border);
+  color: var(--academic-text-main);
+}
+
+.slide-card tr:last-child td {
+  border-bottom: none;
+}
+
+/* Code Blocks & Inline Code */
+.slide-card pre {
+  background-color: #242220;
+  border: 1px solid #3d3a37;
+  border-radius: 6px;
+  color: #f5f2eb;
+  padding: 1rem 1.25rem;
+}
+
+.slide-card :not(pre) > code {
+  background-color: rgba(41, 37, 36, 0.07);
+  color: #7f1d1d;
+  font-family: var(--academic-font-code);
+  font-weight: 600;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+/* GFM Alerts / Callouts */
+.slide-card .markdown-alert {
+  border-radius: 0 6px 6px 0;
+  margin: 1rem 0;
+  padding: 0.85rem 1.25rem;
+}
+.slide-card .markdown-alert-note {
+  border-left: 4px solid #0284c7;
+  background-color: rgba(2, 132, 199, 0.06);
+}
+.slide-card .markdown-alert-tip {
+  border-left: 4px solid #059669;
+  background-color: rgba(5, 150, 105, 0.06);
+}
+.slide-card .markdown-alert-important {
+  border-left: 4px solid #7c3aed;
+  background-color: rgba(124, 58, 237, 0.06);
+}
+.slide-card .markdown-alert-warning {
+  border-left: 4px solid #d97706;
+  background-color: rgba(217, 119, 6, 0.06);
+}
+.slide-card .markdown-alert-caution {
+  border-left: 4px solid #dc2626;
+  background-color: rgba(220, 38, 38, 0.06);
+}
+
+/* ==========================================================================
+   Semantic Layout Overrides: cover, section, two-cols, lead, blank
+   ========================================================================== */
+
+/* 1. Cover Layout (Classic Academic Monograph / Seminar Lecture) */
+.slide-card.cover,
+.slide-card.layout-cover {
+  background: radial-gradient(circle at 50% 25%, #2d1216 0%, #1c1917 100%) !important;
+  color: #fbfbfa !important;
+  border: 1px solid #292524;
+  overflow: hidden;
+}
+
+/* Academic Top Burgundy/Gold Accent Rule */
+.slide-card.cover::before,
+.slide-card.layout-cover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #991b1b 0%, #d97706 50%, #991b1b 100%);
+  z-index: 10;
+}
+
+.slide-card.cover .slide-header,
+.slide-card.cover .slide-footer,
+.slide-card.layout-cover .slide-header,
+.slide-card.layout-cover .slide-footer {
+  display: none !important;
+}
+
+.slide-card.cover .slide-body,
+.slide-card.layout-cover .slide-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  flex: 0 0 1000px !important;
+  height: 1000px !important;
+  min-height: 1000px !important;
+  max-height: 1000px !important;
+  box-sizing: border-box !important;
+  padding: 100px 140px 60px 140px !important;
+  text-align: center !important;
+}
+
+.slide-card.cover h1,
+.slide-card.layout-cover h1 {
+  margin-top: auto !important;
+  margin-bottom: 0.75rem !important;
+  font-family: var(--academic-font-serif) !important;
+  font-size: 3.6rem !important;
+  font-weight: 700 !important;
+  line-height: 1.22 !important;
+  letter-spacing: -0.02em !important;
+  color: #fbfbfa !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.slide-card.cover h2,
+.slide-card.cover h3,
+.slide-card.layout-cover h2,
+.slide-card.layout-cover h3 {
+  margin-top: 0.5rem !important;
+  margin-bottom: auto !important;
+  font-family: var(--academic-font-serif) !important;
+  font-size: 1.5rem !important;
+  font-weight: 400 !important;
+  font-style: italic !important;
+  line-height: 1.5 !important;
+  color: #d6d3d1 !important;
+  max-width: 90%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.slide-card.cover .slide-body > p,
+.slide-card.layout-cover .slide-body > p {
+  text-align: left !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px solid rgba(214, 211, 209, 0.25) !important;
+  font-size: 1.15rem !important;
+  line-height: 1.7 !important;
+  color: #d6d3d1 !important;
+  width: 100% !important;
+}
+
+.slide-card.cover strong,
+.slide-card.layout-cover strong {
+  color: #fde68a !important;
+  font-weight: 600 !important;
+}
+
+/* 2. Section Layout (Chapter / Topic Transition) */
+.slide-card.section,
+.slide-card.layout-section {
+  background-color: var(--academic-bg-subtle);
+  color: var(--academic-primary);
+  border-left: 12px solid var(--academic-accent);
+}
+
+.slide-card.section h1,
+.slide-card.layout-section h1 {
+  font-family: var(--academic-font-serif);
+  color: var(--academic-primary);
+  font-size: 3.25rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.slide-card.section h3,
+.slide-card.layout-section h3,
+.slide-card.section p,
+.slide-card.layout-section p {
+  font-family: var(--academic-font-serif);
+  font-style: italic;
+  color: var(--academic-secondary);
+  font-size: 1.35rem;
+}
+
+/* 3. Two-Cols Layout */
+.slide-card .two-cols {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.slide-card .two-cols .col-left,
+.slide-card .two-cols .col-right {
+  flex: 1;
+  background-color: var(--academic-bg-subtle);
+  border: 1px solid var(--academic-border);
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.slide-card .two-cols .col-left h3,
+.slide-card .two-cols .col-right h3 {
+  font-family: var(--academic-font-serif);
+  color: var(--academic-primary);
+  border-bottom: 1.5px solid var(--academic-accent);
+  padding-bottom: 6px;
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+/* 4. Lead Layout (Hypothesis / Theorem / Core Takeaway) */
+.slide-card.lead,
+.slide-card.layout-lead {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.slide-card.lead .slide-title-box,
+.slide-card.layout-lead .slide-title-box {
+  display: none !important;
+}
+
+.slide-card.lead .slide-body,
+.slide-card.layout-lead .slide-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  flex: 0 0 960px !important;
+  height: 960px !important;
+  box-sizing: border-box !important;
+  padding: 60px 140px !important;
+  margin: 0 !important;
+}
+
+.slide-card.lead h1,
+.slide-card.layout-lead h1 {
+  font-family: var(--academic-font-serif) !important;
+  font-size: 3.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  color: inherit !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.slide-card.lead h2,
+.slide-card.lead h3,
+.slide-card.layout-lead h2,
+.slide-card.layout-lead h3 {
+  font-family: var(--academic-font-serif) !important;
+  font-style: italic !important;
+  font-size: 1.5rem !important;
+  color: inherit !important;
+  opacity: 0.9;
+}
+
+/* Background Dimming Overlay Contrast Protection */
+.slide-card.has-bg-dim {
+  color: #f8fafc;
+}
+.slide-card.has-bg-dim h1,
+.slide-card.has-bg-dim h2,
+.slide-card.has-bg-dim h3,
+.slide-card.has-bg-dim h4,
+.slide-card.has-bg-dim p,
+.slide-card.has-bg-dim li {
+  color: #f8fafc !important;
+}
+.slide-card.has-bg-dim strong {
+  color: #fde68a !important;
+}
+.slide-card.has-bg-dim .slide-header,
+.slide-card.has-bg-dim .slide-footer {
+  color: #cbd5e1 !important;
+}
+
+/* 5. Blank Layout (Full-Bleed Visual / Large Chart Canvas) */
+.slide-card.blank,
+.slide-card.layout-blank {
+  padding: 0 !important;
+}
+
+.slide-card.blank .slide-title-box,
+.slide-card.blank .slide-header,
+.slide-card.blank .slide-footer,
+.slide-card.layout-blank .slide-title-box,
+.slide-card.layout-blank .slide-header,
+.slide-card.layout-blank .slide-footer {
+  display: none !important;
+}
+
+.slide-card.blank .slide-body,
+.slide-card.layout-blank .slide-body {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}

@@ -70,6 +70,12 @@ func TestManager_GetThemeCSS(t *testing.T) {
 			containStr: "Goslide Dark Theme",
 		},
 		{
+			name:       "academic theme",
+			themeName:  "academic",
+			wantErr:    false,
+			containStr: "Goslide Official Embedded Theme: Academic",
+		},
+		{
 			name:      "unknown theme",
 			themeName: "matrix-neon",
 			wantErr:   true,
