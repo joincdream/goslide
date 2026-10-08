@@ -236,3 +236,73 @@ func TestManager_GetStarterTemplate(t *testing.T) {
 		}
 	})
 }
+
+func TestManager_ResolveTheme_ExternalPaths(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	themesSubdir := filepath.Join(tmpDir, "themes")
+	if err := os.MkdirAll(themesSubdir, 0755); err != nil {
+		t.Fatalf("failed to create themes dir: %v", err)
+	}
+
+	corpCSSPath := filepath.Join(themesSubdir, "corporate.css")
+	if err := os.WriteFile(corpCSSPath, []byte(".slide-card { color: #0f172a; }"), 0644); err != nil {
+		t.Fatalf("failed to write corporate.css: %v", err)
+	}
+
+	mgr := theme.NewManager(nil)
+	mgr.SetBaseDir(tmpDir)
+
+	t.Run("resolve relative theme path with extension", func(t *testing.T) {
+		base, custom := mgr.ResolveTheme("themes/corporate.css", "")
+		if base != theme.DefaultTheme {
+			t.Errorf("expected base theme default, got %q", base)
+		}
+		if custom != corpCSSPath {
+			t.Errorf("expected custom path %q, got %q", corpCSSPath, custom)
+		}
+	})
+
+	t.Run("resolve relative theme path without extension", func(t *testing.T) {
+		base, custom := mgr.ResolveTheme("themes/corporate", "")
+		if base != theme.DefaultTheme {
+			t.Errorf("expected base theme default, got %q", base)
+		}
+		if custom != corpCSSPath {
+			t.Errorf("expected custom path %q, got %q", corpCSSPath, custom)
+		}
+	})
+
+	t.Run("resolve bare theme name via local themes directory", func(t *testing.T) {
+		base, custom := mgr.ResolveTheme("corporate", "")
+		if base != theme.DefaultTheme {
+			t.Errorf("expected base theme default, got %q", base)
+		}
+		if custom != corpCSSPath {
+			t.Errorf("expected custom path %q, got %q", corpCSSPath, custom)
+		}
+	})
+
+	t.Run("resolve builtin theme", func(t *testing.T) {
+		base, custom := mgr.ResolveTheme("clean", "")
+		if base != "clean" {
+			t.Errorf("expected base theme clean, got %q", base)
+		}
+		if custom != "" {
+			t.Errorf("expected empty custom path for builtin theme, got %q", custom)
+		}
+	})
+
+	t.Run("explicit customCSSPath overrides frontmatter", func(t *testing.T) {
+		explicitPath := filepath.Join(tmpDir, "override.css")
+		base, custom := mgr.ResolveTheme("clean", explicitPath)
+		if base != "clean" {
+			t.Errorf("expected base theme clean, got %q", base)
+		}
+		if custom != explicitPath {
+			t.Errorf("expected custom path %q, got %q", explicitPath, custom)
+		}
+	})
+}
+

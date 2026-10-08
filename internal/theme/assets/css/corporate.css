@@ -1,0 +1,379 @@
+/* Goslide Corporate Theme
+ * Professional Business & Enterprise Presentation Theme
+ * Deep Navy, Royal Blue Accents, and Clean Corporate Card Structure
+ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, "Helvetica Neue", "Malgun Gothic", sans-serif;
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.slide-card {
+  background-color: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* Headings */
+.slide-card h1 {
+  color: #0f172a;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.slide-card h2 {
+  color: #1e293b;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  color: #334155;
+  font-weight: 600;
+}
+
+/* Slide Header & Tracker */
+.slide-card .slide-header {
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 4px;
+}
+
+.slide-card .slide-footer {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  border-top: 1px solid #f8fafc;
+  padding-top: 4px;
+}
+
+/* Slide Title Box Accent */
+.slide-card .slide-title-box {
+  position: relative;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.slide-card .slide-title-box::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 64px;
+  height: 2px;
+  background-color: #2563eb;
+}
+
+/* Links & Accents */
+.slide-card a {
+  color: #2563eb;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1.5px solid #93c5fd;
+}
+
+.slide-card a:hover {
+  color: #1d4ed8;
+  border-bottom-color: #1d4ed8;
+}
+
+.slide-card strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Lists */
+.slide-card ul {
+  list-style: none;
+  padding-left: 1.25rem;
+}
+
+.slide-card ul > li {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.slide-card ul > li::before {
+  content: "■";
+  position: absolute;
+  left: -1.25rem;
+  top: 0.15em;
+  color: #2563eb;
+  font-size: 0.65em;
+}
+
+/* Blockquotes & Callouts */
+.slide-card blockquote {
+  background-color: #f8fafc;
+  border-left: 4px solid #2563eb;
+  border-radius: 0 8px 8px 0;
+  color: #334155;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Tables */
+.slide-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.95em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.slide-card th {
+  background-color: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+}
+
+.slide-card td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.slide-card tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+.slide-card tr:hover td {
+  background-color: #eff6ff;
+}
+
+/* Code Blocks & Inline Code */
+.slide-card pre {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 1rem;
+}
+
+.slide-card :not(pre) > code {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.88em;
+}
+
+/* ==========================================================================
+   Layout Styles: cover, section, two-cols, lead
+   ========================================================================== */
+
+/* 1. Cover Layout (Executive Enterprise Presentation) */
+.slide-card.cover,
+.slide-card.layout-cover {
+  background: radial-gradient(circle at 85% 15%, #1e293b 0%, #0f172a 55%, #080c16 100%) !important;
+  color: #f8fafc;
+  border: 1px solid #1e293b;
+  overflow: hidden;
+}
+
+/* Executive Brand Top Accent Bar */
+.slide-card.cover::before,
+.slide-card.layout-cover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #1d4ed8 100%);
+  z-index: 10;
+}
+
+.slide-card.cover .slide-header,
+.slide-card.cover .slide-footer,
+.slide-card.layout-cover .slide-header,
+.slide-card.layout-cover .slide-footer {
+  display: none !important;
+}
+
+.slide-card.cover .slide-body,
+.slide-card.layout-cover .slide-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  flex: 0 0 1000px !important;
+  height: 1000px !important;
+  min-height: 1000px !important;
+  max-height: 1000px !important;
+  box-sizing: border-box !important;
+  padding: 100px 140px 60px 140px !important;
+  text-align: center !important;
+}
+
+/* Hero Title: Vertically Centered via Auto Margins */
+.slide-card.cover h1,
+.slide-card.layout-cover h1 {
+  margin-top: auto !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 3.75rem !important;
+  font-weight: 800 !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.035em !important;
+  color: #ffffff !important;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Subtitle: Placed immediately beneath title, pushes metadata to the bottom */
+.slide-card.cover h2,
+.slide-card.cover h3,
+.slide-card.layout-cover h2,
+.slide-card.layout-cover h3 {
+  margin-top: 0.5rem !important;
+  margin-bottom: auto !important; /* Pushes bottom meta to floor */
+  font-size: 1.5rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  color: #94a3b8 !important;
+  max-width: 90%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Presenter & Date Metadata: Grounded at bottom-left */
+.slide-card.cover p,
+.slide-card.layout-cover p {
+  text-align: left !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+  font-size: 1.15rem !important;
+  line-height: 1.7 !important;
+  color: #cbd5e1 !important;
+  width: 100% !important;
+}
+
+.slide-card.cover strong,
+.slide-card.layout-cover strong {
+  color: #60a5fa !important;
+  font-weight: 600 !important;
+}
+
+/* 2. Section Layout (Chapter Divider) */
+.slide-card.section {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-left: 12px solid #2563eb;
+}
+
+.slide-card.section h1 {
+  color: #0f172a;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.slide-card.section p {
+  color: #475569;
+  font-size: 1.25rem;
+}
+
+/* 3. Two-Cols Layout */
+.slide-card .two-cols {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.slide-card .two-cols .col-left,
+.slide-card .two-cols .col-right {
+  flex: 1;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.slide-card .two-cols .col-left h3,
+.slide-card .two-cols .col-right h3 {
+  color: #0f172a;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 6px;
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+/* 4. Lead Layout (Key Takeaway / Highlight / Transition) */
+.slide-card.lead,
+.slide-card.layout-lead {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.slide-card.lead .slide-title-box,
+.slide-card.layout-lead .slide-title-box {
+  display: none !important;
+}
+
+.slide-card.lead .slide-body,
+.slide-card.layout-lead .slide-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  flex: 0 0 960px !important;
+  height: 960px !important;
+  box-sizing: border-box !important;
+  padding: 60px 140px !important;
+  margin: 0 !important;
+}
+
+.slide-card.lead h1,
+.slide-card.layout-lead h1 {
+  font-size: 3.5rem !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.25rem !important;
+  color: inherit !important;
+}
+
+.slide-card.lead h2,
+.slide-card.lead h3,
+.slide-card.layout-lead h2,
+.slide-card.layout-lead h3 {
+  font-size: 1.6rem !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  opacity: 0.9;
+  color: inherit !important;
+}
+
+.slide-card.lead blockquote,
+.slide-card.layout-lead blockquote {
+  font-size: 1.85rem !important;
+  line-height: 1.6 !important;
+  font-weight: 500 !important;
+  border-left: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 1.5rem 0 0 0 !important;
+  box-shadow: none !important;
+  font-style: italic !important;
+}

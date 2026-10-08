@@ -156,10 +156,6 @@ img.img-center {
 }
 
 /* Background Dimming Overlay */
-.slide-card.has-bg-dim {
-  position: relative;
-}
-
 .slide-bg-dim {
   position: absolute;
   inset: 0;

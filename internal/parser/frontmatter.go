@@ -109,8 +109,12 @@ func resolveTheme(theme string) string {
 	if t == "" {
 		return "default"
 	}
+	// If the theme specifies a file path (contains path separators or ends with .css), preserve it
+	if strings.Contains(t, "/") || strings.Contains(t, "\\") || strings.HasSuffix(strings.ToLower(t), ".css") {
+		return t
+	}
 	switch t {
-	case "default", "clean", "dark":
+	case "default", "clean", "dark", "corporate", "academic", "cyber-dark":
 		return t
 	default:
 		// Unsupported themes fallback to "default" as per Decision 3

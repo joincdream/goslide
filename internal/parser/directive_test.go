@@ -23,7 +23,7 @@ header: "Chapter 1"
 -->
 # Slide 1 Content`
 
-	res1 := dm.processSlide(s1Raw)
+	res1 := dm.processSlide(1, s1Raw)
 	if !reflect.DeepEqual(res1.Directives.Class, []string{"lead"}) {
 		t.Errorf("slide 1 class mismatch: got %v, want [lead]", res1.Directives.Class)
 	}
@@ -42,7 +42,7 @@ header: "Chapter 1"
 
 	// Slide 2: verify local directives did NOT leak, but header DID inherit
 	s2Raw := "# Slide 2 Content"
-	res2 := dm.processSlide(s2Raw)
+	res2 := dm.processSlide(2, s2Raw)
 	if len(res2.Directives.Class) != 0 {
 		t.Errorf("slide 2 should not inherit local class, got %v", res2.Directives.Class)
 	}
@@ -55,13 +55,13 @@ header: "Chapter 1"
 
 	// Slide 3: override layout locally to cover
 	s3Raw := "<!-- _layout: cover -->\n# Title"
-	res3 := dm.processSlide(s3Raw)
+	res3 := dm.processSlide(3, s3Raw)
 	if res3.Layout != model.LayoutCover {
 		t.Errorf("slide 3 layout mismatch: got %v, want cover", res3.Layout)
 	}
 
 	// Slide 4: layout should revert to inherited (default)
-	res4 := dm.processSlide("# Next")
+	res4 := dm.processSlide(4, "# Next")
 	if res4.Layout != model.LayoutDefault {
 		t.Errorf("slide 4 layout mismatch: got %v, want default", res4.Layout)
 	}
@@ -72,7 +72,7 @@ func TestDirectiveManager_SpeakerNotes(t *testing.T) {
 
 	t.Run("single line note", func(t *testing.T) {
 		input := "# Slide\n<!-- note: Remember to pause here. -->\nSome text."
-		res := dm.processSlide(input)
+		res := dm.processSlide(1, input)
 		if res.Notes != "Remember to pause here." {
 			t.Errorf("notes mismatch: got %q", res.Notes)
 		}
@@ -83,7 +83,7 @@ func TestDirectiveManager_SpeakerNotes(t *testing.T) {
 
 	t.Run("multiline note", func(t *testing.T) {
 		input := "# Slide\n<!--\nnote:\nLine 1 of speech.\nLine 2 of speech.\n-->"
-		res := dm.processSlide(input)
+		res := dm.processSlide(1, input)
 		expected := "Line 1 of speech.\nLine 2 of speech."
 		if res.Notes != expected {
 			t.Errorf("multiline notes mismatch: got %q, want %q", res.Notes, expected)

@@ -107,3 +107,23 @@ func NormalizeLayout(val string) LayoutType {
 	}
 	return LayoutDefault
 }
+
+// AvailableLayouts returns the list of canonical layout names.
+func AvailableLayouts() []string {
+	return []string{
+		string(LayoutDefault),
+		string(LayoutCover),
+		string(LayoutSection),
+		string(LayoutTwoCols),
+		string(LayoutLead),
+		string(LayoutBlank),
+	}
+}
+
+// IsKnownLayout checks if the given layout name is recognized (canonical or alias).
+func IsKnownLayout(val string) bool {
+	cleaned := strings.ToLower(strings.TrimSpace(val))
+	_, ok := LayoutAliases[cleaned]
+	return ok
+}
+

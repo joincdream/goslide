@@ -43,6 +43,9 @@ func WithBaseDir(dir string) Option {
 	return func(r *HTMLRenderer) {
 		r.baseDir = dir
 		r.bundler = NewAssetBundler(dir)
+		if r.themeMgr != nil {
+			r.themeMgr.SetBaseDir(dir)
+		}
 	}
 }
 
@@ -50,6 +53,9 @@ func WithBaseDir(dir string) Option {
 func WithThemeManager(mgr *theme.Manager) Option {
 	return func(r *HTMLRenderer) {
 		r.themeMgr = mgr
+		if r.themeMgr != nil && r.baseDir != "" {
+			r.themeMgr.SetBaseDir(r.baseDir)
+		}
 	}
 }
 
@@ -65,8 +71,11 @@ type HTMLRenderer struct {
 
 // NewRenderer creates a new HTMLRenderer with the given options.
 func NewRenderer(opts ...Option) *HTMLRenderer {
+	mgr := theme.NewManager(nil)
+	mgr.SetBaseDir(".")
+
 	r := &HTMLRenderer{
-		themeMgr: theme.NewManager(nil),
+		themeMgr: mgr,
 		baseDir:  ".",
 		bundler:  NewAssetBundler("."),
 	}

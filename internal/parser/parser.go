@@ -64,7 +64,7 @@ func (p *Parser) Parse(ctx context.Context, r io.Reader) (*model.Deck, error) {
 		return nil, err
 	}
 
-	slides, err := p.buildSlides(ctx, fm)
+	slides, diagnostics, err := p.buildSlides(ctx, fm)
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +76,7 @@ func (p *Parser) Parse(ctx context.Context, r io.Reader) (*model.Deck, error) {
 		GlobalAttrs: fm.GlobalAttrs,
 		CustomCSS:   fm.CustomCSS,
 		Slides:      slides,
+		Diagnostics: diagnostics,
 	}
 
 	return deck, nil
@@ -86,20 +87,25 @@ func normalizeNewlines(rawBytes []byte) string {
 	return string(bytes.ReplaceAll([]byte(content), []byte("\r"), []byte("\n")))
 }
 
-func (p *Parser) buildSlides(ctx context.Context, fm *FrontmatterResult) ([]*model.Slide, error) {
+func (p *Parser) buildSlides(ctx context.Context, fm *FrontmatterResult) ([]*model.Slide, []model.Diagnostic, error) {
 	slideChunks := splitSlides(fm.Body)
 	dm := newDirectiveManager(fm.GlobalAttrs)
 	slides := make([]*model.Slide, 0, len(slideChunks))
+	var allDiagnostics []model.Diagnostic
 
 	for i, chunk := range slideChunks {
 		if loopErr := ctx.Err(); loopErr != nil {
-			return nil, fmt.Errorf("%w: %v", model.ErrCanceled, loopErr)
+			return nil, nil, fmt.Errorf("%w: %v", model.ErrCanceled, loopErr)
 		}
 
-		parsed := dm.processSlide(chunk)
+		parsed := dm.processSlide(i+1, chunk)
+		if len(parsed.Diagnostics) > 0 {
+			allDiagnostics = append(allDiagnostics, parsed.Diagnostics...)
+		}
+
 		titleHTML, htmlContent, leftHTML, rightHTML, err := renderSlideContent(p.gm, parsed.Layout, parsed.CleanedContent)
 		if err != nil {
-			return nil, fmt.Errorf("failed to render slide %d: %w", i+1, err)
+			return nil, nil, fmt.Errorf("failed to render slide %d: %w", i+1, err)
 		}
 
 		slides = append(slides, &model.Slide{
@@ -112,8 +118,9 @@ func (p *Parser) buildSlides(ctx context.Context, fm *FrontmatterResult) ([]*mod
 			Notes:       parsed.Notes,
 			LeftHTML:    leftHTML,
 			RightHTML:   rightHTML,
+			Diagnostics: parsed.Diagnostics,
 		})
 	}
 
-	return slides, nil
+	return slides, allDiagnostics, nil
 }

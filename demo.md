@@ -1,7 +1,7 @@
 ---
 title: "Modern Large Language Model (LLM) Architecture & Engineering Practice"
 author: "AI Core Architecture Lab"
-theme: "clean"
+theme: "corporate"
 size: "16:9"
 paginate: true
 header: "2026 AI Tech Seminar: Deep Dive into LLMs"

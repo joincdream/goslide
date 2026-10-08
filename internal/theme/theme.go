@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -31,7 +32,8 @@ var baseCSSFiles = []string{
 
 // Manager handles retrieving built-in themes and composing presentation stylesheets.
 type Manager struct {
-	fsys fs.FS
+	fsys    fs.FS
+	baseDir string
 }
 
 // NewManager creates a new theme Manager. If fsys is nil, the embedded filesystem is used.
@@ -39,7 +41,15 @@ func NewManager(fsys fs.FS) *Manager {
 	if fsys == nil {
 		fsys = embeddedAssets
 	}
-	return &Manager{fsys: fsys}
+	return &Manager{fsys: fsys, baseDir: "."}
+}
+
+// SetBaseDir configures the base directory for resolving relative external themes.
+func (m *Manager) SetBaseDir(dir string) {
+	if dir == "" {
+		dir = "."
+	}
+	m.baseDir = dir
 }
 
 // GetBaseCSS returns the composed raw contents of the base stylesheets:
@@ -88,8 +98,96 @@ func (m *Manager) GetThemeCSS(themeName string) (string, error) {
 	return string(data), nil
 }
 
+// HasBuiltinTheme checks if the specified theme name exists in built-in assets.
+func (m *Manager) HasBuiltinTheme(name string) bool {
+	clean := strings.ToLower(strings.TrimSpace(name))
+	if clean == "" {
+		return false
+	}
+	targetPath := fmt.Sprintf("assets/css/%s.css", clean)
+	info, err := fs.Stat(m.fsys, targetPath)
+	return err == nil && !info.IsDir()
+}
+
+// ResolveTheme determines the effective built-in theme and any external custom CSS file path.
+// It supports:
+//  1. Explicit customCSSPath (CLI --theme-path flag) -> highest priority.
+//  2. Frontmatter theme as external file path (e.g. "themes/corporate.css", "themes/corporate", "./my.css").
+//  3. Frontmatter theme as simple name (e.g. "corporate" -> checks themes/corporate.css).
+//  4. Built-in themes (e.g. "default", "clean", "dark").
+//  5. Fallback to raw name if unmatched (for built-in error handling).
+func (m *Manager) ResolveTheme(themeName, customCSSPath string) (baseTheme string, resolvedCustomPath string) {
+	if strings.TrimSpace(customCSSPath) != "" {
+		name := strings.TrimSpace(themeName)
+		if m.HasBuiltinTheme(name) {
+			return strings.ToLower(name), customCSSPath
+		}
+		return DefaultTheme, customCSSPath
+	}
+
+	name := strings.TrimSpace(themeName)
+	if name == "" {
+		return DefaultTheme, ""
+	}
+
+	// 1. If themeName is a path (contains "/" or "\" or ends with ".css")
+	if strings.Contains(name, "/") || strings.Contains(name, "\\") || strings.HasSuffix(strings.ToLower(name), ".css") {
+		if path := m.findExistingCSSFile(name); path != "" {
+			return DefaultTheme, path
+		}
+	}
+
+	// 2. If themeName is a simple identifier, check local project themes directory (e.g. themes/<name>.css)
+	localThemeCandidate := filepath.Join("themes", name+".css")
+	if path := m.findExistingCSSFile(localThemeCandidate); path != "" {
+		return DefaultTheme, path
+	}
+
+	// Also check directly in working directory or baseDir (e.g. <name>.css)
+	directCandidate := name + ".css"
+	if path := m.findExistingCSSFile(directCandidate); path != "" {
+		return DefaultTheme, path
+	}
+
+	// 3. Built-in theme check
+	if m.HasBuiltinTheme(name) {
+		return strings.ToLower(name), ""
+	}
+
+	return name, ""
+}
+
+func (m *Manager) findExistingCSSFile(path string) string {
+	candidates := []string{path}
+	if !strings.HasSuffix(strings.ToLower(path), ".css") {
+		candidates = append(candidates, path+".css")
+	}
+
+	baseDir := m.baseDir
+	if baseDir == "" {
+		baseDir = "."
+	}
+
+	for _, cand := range candidates {
+		// Check relative to current working directory
+		if info, err := os.Stat(cand); err == nil && !info.IsDir() {
+			return cand
+		}
+		// Check relative to baseDir if baseDir != "."
+		if baseDir != "." && !filepath.IsAbs(cand) {
+			joined := filepath.Join(baseDir, cand)
+			if info, err := os.Stat(joined); err == nil && !info.IsDir() {
+				return joined
+			}
+		}
+	}
+	return ""
+}
+
 // ComposeFullCSS combines base, theme, external custom file, and inline CSS in cascading order.
 func (m *Manager) ComposeFullCSS(themeName, customCSSPath, inlineCSS string) (string, error) {
+	effectiveTheme, effectiveCustomPath := m.ResolveTheme(themeName, customCSSPath)
+
 	var b strings.Builder
 
 	baseCSS, err := m.GetBaseCSS()
@@ -100,20 +198,20 @@ func (m *Manager) ComposeFullCSS(themeName, customCSSPath, inlineCSS string) (st
 	b.WriteString(baseCSS)
 	b.WriteString("\n\n")
 
-	themeCSS, err := m.GetThemeCSS(themeName)
+	themeCSS, err := m.GetThemeCSS(effectiveTheme)
 	if err != nil {
 		return "", err
 	}
-	b.WriteString(fmt.Sprintf("/* --- Theme: %s --- */\n", themeName))
+	b.WriteString(fmt.Sprintf("/* --- Theme: %s --- */\n", effectiveTheme))
 	b.WriteString(themeCSS)
 	b.WriteString("\n\n")
 
-	if customCSSPath != "" {
-		customData, err := os.ReadFile(customCSSPath)
+	if effectiveCustomPath != "" {
+		customData, err := os.ReadFile(effectiveCustomPath)
 		if err != nil {
-			return "", fmt.Errorf("failed to read custom css file %q: %w", customCSSPath, err)
+			return "", fmt.Errorf("failed to read custom css file %q: %w", effectiveCustomPath, err)
 		}
-		b.WriteString(fmt.Sprintf("/* --- Custom CSS File: %s --- */\n", customCSSPath))
+		b.WriteString(fmt.Sprintf("/* --- Custom CSS File: %s --- */\n", effectiveCustomPath))
 		b.Write(customData)
 		b.WriteString("\n\n")
 	}

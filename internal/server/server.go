@@ -35,6 +35,53 @@ const sseScript = `
       if (el) el.remove();
     }
 
+    function removeToast() {
+      var el = document.getElementById('goslide-warning-toast');
+      if (el) el.remove();
+    }
+
+    function showWarningToast(diagnostics) {
+      removeToast();
+      if (!diagnostics || !diagnostics.length) return;
+
+      var toast = document.createElement('div');
+      toast.id = 'goslide-warning-toast';
+      toast.style.cssText = 'position:fixed;top:20px;right:20px;max-width:440px;width:calc(100vw - 40px);z-index:999998;background:rgba(24, 24, 27, 0.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1.5px solid #f59e0b;border-radius:8px;box-shadow:0 15px 30px rgba(0,0,0,0.5);padding:14px 16px;color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;line-height:1.4;box-sizing:border-box;transition:opacity 0.3s ease, transform 0.3s ease;';
+
+      var items = diagnostics.map(function(d) {
+        var avail = (d.candidates && d.candidates.length) ? '<div style="margin-top:4px;color:#fbbf24;font-size:12px;">💡 Available: <code>' + d.candidates.join(', ') + '</code></div>' : '';
+        return '<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(245,158,11,0.2);">' +
+          '<div style="font-weight:600;color:#fde68a;">Slide ' + d.slideIndex + ' (Line ' + d.line + ')</div>' +
+          '<div style="color:#d1d5db;margin-top:2px;">' + d.message + '</div>' +
+          avail +
+          '</div>';
+      }).join('');
+
+      var content = '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">' +
+        '<div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#fbbf24;font-size:14px;">' +
+        '<span>⚠️</span> <span>DSL Warning</span>' +
+        '</div>' +
+        '<button id="goslide-toast-close" style="background:transparent;border:none;color:#9ca3af;font-size:18px;cursor:pointer;line-height:1;" title="Dismiss">&times;</button>' +
+        '</div>' +
+        '<div style="max-height:220px;overflow-y:auto;">' + items + '</div>';
+
+      toast.innerHTML = content;
+      document.body.appendChild(toast);
+
+      var closeBtn = document.getElementById('goslide-toast-close');
+      if (closeBtn) {
+        closeBtn.onclick = function() { removeToast(); };
+      }
+
+      setTimeout(function() {
+        if (toast.parentNode) {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+          setTimeout(removeToast, 350);
+        }
+      }, 6000);
+    }
+
     function showOverlay(title, message, file) {
       removeOverlay();
       var overlay = document.createElement('div');
@@ -130,6 +177,9 @@ const sseScript = `
       } else if (payload.type === 'error') {
         console.error('[goslide] Build error:', payload.message);
         showOverlay(payload.title, payload.message, payload.file);
+      } else if (payload.type === 'warning') {
+        console.warn('[goslide] DSL warnings:', payload.diagnostics);
+        showWarningToast(payload.diagnostics);
       }
     };
     es.onerror = function() {
@@ -143,18 +193,20 @@ const sseScript = `
 type EventType string
 
 const (
-	EventReload EventType = "reload"
-	EventError  EventType = "error"
-	EventPatch  EventType = "patch"
+	EventReload  EventType = "reload"
+	EventError   EventType = "error"
+	EventPatch   EventType = "patch"
+	EventWarning EventType = "warning"
 )
 
 // SSEMessage represents a structured payload broadcasted via Server-Sent Events.
 type SSEMessage struct {
-	Type    EventType    `json:"type"`
-	Title   string       `json:"title,omitempty"`
-	Message string       `json:"message,omitempty"`
-	File    string       `json:"file,omitempty"`
-	Patches []SlidePatch `json:"patches,omitempty"`
+	Type        EventType          `json:"type"`
+	Title       string             `json:"title,omitempty"`
+	Message     string             `json:"message,omitempty"`
+	File        string             `json:"file,omitempty"`
+	Patches     []SlidePatch       `json:"patches,omitempty"`
+	Diagnostics []model.Diagnostic `json:"diagnostics,omitempty"`
 }
 
 // Config holds options for running the development server.
@@ -434,6 +486,17 @@ func (s *Server) BroadcastPatches(patches []SlidePatch) {
 	})
 }
 
+// BroadcastWarnings sends non-blocking DSL diagnostics as floating warning toasts to connected SSE clients.
+func (s *Server) BroadcastWarnings(diagnostics []model.Diagnostic) {
+	if len(diagnostics) == 0 {
+		return
+	}
+	s.BroadcastMessage(SSEMessage{
+		Type:        EventWarning,
+		Diagnostics: diagnostics,
+	})
+}
+
 // URL returns the addressable base URL for this server (e.g. http://localhost:8080).
 func (s *Server) URL() string {
 	if s.listener != nil {
@@ -557,6 +620,9 @@ func (s *Server) rebuildAndWarmCache(ctx context.Context) (*model.Deck, error) {
 		return nil, parseErr
 	}
 
+	s.logDiagnostics(deck.Diagnostics)
+	s.BroadcastWarnings(deck.Diagnostics)
+
 	// Pre-render full HTML to warm cache and update lastHTML
 	var fullBuf bytes.Buffer
 	if renderErr := s.renderer.Render(ctx, deck, &fullBuf); renderErr != nil {
@@ -629,4 +695,17 @@ func (s *Server) dispatchSlidePatches(ctx context.Context, deck *model.Deck, ind
 		s.BroadcastPatches(patches)
 	}
 }
+
+func (s *Server) logDiagnostics(diagnostics []model.Diagnostic) {
+	for _, diag := range diagnostics {
+		if len(diag.Candidates) > 0 {
+			log.Printf("[goslide] ⚠️  Slide %d (Line %d): %s (Raw: %q, Available: %v)",
+				diag.SlideIndex, diag.Line, diag.Message, diag.RawSnippet, diag.Candidates)
+		} else {
+			log.Printf("[goslide] ⚠️  Slide %d (Line %d): %s (Raw: %q)",
+				diag.SlideIndex, diag.Line, diag.Message, diag.RawSnippet)
+		}
+	}
+}
+
 

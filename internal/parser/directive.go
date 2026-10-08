@@ -31,15 +31,18 @@ type slideParseResult struct {
 	Directives     model.SlideDirectives
 	Layout         model.LayoutType
 	Notes          string
+	Diagnostics    []model.Diagnostic
 }
 
-// processSlideDirectives parses and strips comments, updating slide attributes and state.
-func (dm *directiveManager) processSlide(rawContent string) slideParseResult {
+// processSlide parses and strips comments, updating slide attributes, state, and collecting diagnostics.
+func (dm *directiveManager) processSlide(slideIndex int, rawContent string) slideParseResult {
+	diagnostics, sanitizedContent := inspectSlideComments(slideIndex, rawContent)
+
 	currentDirectives := dm.inheritedDirectives
 	currentLayout := dm.inheritedLayout
 	var noteChunks []string
 
-	cleanedContent := htmlCommentRegex.ReplaceAllStringFunc(rawContent, func(fullMatch string) string {
+	cleanedContent := htmlCommentRegex.ReplaceAllStringFunc(sanitizedContent, func(fullMatch string) string {
 		submatches := htmlCommentRegex.FindStringSubmatch(fullMatch)
 		if len(submatches) < 2 {
 			return fullMatch
@@ -75,6 +78,7 @@ func (dm *directiveManager) processSlide(rawContent string) slideParseResult {
 		Directives:     currentDirectives,
 		Layout:         currentLayout,
 		Notes:          strings.Join(noteChunks, "\n\n"),
+		Diagnostics:    diagnostics,
 	}
 }
 

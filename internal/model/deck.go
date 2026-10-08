@@ -30,6 +30,7 @@ type Deck struct {
 	GlobalAttrs GlobalDirectives `json:"global_attributes" yaml:",inline"`
 	CustomCSS   string           `json:"custom_css,omitempty" yaml:"custom_css"`
 	Slides      []*Slide         `json:"slides" yaml:"-"`
+	Diagnostics []Diagnostic     `json:"diagnostics,omitempty" yaml:"-"`
 }
 
 // GlobalDirectives holds deck-level global attributes defined in Frontmatter.
@@ -68,4 +69,5 @@ type Slide struct {
 	Notes       string          `json:"notes,omitempty"`
 	LeftHTML    string          `json:"left_html,omitempty"`
 	RightHTML   string          `json:"right_html,omitempty"`
+	Diagnostics []Diagnostic    `json:"diagnostics,omitempty"`
 }

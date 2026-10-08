@@ -11,6 +11,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/yundream/goslide/internal/model"
 )
 
 func createSampleDeck(t *testing.T, dir string) string {
@@ -375,4 +377,78 @@ func TestServer_SSE_BroadcastPatches(t *testing.T) {
 		t.Fatal("expected structured patch message from SSE stream")
 	}
 }
+
+func TestServer_SSE_BroadcastWarnings(t *testing.T) {
+	tempDir := t.TempDir()
+	mdPath := createSampleDeck(t, tempDir)
+
+	s, err := NewServer(Config{
+		MarkdownPath: mdPath,
+	})
+	if err != nil {
+		t.Fatalf("failed to create server: %v", err)
+	}
+	defer func() { _ = s.Close() }()
+
+	ts := httptest.NewServer(s.Handler())
+	defer ts.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", ts.URL+"/events", nil)
+	if err != nil {
+		t.Fatalf("failed to create SSE request: %v", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to connect to SSE stream: %v", err)
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	reader := bufio.NewReader(res.Body)
+
+	// Read handshake comment
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		t.Fatalf("failed to read handshake: %v", err)
+	}
+	if !strings.HasPrefix(line, ": connected") {
+		t.Errorf("expected connected handshake, got %q", line)
+	}
+
+	// Trigger warning broadcast
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		s.BroadcastWarnings([]model.Diagnostic{
+			{
+				Severity:   model.SeverityWarning,
+				SlideIndex: 3,
+				Line:       2,
+				Rule:       "directive.missing_underscore",
+				Message:    "Slide-local directive missing underscore prefix",
+				RawSnippet: "<!-- class: lead -->",
+				Candidates: []string{"_class"},
+			},
+		})
+	}()
+
+	var receivedWarning bool
+	for i := 0; i < 5; i++ {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			t.Fatalf("error reading SSE stream: %v", err)
+		}
+		if strings.Contains(line, `"type":"warning"`) && strings.Contains(line, "directive.missing_underscore") && strings.Contains(line, "_class") {
+			receivedWarning = true
+			break
+		}
+	}
+
+	if !receivedWarning {
+		t.Fatal("expected structured warning message with candidates from SSE stream")
+	}
+}
+
 

@@ -136,6 +136,19 @@ func openInputDeck(cmd *cobra.Command, inputPath string) (*model.Deck, error) {
 	if err != nil {
 		return nil, newCLIError(model.ExitParseError, fmt.Errorf("failed to parse markdown: %w", err))
 	}
+
+	if !quietFlag && len(deck.Diagnostics) > 0 {
+		for _, diag := range deck.Diagnostics {
+			if len(diag.Candidates) > 0 {
+				fmt.Fprintf(cmd.ErrOrStderr(), "[goslide] ⚠️  Slide %d (Line %d): %s\n          Raw: %q\n          Available: %v\n",
+					diag.SlideIndex, diag.Line, diag.Message, diag.RawSnippet, diag.Candidates)
+			} else {
+				fmt.Fprintf(cmd.ErrOrStderr(), "[goslide] ⚠️  Slide %d (Line %d): %s\n          Raw: %q\n",
+					diag.SlideIndex, diag.Line, diag.Message, diag.RawSnippet)
+			}
+		}
+	}
+
 	return deck, nil
 }
 

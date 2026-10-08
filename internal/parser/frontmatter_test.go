@@ -84,6 +84,36 @@ style: "section { padding: 20px; }"
 				},
 			},
 		},
+		{
+			name: "external theme path preserved",
+			content: `---
+theme: "themes/corporate.css"
+---
+# External Theme Slide`,
+			expected: &FrontmatterResult{
+				Body: "# External Theme Slide",
+				GlobalAttrs: model.GlobalDirectives{
+					Theme:  "themes/corporate.css",
+					Layout: model.LayoutDefault,
+					Size:   model.Ratio16x9,
+				},
+			},
+		},
+		{
+			name: "external theme relative path without css extension preserved",
+			content: `---
+theme: "themes/corporate"
+---
+# External Theme Relative Slide`,
+			expected: &FrontmatterResult{
+				Body: "# External Theme Relative Slide",
+				GlobalAttrs: model.GlobalDirectives{
+					Theme:  "themes/corporate",
+					Layout: model.LayoutDefault,
+					Size:   model.Ratio16x9,
+				},
+			},
+		},
 	}
 	runFrontmatterTests(t, tests)
 }
