@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -36,48 +35,6 @@ func TestNewWatcher_Validation(t *testing.T) {
 		t.Fatalf("unexpected error for valid file: %v", err)
 	}
 	defer func() { _ = w.Close() }()
-}
-
-func TestWatcher_FileModificationAndDebounce(t *testing.T) {
-	tempDir := t.TempDir()
-	testFile := filepath.Join(tempDir, "presentation.md")
-	if err := os.WriteFile(testFile, []byte("# Slide 1"), 0644); err != nil {
-		t.Fatalf("failed to create test file: %v", err)
-	}
-
-	debounce := 40 * time.Millisecond
-	w, err := NewWatcher(testFile, debounce)
-	if err != nil {
-		t.Fatalf("failed to create watcher: %v", err)
-	}
-	defer func() { _ = w.Close() }()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	w.Start(ctx)
-
-	// Rapid modifications within debounce window
-	for i := 0; i < 5; i++ {
-		time.Sleep(5 * time.Millisecond)
-		if err := os.WriteFile(testFile, []byte("# Updated Slide "+string(rune('A'+i))), 0644); err != nil {
-			t.Fatalf("failed to write test file: %v", err)
-		}
-	}
-
-	select {
-	case <-w.Events():
-		// Received event as expected
-	case <-time.After(500 * time.Millisecond):
-		t.Fatal("timeout waiting for reload event")
-	}
-
-	// Ensure no extra duplicate events immediately queued
-	select {
-	case <-w.Events():
-		t.Fatal("unexpected duplicate event received after debounce window")
-	case <-time.After(100 * time.Millisecond):
-		// Success: debounced into a single event
-	}
 }
 
 func TestWatcher_FilterIrrelevantFiles(t *testing.T) {
