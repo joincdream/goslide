@@ -149,3 +149,31 @@ const masterHTMLTemplate = `<!DOCTYPE html>
 func parseMasterTemplate() (*template.Template, error) {
 	return template.New("slideDocument").Parse(masterHTMLTemplate)
 }
+
+const slideCardHTMLTemplate = `<section class="slide-card {{ .Layout }} layout-{{ .Layout }} {{ .Classes }}{{ if .IsFirst }} active{{ end }}{{ if .BgDim }} has-bg-dim{{ end }}{{ if .Autofit }} has-autofit{{ end }}"
+         data-slide="{{ .Index }}"
+         {{ if .Autofit }}data-autofit="true"{{ end }}
+         style="{{ if .BgColor }}background-color: {{ .BgColor }};{{ end }}{{ if .BgImage }}background-image: {{ .BgImage }};{{ if not .IsBgGradient }} background-size: cover; background-position: center;{{ end }}{{ end }}{{ if .Color }}color: {{ .Color }};{{ end }}">
+  {{ if .BgDim }}<div class="slide-bg-dim" style="background-color: {{ .BgDim }};"></div>{{ end }}
+  <div class="slide-header slide-tracker">{{ .Header }}</div>
+  {{ if .TitleHTML }}
+  <div class="slide-title-box">{{ .TitleHTML }}</div>
+  {{ end }}
+  <div class="slide-body slide-content-box">
+    {{ if and .LeftHTML .RightHTML }}
+    <div class="two-cols">
+      <div class="col-left">{{ .LeftHTML }}</div>
+      <div class="col-right">{{ .RightHTML }}</div>
+    </div>
+    {{ else }}
+    {{ .HTMLContent }}
+    {{ end }}
+  </div>
+  <div class="slide-footer">{{ if or .Footer .Paginate }}<span>{{ .Footer }}</span>{{ if .Paginate }}<span>{{ .Index }}</span>{{ end }}{{ end }}</div>
+  {{ if .Notes }}<aside class="slide-notes" style="display:none;">{{ .Notes }}</aside>{{ end }}
+</section>`
+
+func parseSlideCardTemplate() (*template.Template, error) {
+	return template.New("slideCard").Parse(slideCardHTMLTemplate)
+}
+

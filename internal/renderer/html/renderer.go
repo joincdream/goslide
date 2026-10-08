@@ -135,6 +135,36 @@ func (r *HTMLRenderer) Render(ctx context.Context, deck *model.Deck, w io.Writer
 	return nil
 }
 
+// RenderSlide renders a single slide into its self-contained <section> HTML element.
+func (r *HTMLRenderer) RenderSlide(ctx context.Context, deck *model.Deck, slideIndex int, w io.Writer) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("%w: %w", model.ErrCanceled, err)
+	}
+	if deck == nil {
+		return errors.New("cannot render nil deck")
+	}
+	if slideIndex < 0 || slideIndex >= len(deck.Slides) {
+		return fmt.Errorf("invalid slide index: %d (total: %d)", slideIndex, len(deck.Slides))
+	}
+
+	tmpl, err := parseSlideCardTemplate()
+	if err != nil {
+		return fmt.Errorf("failed to parse slide card template: %w", err)
+	}
+
+	s := deck.Slides[slideIndex]
+	view, err := r.buildSlideView(slideIndex, s, deck)
+	if err != nil {
+		return err
+	}
+
+	if err := tmpl.Execute(w, view); err != nil {
+		return fmt.Errorf("failed to execute slide card template for slide %d: %w", slideIndex, err)
+	}
+
+	return nil
+}
+
 func (r *HTMLRenderer) resolveTheme(deck *model.Deck) string {
 	if r.themeName != "" {
 		return r.themeName

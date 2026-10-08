@@ -40,5 +40,18 @@
   "presenter.next_slide": "다음 슬라이드",
   "presenter.notes": "발표자 메모",
   "annotation.toggle": "판서 모드 전환 (D)",
-  "annotation.clear": "판서 지우기 (C)"
+  "annotation.clear": "판서 지우기 (C)",
+
+  "server.hmr.reload.initial": "초기 슬라이드 로드",
+  "server.hmr.reload.slide_count": "슬라이드 개수 변경 (추가/삭제)",
+  "server.hmr.reload.title": "프레젠테이션 제목(Title) 변경",
+  "server.hmr.reload.custom_css": "전역 커스텀 스타일(CSS) 변경",
+  "server.hmr.reload.theme": "전역 테마(Theme) 변경",
+  "server.hmr.reload.header": "전역 헤더(Header) 변경",
+  "server.hmr.reload.footer": "전역 푸터(Footer) 변경",
+  "server.hmr.reload.layout": "전역 기본 레이아웃 변경",
+  "server.hmr.reload.size": "전역 화면 비율(Size) 변경",
+  "server.hmr.reload.paginate": "전역 페이지 번호 설정 변경",
+  "server.hmr.reload.autofit": "전역 텍스트 자동 맞춤(Autofit) 설정 변경",
+  "server.hmr.patch.log": "[goslide] 슬라이드 %d 증분 패치 완료 (%v)"
 }

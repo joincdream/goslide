@@ -35,12 +35,20 @@
       if (sidebarComponent) sidebarComponent.openPopout();
     };
 
+    const handleSlidePatched = (e) => {
+      if (e.detail) {
+        deck.patchSlide(e.detail.index, e.detail.element);
+      }
+    };
+
     window.addEventListener('goslide:clear-canvas', handleClearCanvas);
     window.addEventListener('goslide:open-popout', handleOpenPopout);
+    window.addEventListener('goslide:slide-patched', handleSlidePatched);
 
     return () => {
       window.removeEventListener('goslide:clear-canvas', handleClearCanvas);
       window.removeEventListener('goslide:open-popout', handleOpenPopout);
+      window.removeEventListener('goslide:slide-patched', handleSlidePatched);
     };
   });
 </script>

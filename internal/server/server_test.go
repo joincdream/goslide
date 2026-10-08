@@ -306,3 +306,73 @@ title: [unclosed yaml bracket
 		t.Errorf("expected cached presentation to be served during syntax error")
 	}
 }
+
+func TestServer_SSE_BroadcastPatches(t *testing.T) {
+	tempDir := t.TempDir()
+	mdPath := createSampleDeck(t, tempDir)
+
+	s, err := NewServer(Config{
+		MarkdownPath: mdPath,
+	})
+	if err != nil {
+		t.Fatalf("failed to create server: %v", err)
+	}
+	defer func() { _ = s.Close() }()
+
+	ts := httptest.NewServer(s.Handler())
+	defer ts.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", ts.URL+"/events", nil)
+	if err != nil {
+		t.Fatalf("failed to create SSE request: %v", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("failed to connect to SSE stream: %v", err)
+	}
+	defer func() { _ = res.Body.Close() }()
+
+	reader := bufio.NewReader(res.Body)
+
+	// Read handshake comment
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		t.Fatalf("failed to read handshake: %v", err)
+	}
+	if !strings.HasPrefix(line, ": connected") {
+		t.Errorf("expected connected handshake, got %q", line)
+	}
+
+	// Trigger patch broadcast
+	go func() {
+		time.Sleep(50 * time.Millisecond)
+		s.BroadcastPatches([]SlidePatch{
+			{
+				Index: 2,
+				HTML:  `<section class="slide-card" data-slide="2">Updated Slide 2</section>`,
+			},
+		})
+	}()
+
+	// Wait for patch message
+	var receivedPatch bool
+	for i := 0; i < 5; i++ {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			t.Fatalf("error reading SSE stream: %v", err)
+		}
+		if strings.Contains(line, `"type":"patch"`) && strings.Contains(line, `"index":2`) && strings.Contains(line, "Updated Slide 2") {
+			receivedPatch = true
+			break
+		}
+	}
+
+	if !receivedPatch {
+		t.Fatal("expected structured patch message from SSE stream")
+	}
+}
+

@@ -142,6 +142,16 @@ export class DeckStore {
     this.broadcastSlideChange();
   }
 
+  patchSlide(index, newElement) {
+    if (index >= 0 && index < this.slides.length && newElement) {
+      this.slides[index] = newElement;
+      if (this.currentIndex === index) {
+        this.updateFragments(newElement);
+        this.applyAutofit(newElement);
+      }
+    }
+  }
+
   updateFragments(slideEl, fromPrev = false) {
     if (!slideEl) {
       this.totalFragments = 0;

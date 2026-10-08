@@ -40,5 +40,18 @@
   "presenter.next_slide": "Next Slide",
   "presenter.notes": "Speaker Notes",
   "annotation.toggle": "Toggle Drawing Mode (D)",
-  "annotation.clear": "Clear Drawings (C)"
+  "annotation.clear": "Clear Drawings (C)",
+
+  "server.hmr.reload.initial": "Initial slide load",
+  "server.hmr.reload.slide_count": "Slide count changed (added/deleted)",
+  "server.hmr.reload.title": "Presentation title changed",
+  "server.hmr.reload.custom_css": "Global custom CSS changed",
+  "server.hmr.reload.theme": "Global theme changed",
+  "server.hmr.reload.header": "Global header changed",
+  "server.hmr.reload.footer": "Global footer changed",
+  "server.hmr.reload.layout": "Global default layout changed",
+  "server.hmr.reload.size": "Global slide size ratio changed",
+  "server.hmr.reload.paginate": "Global pagination setting changed",
+  "server.hmr.reload.autofit": "Global autofit setting changed",
+  "server.hmr.patch.log": "[goslide] Slide %d incrementally patched (%v)"
 }

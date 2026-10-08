@@ -275,16 +275,16 @@ flowchart LR
 ## Media & Image Sizing Control
 
 ### Landscape Image (PNG)
-`w:500` width directive:
+`h:700` width directive:
 
-![w:500 Landscape Image](sample-img-01.png)
+![h:700 Landscape Image](sample-img-01.png)
 
 <!-- split -->
 
 ### Portrait Image (JPG)
-`w:300 center` width & center directive:
+`w:400 center` width & center directive:
 
-![w:300 center Portrait Image](sample-img-02.jpg)
+![w:400 center Portrait Image](sample-img-02.jpg)
 
 <!-- note:
 - Media & Image sizing verification slide (Checklist 7.6).

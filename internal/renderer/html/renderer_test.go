@@ -332,3 +332,65 @@ func TestHTMLRenderer_Render_BackgroundImage_Standalone(t *testing.T) {
 		t.Errorf("expected single quote to be escaped as %%27 in background-image")
 	}
 }
+
+func TestRenderSlide(t *testing.T) {
+	deck := sampleDeck()
+	renderer := htmlrenderer.NewRenderer()
+	ctx := context.Background()
+
+	t.Run("render valid slide", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := renderer.RenderSlide(ctx, deck, 1, &buf)
+		if err != nil {
+			t.Fatalf("unexpected error rendering slide 1: %v", err)
+		}
+
+		out := buf.String()
+		if !strings.Contains(out, `data-slide="2"`) {
+			t.Errorf("expected data-slide=\"2\", got: %s", out)
+		}
+		if !strings.Contains(out, "<h2>Architecture Overview</h2>") {
+			t.Errorf("expected slide content in output, got: %s", out)
+		}
+		if !strings.Contains(out, "Tech Conference 2026") {
+			t.Errorf("expected global header inheritance, got: %s", out)
+		}
+		// Must be a fragment, not full HTML document
+		if strings.Contains(out, "<!DOCTYPE html>") || strings.Contains(out, "</body>") {
+			t.Errorf("RenderSlide should produce a slide snippet, not full document")
+		}
+	})
+
+	t.Run("render invalid slide index", func(t *testing.T) {
+		var buf bytes.Buffer
+		errNegative := renderer.RenderSlide(ctx, deck, -1, &buf)
+		if errNegative == nil {
+			t.Errorf("expected error for negative slide index, got nil")
+		}
+
+		errOverflow := renderer.RenderSlide(ctx, deck, len(deck.Slides), &buf)
+		if errOverflow == nil {
+			t.Errorf("expected error for out of bounds slide index, got nil")
+		}
+	})
+
+	t.Run("render nil deck", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := renderer.RenderSlide(ctx, nil, 0, &buf)
+		if err == nil {
+			t.Errorf("expected error for nil deck, got nil")
+		}
+	})
+
+	t.Run("render canceled context", func(t *testing.T) {
+		canceledCtx, cancel := context.WithCancel(ctx)
+		cancel()
+
+		var buf bytes.Buffer
+		err := renderer.RenderSlide(canceledCtx, deck, 0, &buf)
+		if !errors.Is(err, model.ErrCanceled) {
+			t.Errorf("expected ErrCanceled, got: %v", err)
+		}
+	})
+}
+
