@@ -176,4 +176,3 @@ const slideCardHTMLTemplate = `<section class="slide-card {{ .Layout }} layout-{
 func parseSlideCardTemplate() (*template.Template, error) {
 	return template.New("slideCard").Parse(slideCardHTMLTemplate)
 }
-

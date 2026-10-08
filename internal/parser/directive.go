@@ -36,13 +36,13 @@ type slideParseResult struct {
 
 // processSlide parses and strips comments, updating slide attributes, state, and collecting diagnostics.
 func (dm *directiveManager) processSlide(slideIndex int, rawContent string) slideParseResult {
-	diagnostics, sanitizedContent := inspectSlideComments(slideIndex, rawContent)
+	diagnostics := inspectSlideComments(slideIndex, rawContent)
 
 	currentDirectives := dm.inheritedDirectives
 	currentLayout := dm.inheritedLayout
 	var noteChunks []string
 
-	cleanedContent := htmlCommentRegex.ReplaceAllStringFunc(sanitizedContent, func(fullMatch string) string {
+	cleanedContent := htmlCommentRegex.ReplaceAllStringFunc(rawContent, func(fullMatch string) string {
 		submatches := htmlCommentRegex.FindStringSubmatch(fullMatch)
 		if len(submatches) < 2 {
 			return fullMatch

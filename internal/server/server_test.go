@@ -450,5 +450,3 @@ func TestServer_SSE_BroadcastWarnings(t *testing.T) {
 		t.Fatal("expected structured warning message with candidates from SSE stream")
 	}
 }
-
-

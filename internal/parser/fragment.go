@@ -97,48 +97,55 @@ func injectFragmentToListItems(content string, fragmentClass string, fragmentInd
 	listDepth := 0
 
 	for idx < len(content) {
-		if content[idx] == '<' {
-			end := strings.IndexByte(content[idx:], '>')
-			if end == -1 {
-				sb.WriteString(content[idx:])
-				break
-			}
-			tag := content[idx : idx+end+1]
-			lowerTag := strings.ToLower(tag)
-
-			if strings.HasPrefix(lowerTag, "<ul") || strings.HasPrefix(lowerTag, "<ol") {
-				listDepth++
-				sb.WriteString(tag)
-			} else if strings.HasPrefix(lowerTag, "</ul") || strings.HasPrefix(lowerTag, "</ol") {
-				if listDepth > 0 {
-					listDepth--
-				}
-				sb.WriteString(tag)
-			} else if listDepth == 0 && (strings.HasPrefix(lowerTag, "<li ") || strings.HasPrefix(lowerTag, "<li>")) {
-				modifiedTag := tag
-				if fragmentClass != "" {
-					existingClass, hasClass := getAttribute(modifiedTag, "class")
-					if hasClass && existingClass != "" {
-						if !strings.Contains(existingClass, "fragment") {
-							modifiedTag = setAttribute(modifiedTag, "class", existingClass+" fragment")
-						}
-					} else {
-						modifiedTag = setAttribute(modifiedTag, "class", "fragment")
-					}
-				}
-				if fragmentIndex != "" {
-					modifiedTag = setAttribute(modifiedTag, "data-fragment-index", fragmentIndex)
-				}
-				sb.WriteString(modifiedTag)
-			} else {
-				sb.WriteString(tag)
-			}
-			idx += end + 1
-		} else {
+		if content[idx] != '<' {
 			sb.WriteByte(content[idx])
 			idx++
+			continue
 		}
+
+		end := strings.IndexByte(content[idx:], '>')
+		if end == -1 {
+			sb.WriteString(content[idx:])
+			break
+		}
+
+		tag := content[idx : idx+end+1]
+		lowerTag := strings.ToLower(tag)
+
+		switch {
+		case strings.HasPrefix(lowerTag, "<ul") || strings.HasPrefix(lowerTag, "<ol"):
+			listDepth++
+			sb.WriteString(tag)
+		case strings.HasPrefix(lowerTag, "</ul") || strings.HasPrefix(lowerTag, "</ol"):
+			if listDepth > 0 {
+				listDepth--
+			}
+			sb.WriteString(tag)
+		case listDepth == 0 && (strings.HasPrefix(lowerTag, "<li ") || strings.HasPrefix(lowerTag, "<li>")):
+			sb.WriteString(applyFragmentToLiTag(tag, fragmentClass, fragmentIndex))
+		default:
+			sb.WriteString(tag)
+		}
+
+		idx += end + 1
 	}
 
 	return sb.String()
+}
+
+func applyFragmentToLiTag(tag, fragmentClass, fragmentIndex string) string {
+	modifiedTag := tag
+	if fragmentClass != "" {
+		existingClass, hasClass := getAttribute(modifiedTag, "class")
+		switch {
+		case !hasClass || existingClass == "":
+			modifiedTag = setAttribute(modifiedTag, "class", "fragment")
+		case !strings.Contains(existingClass, "fragment"):
+			modifiedTag = setAttribute(modifiedTag, "class", existingClass+" fragment")
+		}
+	}
+	if fragmentIndex != "" {
+		modifiedTag = setAttribute(modifiedTag, "data-fragment-index", fragmentIndex)
+	}
+	return modifiedTag
 }

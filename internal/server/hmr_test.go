@@ -60,9 +60,9 @@ func TestCompareSnapshots_GlobalRulesTable(t *testing.T) {
 	oldSnap := NewDeckSnapshot(base)
 
 	tests := []struct {
-		name            string
-		modify          func(d *model.Deck)
-		expectedReason  string
+		name           string
+		modify         func(d *model.Deck)
+		expectedReason string
 	}{
 		{
 			name: "slide count increased",

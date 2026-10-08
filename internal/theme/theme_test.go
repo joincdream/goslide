@@ -263,58 +263,65 @@ func TestManager_ResolveTheme_ExternalPaths(t *testing.T) {
 		t.Fatalf("failed to write corporate.css: %v", err)
 	}
 
+	explicitPath := filepath.Join(tmpDir, "override.css")
+
 	mgr := theme.NewManager(nil)
 	mgr.SetBaseDir(tmpDir)
 
-	t.Run("resolve relative theme path with extension", func(t *testing.T) {
-		base, custom := mgr.ResolveTheme("themes/corporate.css", "")
-		if base != theme.DefaultTheme {
-			t.Errorf("expected base theme default, got %q", base)
-		}
-		if custom != corpCSSPath {
-			t.Errorf("expected custom path %q, got %q", corpCSSPath, custom)
-		}
-	})
+	tests := []struct {
+		name           string
+		themeInput     string
+		customCSS      string
+		expectedBase   string
+		expectedCustom string
+	}{
+		{
+			name:           "resolve relative theme path with extension",
+			themeInput:     "themes/corporate.css",
+			customCSS:      "",
+			expectedBase:   theme.DefaultTheme,
+			expectedCustom: corpCSSPath,
+		},
+		{
+			name:           "resolve relative theme path without extension",
+			themeInput:     "themes/corporate",
+			customCSS:      "",
+			expectedBase:   theme.DefaultTheme,
+			expectedCustom: corpCSSPath,
+		},
+		{
+			name:           "resolve bare theme name via local themes directory",
+			themeInput:     "corporate",
+			customCSS:      "",
+			expectedBase:   theme.DefaultTheme,
+			expectedCustom: corpCSSPath,
+		},
+		{
+			name:           "resolve builtin theme",
+			themeInput:     "clean",
+			customCSS:      "",
+			expectedBase:   "clean",
+			expectedCustom: "",
+		},
+		{
+			name:           "explicit customCSSPath overrides frontmatter",
+			themeInput:     "clean",
+			customCSS:      explicitPath,
+			expectedBase:   "clean",
+			expectedCustom: explicitPath,
+		},
+	}
 
-	t.Run("resolve relative theme path without extension", func(t *testing.T) {
-		base, custom := mgr.ResolveTheme("themes/corporate", "")
-		if base != theme.DefaultTheme {
-			t.Errorf("expected base theme default, got %q", base)
-		}
-		if custom != corpCSSPath {
-			t.Errorf("expected custom path %q, got %q", corpCSSPath, custom)
-		}
-	})
-
-	t.Run("resolve bare theme name via local themes directory", func(t *testing.T) {
-		base, custom := mgr.ResolveTheme("corporate", "")
-		if base != theme.DefaultTheme {
-			t.Errorf("expected base theme default, got %q", base)
-		}
-		if custom != corpCSSPath {
-			t.Errorf("expected custom path %q, got %q", corpCSSPath, custom)
-		}
-	})
-
-	t.Run("resolve builtin theme", func(t *testing.T) {
-		base, custom := mgr.ResolveTheme("clean", "")
-		if base != "clean" {
-			t.Errorf("expected base theme clean, got %q", base)
-		}
-		if custom != "" {
-			t.Errorf("expected empty custom path for builtin theme, got %q", custom)
-		}
-	})
-
-	t.Run("explicit customCSSPath overrides frontmatter", func(t *testing.T) {
-		explicitPath := filepath.Join(tmpDir, "override.css")
-		base, custom := mgr.ResolveTheme("clean", explicitPath)
-		if base != "clean" {
-			t.Errorf("expected base theme clean, got %q", base)
-		}
-		if custom != explicitPath {
-			t.Errorf("expected custom path %q, got %q", explicitPath, custom)
-		}
-	})
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			base, custom := mgr.ResolveTheme(tt.themeInput, tt.customCSS)
+			if base != tt.expectedBase {
+				t.Errorf("expected base theme %q, got %q", tt.expectedBase, base)
+			}
+			if custom != tt.expectedCustom {
+				t.Errorf("expected custom path %q, got %q", tt.expectedCustom, custom)
+			}
+		})
+	}
 }
-

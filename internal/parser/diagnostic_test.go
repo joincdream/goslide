@@ -10,7 +10,7 @@ import (
 
 func TestInspectSlideComments_UnknownLayout(t *testing.T) {
 	content := "# Title\n<!-- _layout: two-col -->\nBody text"
-	diags, _ := inspectSlideComments(1, content)
+	diags := inspectSlideComments(1, content)
 
 	if len(diags) != 1 {
 		t.Fatalf("expected 1 diagnostic, got %d", len(diags))
@@ -42,7 +42,7 @@ func TestInspectSlideComments_UnknownLayout(t *testing.T) {
 
 func TestInspectSlideComments_MissingUnderscore(t *testing.T) {
 	content := "<!-- layout: two-cols -->\n# Slide Content"
-	diags, _ := inspectSlideComments(2, content)
+	diags := inspectSlideComments(2, content)
 
 	if len(diags) != 1 {
 		t.Fatalf("expected 1 diagnostic, got %d", len(diags))
@@ -65,7 +65,7 @@ func TestInspectSlideComments_MissingUnderscore(t *testing.T) {
 
 func TestInspectSlideComments_CodeBlockIsolation(t *testing.T) {
 	content := "# Code Example\n\n```html\n<!-- layout: two-cols -->\n<!-- _layout: two-col -->\n```\n\nSome description"
-	diags, _ := inspectSlideComments(1, content)
+	diags := inspectSlideComments(1, content)
 
 	if len(diags) != 0 {
 		t.Errorf("expected 0 diagnostics inside code block, got %d: %+v", len(diags), diags)
@@ -74,7 +74,7 @@ func TestInspectSlideComments_CodeBlockIsolation(t *testing.T) {
 
 func TestInspectSlideComments_MalformedDelimiter(t *testing.T) {
 	content := "# Slide\n<!-- _layout: two-cols --->\nContent"
-	diags, sanitized := inspectSlideComments(1, content)
+	diags := inspectSlideComments(1, content)
 
 	if len(diags) != 1 {
 		t.Fatalf("expected 1 diagnostic for malformed delimiter, got %d", len(diags))
@@ -82,14 +82,11 @@ func TestInspectSlideComments_MalformedDelimiter(t *testing.T) {
 	if diags[0].Rule != "syntax.malformed_delimiter" {
 		t.Errorf("expected rule 'syntax.malformed_delimiter', got %q", diags[0].Rule)
 	}
-	if strings.Contains(sanitized, "--->") {
-		t.Errorf("expected sanitized content without '--->', got %q", sanitized)
-	}
 }
 
 func TestInspectSlideComments_GeneralUserComments(t *testing.T) {
 	content := "# Meeting Notes\n<!-- memo: remember to send follow-up email -->\n<!-- todo: add roadmap diagram -->\n<!-- section note -->"
-	diags, _ := inspectSlideComments(1, content)
+	diags := inspectSlideComments(1, content)
 
 	if len(diags) != 0 {
 		t.Errorf("expected 0 diagnostics for general comments, got %d: %+v", len(diags), diags)
@@ -98,7 +95,7 @@ func TestInspectSlideComments_GeneralUserComments(t *testing.T) {
 
 func TestInspectSlideComments_MarkerTypo(t *testing.T) {
 	content := "# Column Left\n<!-- splti -->\n# Column Right"
-	diags, _ := inspectSlideComments(1, content)
+	diags := inspectSlideComments(1, content)
 
 	if len(diags) != 1 {
 		t.Fatalf("expected 1 diagnostic for marker typo, got %d", len(diags))

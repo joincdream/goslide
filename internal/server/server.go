@@ -707,5 +707,3 @@ func (s *Server) logDiagnostics(diagnostics []model.Diagnostic) {
 		}
 	}
 }
-
-

@@ -126,4 +126,3 @@ func IsKnownLayout(val string) bool {
 	_, ok := LayoutAliases[cleaned]
 	return ok
 }
-

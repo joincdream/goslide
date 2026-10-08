@@ -393,4 +393,3 @@ func TestRenderSlide(t *testing.T) {
 		}
 	})
 }
-
