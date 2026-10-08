@@ -3,7 +3,7 @@
 > **티켓 번호**: [GOS-29](https://joincdream.atlassian.net/browse/GOS-29)  
 > **마일스톤**: v1.0.0 정식 릴리즈 준비 (Official Themes & Starter Templates)  
 > **마감일**: 2026-11-30  
-> **상태**: 할 일 (To Do)  
+> **상태**: 완료 (Done)  
 > **담당 패키지**: [`internal/theme/`](../internal/theme/), [`cmd/goslide/`](../cmd/goslide/)  
 > **연관 문서**:  
 > - [`docs/planning/competitive-analysis-and-strategy.md`](../docs/planning/competitive-analysis-and-strategy.md)  
@@ -72,8 +72,8 @@ Goslide의 기술적 완성도(CGO 0% 단일 정적 바이너리, < 50ms 초고�
 
 ## 4. 수용 기준 (Acceptance Criteria)
 
-- [ ] **테마 등록 및 유효성**: Frontmatter `theme: corporate`, `theme: academic`, `theme: cyber-dark` 선언 시 올바른 CSS가 로드되어야 함.
-- [ ] **CLI 플래그 지원**: `goslide build talk.md -t academic` 및 `goslide serve talk.md -t corporate` 정상 동작.
-- [ ] **`goslide init` 연동**: `goslide init sample.md --theme cyber-dark` 실행 시 해당 테마가 지정된 스타터 마크다운 파일이 생성되어야 함.
-- [ ] **멀티 포맷 출력 무결성**: 신규 테마 3종에 대해 `-f all` 실행 시 HTML, PDF, PPTX 모두 폰트/레이아웃 깨짐 없이 렌더링되어야 함.
-- [ ] **바이너리 무의존성 유지**: 외부 CDN 폰트 로드 실패 시에도 시스템 로컬 폰트로 안전하게 폴백되어 오프라인 환경에서 100% 정상 작동해야 함.
+- [x] **테마 등록 및 유효성**: Frontmatter `theme: corporate`, `theme: academic`, `theme: cyber-dark` 선언 시 올바른 CSS가 로드되어야 함.
+- [x] **CLI 플래그 지원**: `goslide build talk.md -t academic` 및 `goslide serve talk.md -t corporate` 정상 동작.
+- [x] **`goslide init` 연동**: `goslide init sample.md --theme cyber-dark` 실행 시 해당 테마가 지정된 스타터 마크다운 파일이 생성되어야 함.
+- [x] **멀티 포맷 출력 무결성**: 신규 테마 3종에 대해 `-f all` 실행 시 HTML, PDF, PPTX 모두 폰트/레이아웃 깨짐 없이 렌더링되어야 함.
+- [x] **바이너리 무의존성 유지**: 외부 CDN 폰트 로드 실패 시에도 시스템 로컬 폰트로 안전하게 폴백되어 오프라인 환경에서 100% 정상 작동해야 함.
