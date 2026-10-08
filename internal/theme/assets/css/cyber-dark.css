@@ -1,0 +1,617 @@
+/* ==========================================================================
+   Goslide Official Embedded Theme: Cyber-Dark
+   Design: Deep Midnight Space, Neon Cyan/Purple Glow & Terminal Monospace
+   Target: Developer Meetups, Tech Conferences, Cloud Architecture Seminars
+   ========================================================================== */
+
+:root {
+  /* Brand Primary & Accents */
+  --cyber-primary: #f8fafc;          /* Slate 50 (메인 텍스트 화이트) */
+  --cyber-secondary: #94a3b8;        /* Slate 400 (서브 텍스트) */
+  --cyber-accent-cyan: #06b6d4;      /* Cyan 500 (터미널 시안 메인) */
+  --cyber-cyan-glow: #22d3ee;        /* Cyan 400 (네온 발광 시안) */
+  --cyber-accent-purple: #a855f7;    /* Purple 500 (일렉트릭 퍼플) */
+  --cyber-purple-glow: #c084fc;      /* Purple 400 (네온 발광 퍼플) */
+  --cyber-accent-green: #10b981;     /* Emerald 500 (매트릭스 터미널 그린) */
+
+  /* Dark Canvas & Neutral Surfaces */
+  --cyber-bg-card: #090d16;          /* Deep Midnight Black (슬라이드 캔버스) */
+  --cyber-bg-stage: #030712;         /* Gray 950 (슬라이드 무대 외곽) */
+  --cyber-bg-subtle: #0f172a;        /* Slate 900 (카드/서페이스 배경) */
+  --cyber-bg-surface: #1e293b;       /* Slate 800 (하이라이트 박스) */
+  --cyber-text-main: #f8fafc;        /* Slate 50 */
+  --cyber-text-muted: #94a3b8;       /* Slate 400 */
+  --cyber-text-dim: #64748b;         /* Slate 500 */
+  --cyber-border: #1e293b;           /* Slate 800 (은은한 테두리) */
+  --cyber-border-glow: rgba(34, 211, 238, 0.35); /* 시안 네온 발광 테두리 */
+
+  /* Typography Stacks (Offline Portability Invariant) */
+  --cyber-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --cyber-font-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Base Canvas & Body */
+body {
+  font-family: var(--cyber-font-sans);
+  background-color: var(--cyber-bg-stage);
+  color: var(--cyber-text-main);
+}
+
+.slide-card {
+  background-color: var(--cyber-bg-card);
+  color: var(--cyber-text-main);
+  border: 1px solid var(--cyber-border);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75), 0 0 20px rgba(6, 182, 212, 0.05);
+}
+
+/* Headings: Cyber High-Tech Hierarchy */
+.slide-card h1 {
+  font-family: var(--cyber-font-sans);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, #22d3ee 50%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.slide-card h2 {
+  font-family: var(--cyber-font-sans);
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.slide-card h3,
+.slide-card h4 {
+  font-family: var(--cyber-font-sans);
+  color: var(--cyber-cyan-glow);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Slide Header & Tracker (Category / System Status) */
+.slide-card .slide-header {
+  color: var(--cyber-text-dim);
+  font-family: var(--cyber-font-mono);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+  padding-bottom: 4px;
+}
+
+.slide-card .slide-header::before {
+  content: "●";
+  color: var(--cyber-accent-green);
+  margin-right: 6px;
+  font-size: 0.7em;
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.8));
+}
+
+.slide-card .slide-footer {
+  color: var(--cyber-text-dim);
+  font-family: var(--cyber-font-mono);
+  font-size: 0.75rem;
+  border-top: 1px solid rgba(30, 41, 59, 0.8);
+  padding-top: 4px;
+}
+
+/* Slide Title Box Accent: Electric Cyan Underline with Glow */
+.slide-card .slide-title-box {
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--cyber-border);
+  position: relative;
+}
+
+.slide-card .slide-title-box::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 140px;
+  height: 2px;
+  background: linear-gradient(90deg, #22d3ee 0%, #c084fc 100%);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.7);
+}
+
+.slide-card .slide-title-box .slide-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.slide-card .slide-title-box .slide-subtitle {
+  font-family: var(--cyber-font-mono);
+  font-size: 0.95rem;
+  color: var(--cyber-cyan-glow);
+  margin-top: 0;
+  letter-spacing: 0.02em;
+}
+
+/* Typography Enhancements */
+.slide-card p {
+  line-height: 1.65;
+  color: #cbd5e1;
+}
+
+.slide-card a {
+  color: var(--cyber-cyan-glow);
+  text-decoration: none;
+  border-bottom: 1.5px solid rgba(34, 211, 238, 0.4);
+  transition: all 0.2s ease;
+}
+
+.slide-card a:hover {
+  color: #ffffff;
+  border-bottom-color: var(--cyber-cyan-glow);
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.8);
+}
+
+.slide-card strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Lists: Terminal Shell Prompt (❯) Style */
+.slide-card ul {
+  list-style: none;
+  padding-left: 1.35rem;
+}
+
+.slide-card ul > li {
+  position: relative;
+  margin-bottom: 0.55rem;
+  line-height: 1.65;
+}
+
+.slide-card ul > li::before {
+  content: "❯";
+  position: absolute;
+  left: -1.35rem;
+  top: 0;
+  line-height: inherit;
+  color: var(--cyber-cyan-glow);
+  font-family: var(--cyber-font-mono);
+  font-weight: 700;
+  font-size: 0.82em;
+  text-shadow: 0 0 6px rgba(34, 211, 238, 0.6);
+}
+
+.slide-card ul > li.task-list-item::before {
+  content: none;
+}
+
+.slide-card li p {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.slide-card ol {
+  padding-left: 1.5rem;
+  color: #cbd5e1;
+}
+
+.slide-card ol > li {
+  margin-bottom: 0.55rem;
+  line-height: 1.65;
+}
+
+/* Blockquotes & Cyber Callouts */
+.slide-card blockquote {
+  background-color: rgba(168, 85, 247, 0.08);
+  border-left: 4px solid var(--cyber-accent-purple);
+  border-radius: 0 8px 8px 0;
+  color: #e2e8f0;
+  padding: 1rem 1.4rem;
+  margin: 1.25rem 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 0 12px rgba(168, 85, 247, 0.05);
+}
+
+.slide-card blockquote p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* Code Blocks & Chroma Syntax Highlighter Focus */
+.slide-card pre {
+  background-color: #0b0f19 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 1.1rem 1.35rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.slide-card :not(pre) > code {
+  background-color: rgba(34, 211, 238, 0.12);
+  color: #22d3ee;
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  font-family: var(--cyber-font-mono);
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.86em;
+}
+
+/* Line Highlighting in Code Blocks: Extreme Focus */
+.slide-card .chroma .hl {
+  background-color: rgba(34, 211, 238, 0.14) !important;
+  border-left: 3px solid #22d3ee !important;
+  display: block;
+  margin-left: -1.35rem;
+  margin-right: -1.35rem;
+  padding-left: 1.15rem;
+}
+
+/* Keyboard Shortcut Badges */
+.slide-card kbd {
+  background-color: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 0 8px rgba(56, 189, 248, 0.15);
+}
+
+/* Tables (Tech Grid Matrix Style) */
+.slide-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  font-size: 0.92em;
+  background-color: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.slide-card th {
+  background-color: #1e1b4b;
+  color: #38bdf8;
+  font-family: var(--cyber-font-mono);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+  letter-spacing: 0.03em;
+}
+
+.slide-card td {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+  color: #cbd5e1;
+}
+
+.slide-card tr:nth-child(even) td {
+  background-color: rgba(15, 23, 42, 0.4);
+}
+
+.slide-card tr:last-child td {
+  border-bottom: none;
+}
+
+/* KaTeX Math Equations */
+.slide-card .katex-display {
+  background-color: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin: 1.25rem 0;
+  text-align: center;
+  overflow-x: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* GFM Alerts / Callouts */
+.slide-card .markdown-alert {
+  border-radius: 0 8px 8px 0;
+  margin: 1rem 0;
+  padding: 0.85rem 1.25rem;
+  background-color: rgba(15, 23, 42, 0.6);
+}
+.slide-card .markdown-alert-note {
+  border-left: 4px solid #06b6d4;
+  background-color: rgba(6, 182, 212, 0.08);
+}
+.slide-card .markdown-alert-tip {
+  border-left: 4px solid #10b981;
+  background-color: rgba(16, 185, 129, 0.08);
+}
+.slide-card .markdown-alert-important {
+  border-left: 4px solid #a855f7;
+  background-color: rgba(168, 85, 247, 0.08);
+}
+.slide-card .markdown-alert-warning {
+  border-left: 4px solid #f59e0b;
+  background-color: rgba(245, 158, 11, 0.08);
+}
+.slide-card .markdown-alert-caution {
+  border-left: 4px solid #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+/* Mermaid Diagrams Optimization for Cyber-Dark */
+.slide-card .mermaid .node rect,
+.slide-card .mermaid .node polygon,
+.slide-card .mermaid .node circle,
+.slide-card .mermaid .node path {
+  fill: #0f172a !important;
+  stroke: #22d3ee !important;
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)) !important;
+}
+
+.slide-card .mermaid .nodeLabel {
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+}
+
+.slide-card .mermaid .node .katex,
+.slide-card .mermaid .node .katex path {
+  color: #22d3ee !important;
+  fill: #22d3ee !important;
+  stroke: #22d3ee !important;
+}
+
+.slide-card .mermaid .edgeLabel {
+  background-color: #1e293b !important;
+  color: #38bdf8 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+}
+
+.slide-card .mermaid .flowchart-link {
+  stroke: #22d3ee !important;
+  stroke-width: 1.5px !important;
+}
+
+.slide-card .mermaid .marker {
+  fill: #22d3ee !important;
+  stroke: #22d3ee !important;
+}
+
+/* ==========================================================================
+   Semantic Layout Overrides: cover, section, two-cols, lead, blank
+   ========================================================================== */
+
+/* 1. Cover Layout (Developer Keynote / Tech Architecture) */
+.slide-card.cover,
+.slide-card.layout-cover {
+  background: radial-gradient(circle at 75% 20%, #1e1b4b 0%, #090d16 55%, #030712 100%) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  overflow: hidden;
+}
+
+/* Neon Top Cyan/Purple Laser Accent Rule */
+.slide-card.cover::before,
+.slide-card.layout-cover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #06b6d4 0%, #38bdf8 30%, #a855f7 70%, #ec4899 100%);
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.8);
+  z-index: 10;
+}
+
+.slide-card.cover .slide-header,
+.slide-card.cover .slide-footer,
+.slide-card.layout-cover .slide-header,
+.slide-card.layout-cover .slide-footer {
+  display: none !important;
+}
+
+.slide-card.cover .slide-body,
+.slide-card.layout-cover .slide-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  flex: 0 0 1000px !important;
+  height: 1000px !important;
+  min-height: 1000px !important;
+  max-height: 1000px !important;
+  box-sizing: border-box !important;
+  padding: 100px 140px 60px 140px !important;
+  text-align: center !important;
+}
+
+.slide-card.cover h1,
+.slide-card.layout-cover h1 {
+  margin-top: auto !important;
+  margin-bottom: 0.75rem !important;
+  font-size: 3.75rem !important;
+  font-weight: 900 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.03em !important;
+  background: linear-gradient(135deg, #ffffff 0%, #22d3ee 45%, #c084fc 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 4px 20px rgba(34, 211, 238, 0.35));
+}
+
+.slide-card.cover h2,
+.slide-card.cover h3,
+.slide-card.layout-cover h2,
+.slide-card.layout-cover h3 {
+  margin-top: 0.5rem !important;
+  margin-bottom: auto !important;
+  font-family: var(--cyber-font-mono) !important;
+  font-size: 1.45rem !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  color: #94a3b8 !important;
+  max-width: 90%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.slide-card.cover .slide-body > p,
+.slide-card.layout-cover .slide-body > p {
+  text-align: left !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px solid rgba(56, 189, 248, 0.2) !important;
+  font-family: var(--cyber-font-mono) !important;
+  font-size: 1.1rem !important;
+  line-height: 1.7 !important;
+  color: #94a3b8 !important;
+  width: 100% !important;
+}
+
+.slide-card.cover strong,
+.slide-card.layout-cover strong {
+  color: #22d3ee !important;
+  font-weight: 600 !important;
+}
+
+/* 2. Section Layout (Tech Topic / Chapter Transition) */
+.slide-card.section,
+.slide-card.layout-section {
+  background: linear-gradient(135deg, #0f172a 0%, #090d16 100%);
+  color: #f8fafc;
+  border-left: 12px solid #22d3ee;
+  box-shadow: inset 10px 0 20px rgba(34, 211, 238, 0.15);
+}
+
+.slide-card.section h1,
+.slide-card.layout-section h1 {
+  font-size: 3.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 0%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.slide-card.section h3,
+.slide-card.layout-section h3,
+.slide-card.section p,
+.slide-card.layout-section p {
+  font-family: var(--cyber-font-mono);
+  color: #94a3b8;
+  font-size: 1.35rem;
+}
+
+/* 3. Two-Cols Layout (Tech Specs / Arch Comparison) */
+.slide-card .two-cols {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.slide-card .two-cols .col-left,
+.slide-card .two-cols .col-right {
+  flex: 1;
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.slide-card .two-cols .col-left h3,
+.slide-card .two-cols .col-right h3 {
+  font-family: var(--cyber-font-mono);
+  color: #22d3ee;
+  border-bottom: 2px solid rgba(34, 211, 238, 0.35);
+  padding-bottom: 6px;
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+/* 4. Lead Layout (Key Engineering Insight / Metric Punchline) */
+.slide-card.lead,
+.slide-card.layout-lead {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.slide-card.lead .slide-title-box,
+.slide-card.layout-lead .slide-title-box {
+  display: none !important;
+}
+
+.slide-card.lead .slide-body,
+.slide-card.layout-lead .slide-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  flex: 0 0 960px !important;
+  height: 960px !important;
+  box-sizing: border-box !important;
+  padding: 60px 140px !important;
+  margin: 0 !important;
+}
+
+.slide-card.lead h1,
+.slide-card.layout-lead h1 {
+  font-size: 3.5rem !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+  color: inherit !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.slide-card.lead h2,
+.slide-card.lead h3,
+.slide-card.layout-lead h2,
+.slide-card.layout-lead h3 {
+  font-family: var(--cyber-font-mono) !important;
+  font-size: 1.5rem !important;
+  color: inherit !important;
+  opacity: 0.9;
+}
+
+/* Background Dimming Overlay Contrast Protection */
+.slide-card.has-bg-dim {
+  color: #f8fafc;
+}
+.slide-card.has-bg-dim h1,
+.slide-card.has-bg-dim h2,
+.slide-card.has-bg-dim h3,
+.slide-card.has-bg-dim h4,
+.slide-card.has-bg-dim p,
+.slide-card.has-bg-dim li {
+  color: #f8fafc !important;
+}
+.slide-card.has-bg-dim strong {
+  color: #22d3ee !important;
+}
+.slide-card.has-bg-dim .slide-header,
+.slide-card.has-bg-dim .slide-footer {
+  color: #94a3b8 !important;
+}
+
+/* 5. Blank Layout (Full-Bleed Visual / Architecture Canvas) */
+.slide-card.blank,
+.slide-card.layout-blank {
+  padding: 0 !important;
+}
+
+.slide-card.blank .slide-title-box,
+.slide-card.blank .slide-header,
+.slide-card.blank .slide-footer,
+.slide-card.layout-blank .slide-title-box,
+.slide-card.layout-blank .slide-header,
+.slide-card.layout-blank .slide-footer {
+  display: none !important;
+}
+
+.slide-card.blank .slide-body,
+.slide-card.layout-blank .slide-body {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
