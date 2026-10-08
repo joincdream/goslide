@@ -142,6 +142,10 @@ body {
   font-size: 0.65em;
 }
 
+.slide-card ul > li.task-list-item::before {
+  content: none;
+}
+
 /* Blockquotes & Callouts */
 .slide-card blockquote {
   background-color: var(--corporate-bg-subtle);

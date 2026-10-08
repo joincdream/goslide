@@ -33,6 +33,7 @@ func postProcessHTML(html string) string {
 	html = transformImages(html)
 	html = transformAlerts(html)
 	html = transformFragments(html)
+	html = normalizeListFragments(html)
 	return html
 }
 

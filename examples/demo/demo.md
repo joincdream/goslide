@@ -1,7 +1,7 @@
 ---
 title: "Modern Large Language Model (LLM) Architecture & Engineering Practice"
 author: "AI Core Architecture Lab"
-theme: "clean"
+theme: "corporate"
 size: "16:9"
 paginate: true
 header: "2026 AI Tech Seminar: Deep Dive into LLMs"
@@ -400,9 +400,9 @@ func StreamTokenProxy(ctx context.Context, w http.ResponseWriter, upstreamBody i
 * **Presentation Engine**: Goslide Pure Go Presentation Builder (Single Binary)
 * **Presenter Tooling**: 1080p Screencasting, Live Annotation, Laser Pointer & Shortcuts
 
-- [x] Core presentation concepts delivered
-- [x] Live preview & real-time hot reload demonstrated
-- [ ] Open Q&A and technical feedback session
+* **Delivered**: Core presentation concepts and architecture
+* **Demonstrated**: Live preview & real-time hot reload
+* **Open Discussion**: Interactive Q&A and technical feedback
 
 <!-- note:
 [Closing]

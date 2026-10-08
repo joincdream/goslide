@@ -78,6 +78,7 @@ Every generated theme CSS must comply with these architectural invariants:
 1. ✅ **Define theme colors and typography via `:root` CSS variables** for frictionless user customization.
 2. ✅ **Explicitly override all 5 semantic layouts** (`cover`, `default`, `two-cols`, `section`, `lead`).
 3. ✅ **Include complete component typography**: code blocks (`pre`, `code`), tables (`table`, `th`, `td`), callout alerts (`blockquote`), keyboard badges (`kbd`), and unordered/ordered lists.
+4. ✅ **Ensure distance legibility**: maintain high contrast between canvas and text, avoiding thin font weights (<400) for projector and large-display clarity.
 
 ---
 
@@ -282,6 +283,10 @@ semantic_mapping_matrix:
 }
 .slide-card li {
   margin-bottom: 0.5rem;
+}
+/* If using custom pseudo-element bullets on ul > li::before, suppress on task lists */
+.slide-card ul > li.task-list-item::before {
+  content: none;
 }
 
 /* Incremental Reveal (Fragment Animations) */
