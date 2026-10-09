@@ -143,6 +143,12 @@ func (m *Manager) ResolveTheme(themeName, customCSSPath string) (baseTheme strin
 		return DefaultTheme, path
 	}
 
+	// Also check parent themes directory (e.g. ../themes/<name>.css) in case user is inside a subfolder like demo/
+	parentThemeCandidate := filepath.Join("..", "themes", name+".css")
+	if path := m.findExistingCSSFile(parentThemeCandidate); path != "" {
+		return DefaultTheme, path
+	}
+
 	// Also check directly in working directory or baseDir (e.g. <name>.css)
 	directCandidate := name + ".css"
 	if path := m.findExistingCSSFile(directCandidate); path != "" {
@@ -240,4 +246,25 @@ func (m *Manager) GetStarterTemplate(themeName string) (string, error) {
 	}
 
 	return content, nil
+}
+
+// GetDemoImages returns the embedded images required for the showcase demo presentation deck.
+func (m *Manager) GetDemoImages() (map[string][]byte, error) {
+	images := []string{
+		"hands-on-bg.jpeg",
+		"sample-img-01.png",
+		"sample-img-02.jpg",
+		"llm-architecture.jpg",
+	}
+
+	result := make(map[string][]byte, len(images))
+	for _, name := range images {
+		path := filepath.Join("assets/templates", name)
+		data, err := fs.ReadFile(m.fsys, path)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read embedded demo image %q: %w", name, err)
+		}
+		result[name] = data
+	}
+	return result, nil
 }

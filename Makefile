@@ -48,7 +48,8 @@ package: build-web
 	@echo "==> Packaging $(ARTIFACT_NAME) ($(GOOS)/$(GOARCH), version: $(VERSION))..."
 	@mkdir -p $(DIST_DIR)/$(ARTIFACT_NAME)
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -trimpath -ldflags="-s -w -X 'main.version=$(VERSION)'" -o $(DIST_DIR)/$(ARTIFACT_NAME)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
-	@cp README.md $(DIST_DIR)/$(ARTIFACT_NAME)/ 2>/dev/null || true
+	@cp README*.md QUICKSTART*.md LICENSE* $(DIST_DIR)/$(ARTIFACT_NAME)/ 2>/dev/null || true
+	@mkdir -p $(DIST_DIR)/$(ARTIFACT_NAME)/prompts && cp prompts/* $(DIST_DIR)/$(ARTIFACT_NAME)/prompts/ 2>/dev/null || true
 	@if [ "$(GOOS)" = "windows" ]; then \
 		cd $(DIST_DIR) && rm -f $(ARTIFACT_NAME).zip && zip -r $(ARTIFACT_NAME).zip $(ARTIFACT_NAME) >/dev/null; \
 	else \

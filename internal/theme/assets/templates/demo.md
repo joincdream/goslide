@@ -15,12 +15,43 @@ footer: "© 2026 joinc edu AI Tech Lab. All rights reserved."
 
 **Presenter**: joinc edu AI Tech Lab  
 **Date**: October 2026 Tech Seminar  
-**Shortcut Guide**: <kbd>P</kbd> Presenter View | <kbd>N</kbd> Sidebar | <kbd>D</kbd> Draw Mode | <kbd>?</kbd> All Shortcuts
 
 <!-- note:
 [Introduction]
 - Welcome all attendees and emphasize that today's seminar goes beyond conceptual overviews to address real-world, production-grade engineering architectures.
 - Press 'P' to open the detached presenter console, or 'N' to toggle the in-window sidebar and start the timer.
+-->
+
+---
+
+<!-- _layout: two-cols -->
+## Interactive Presenter & Shortcut Guide
+
+Goslide provides built-in keyboard shortcuts and presentation tools for smooth delivery:
+
+### Navigation & Presenter Console
+- <kbd>→</kbd> / <kbd>Space</kbd> : Next slide or fragment step
+- <kbd>←</kbd> : Previous slide or fragment step
+- <kbd>P</kbd> : **Presenter Mode** (Dual-screen notes, preview & timer)
+- <kbd>N</kbd> : **Sidebar Navigator** (Thumbnail jump & timer toggle)
+- <kbd>F</kbd> : **Fullscreen** toggle
+- <kbd>?</kbd> : **All Shortcuts** cheat sheet dialog
+
+<!-- split -->
+
+### Live Annotation & Visual Focus
+- <kbd>D</kbd> : **Draw Mode** (Activate live on-screen canvas pen)
+- <kbd>C</kbd> : **Clear Drawing** (Erase annotations on current slide)
+- <kbd>L</kbd> : **Laser Pointer** (High-visibility red cursor)
+- <kbd>S</kbd> : **Spotlight Mode** (Dim stage to highlight key items)
+- <kbd>Esc</kbd> : Close open tools / dismiss modal / reset view
+
+> [!TIP] Dual-Screen Tip
+> Connect a second monitor and press <kbd>P</kbd> to view speaker notes and timer while audiences view clean presentation slides.
+
+<!-- note:
+- Explain that Goslide is fully interactive in modern web browsers.
+- Quickly demonstrate <kbd>D</kbd> for live drawing and <kbd>L</kbd> for laser pointer as a quick icebreaker before diving into the agenda.
 -->
 
 ---
@@ -135,7 +166,8 @@ flowchart LR
 
 <!--
 _class: lead
-_backgroundImage: linear-gradient(135deg, #0b192c 0%, #1e3e62 60%, #0073bb 100%)
+_backgroundImage: "hands-on-bg.jpeg"
+_backgroundDim: 0.5
 _color: #ffffff
 -->
 
@@ -274,16 +306,16 @@ flowchart LR
 ## Media & Image Sizing Control
 
 ### Landscape Image (PNG)
-`w:500` width directive:
+`h:700` width directive:
 
-![w:500 Landscape Image](examples/demo/sample-img-01.png)
+![h:700 Landscape Image](sample-img-01.png)
 
 <!-- split -->
 
 ### Portrait Image (JPG)
-`w:300 center` width & center directive:
+`w:400 center` width & center directive:
 
-![w:300 center Portrait Image](examples/demo/sample-img-02.jpg)
+![w:400 center Portrait Image](sample-img-02.jpg)
 
 <!-- note:
 - Media & Image sizing verification slide (Checklist 7.6).
@@ -368,9 +400,9 @@ func StreamTokenProxy(ctx context.Context, w http.ResponseWriter, upstreamBody i
 * **Presentation Engine**: Goslide Pure Go Presentation Builder (Single Binary)
 * **Presenter Tooling**: 1080p Screencasting, Live Annotation, Laser Pointer & Shortcuts
 
-- [x] Core presentation concepts delivered
-- [x] Live preview & real-time hot reload demonstrated
-- [ ] Open Q&A and technical feedback session
+* **Delivered**: Core presentation concepts and architecture
+* **Demonstrated**: Live preview & real-time hot reload
+* **Open Discussion**: Interactive Q&A and technical feedback
 
 <!-- note:
 [Closing]

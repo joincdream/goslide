@@ -1,7 +1,7 @@
 {
   "cli.description": "Goslide는 순수 Go 기반의 초고속 단일 바이너리 마크다운 슬라이드 데크 빌더입니다.",
   "cli.long": "Goslide 📽️ - 순수 Go 기반의 초고속 단일 바이너리 마크다운 슬라이드 데크 빌더\n\nCGO 및 외부 런타임 의존성 없이 마크다운 문서를 반응형 웹 슬라이드(HTML),\n16:9 무마진 벡터 PDF, 그리고 발표자 노트가 완벽히 보존되는 파워포인트(PPTX)로 즉시 변환합니다.\n\n강의 및 기술 발표에 최적화된 투명 캔버스 판서(D/C 키), 듀얼 스크린 발표자 콘솔(P 키),\n디지털 레이저 포인터(L 키) 및 스포트라이트 집중 모드(S 키)를 기본 탑재하고 있습니다.",
-  "cli.example": "  # 1. 독립형 HTML 슬라이드 생성 (이미지 Base64 인라인 임베딩)\n  goslide build presentation.md -o index.html --standalone\n\n  # 2. 16:9 무마진 고해상도 벡터 PDF 내보내기\n  goslide build presentation.md -f pdf -o talk.pdf\n\n  # 3. 발표자 노트 포함 16:9 파워포인트(PPTX) 내보내기\n  goslide build presentation.md -f pptx -o talk.pptx\n\n  # 4. 클린 테마 적용 및 출력 경로 지정\n  goslide build talk.md -t clean -o dist/talk.html\n\n  # 5. 실시간 변경 감지(SSE 핫 리로드) 개발 서버 실행 및 브라우저 자동 오픈\n  goslide serve presentation.md --port 8080 --open\n\n  # 6. 슬라이드 작성 문법 및 DSL 스펙 참조:\n  #    https://raw.githubusercontent.com/yundream/goslide/main/examples/example-dsl.ko.md",
+  "cli.example": "  # 1. 데모 환경 언팩 및 체험 가이드 확인\n  goslide demo\n\n  # 2. 실시간 라이브 프리뷰 개발 서버 시작 (브라우저 자동 오픈)\n  goslide serve demo.md --open\n\n  # 3. HTML, PDF, PPTX 멀티포맷 일괄 빌드\n  goslide build demo.md -f all -o dist/\n\n  # 4. 나만의 새 슬라이드 생성\n  goslide init my-slide.md\n\n  # 5. AI(ChatGPT/Claude) 슬라이드 생성 프롬프트 출력\n  goslide prompt\n\n  # 6. 내장 테마 목록 조회 및 CSS 추출\n  goslide theme list",
   "cli.version": "Goslide 버전 %s",
   "cli.version.flag": "버전 정보 출력",
   "cli.lang.flag": "CLI 및 슬라이드 UI 언어 설정 (auto, en, ko)",
@@ -23,6 +23,19 @@
   "cli.init.flag.theme": "스타터 테마 이름 (default, clean, dark)",
   "cli.init.flag.force": "기존 파일이 존재할 경우 확인 없이 덮어쓰기",
   "cli.init.success": "✓ 샘플 프레젠테이션 파일이 생성되었습니다: %s\n\n🚀 다음 추천 작업:\n  1. 실시간 핫리로드 개발 서버 실행:\n     goslide serve %s\n\n  2. HTML, PDF, PPTX 슬라이드 일괄 빌드:\n     goslide build %s -f all -o dist/\n\n  3. 전체 기능 및 옵션 확인:\n     goslide --help\n\n📖 문서 및 공식 저장소:\n  https://github.com/joincdream/goslide",
+
+  "cli.demo.desc": "전용 데모 디렉토리(./demo)에 데모 슬라이드 및 에셋 언팩, 현재 디렉토리에 themes/ 언팩",
+  "cli.demo.flag.force": "기존 데모 또는 테마 파일이 존재할 경우 확인 없이 덮어쓰기",
+  "cli.demo.already_exists": "⚠️  %s 경로가 이미 존재합니다. 덮어쓰려면 --force 플래그를 사용하세요.",
+  "cli.demo.success": "🎉 Goslide 데모 및 테마 환경이 준비되었습니다!\n   • 데모 슬라이드: ./%s/demo.md (14장 규모 쇼케이스 슬라이드 및 이미지 에셋)\n   • 프로젝트 테마: ./%s/ (clean.css, dark.css, academic.css)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🚀 다음 단계로 Goslide를 직접 체험해 보세요:\n\n1. 실시간 미리보기 실행:\n   $ goslide serve %s/demo.md\n   (브라우저가 자동으로 열리며 발표 모드가 시작됩니다)\n\n2. 실시간 라이브 리로드 체험:\n   • %s/demo.md 파일을 에디터로 열어 내용을 수정하고 저장해 보세요.\n   • 브라우저가 깜빡임 없이 즉시 갱신됩니다!\n\n3. 테마 변경해보기:\n   • %s/demo.md 상단의 theme: \"clean\"을 \"dark\" 또는 \"academic\"으로 바꿔보세요.\n   • %s/ 폴더의 CSS를 직접 수정하여 나만의 스타일을 만들 수도 있습니다.\n\n4. 다양한 포맷으로 변환해보기 (HTML, PDF, PPTX):\n   $ goslide build %s/demo.md -f html,pdf,pptx\n   (웹 슬라이드, 인쇄용 PDF, 파워포인트 PPTX 파일이 한 번에 생성됩니다)\n\n5. 나만의 새 슬라이드 만들기:\n   $ goslide init my-slide.md\n\n💡 더 자세한 명령어는 'goslide --help', 전체 가이드는 'QUICKSTART.md'를 참고하세요.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+
+  "cli.prompt.desc": "ChatGPT, Claude, Cursor 등 AI 에이전트 연동용 슬라이드(slide) 또는 테마(theme) 시스템 프롬프트 출력",
+  "cli.prompt.slide.desc": "AI 슬라이드 마크다운 생성용 시스템 프롬프트 및 공식 DSL 규격 링크 출력",
+  "cli.prompt.theme.desc": "AI 커스텀 테마 CSS 생성용 시스템 프롬프트 및 4-Tier 테마 규격 링크 출력",
+  "cli.theme.desc": "내장 테마 관리 및 커스텀 스타일시트(CSS) 추출",
+  "cli.theme.list.desc": "사용 가능한 내장 테마 목록 및 설명 출력",
+  "cli.theme.export.desc": "내장 테마의 CSS를 로컬 파일로 추출하여 커스텀 테마 제작 시작",
+  "cli.theme.export.success": "✓ 내장 테마 '%s' 스타일시트가 추출되었습니다: %s",
 
   "cli.serve.desc": "실시간 핫 리로드를 지원하는 로컬 개발 서버 시작",
   "cli.serve.long": "마크다운 파일의 수정을 실시간으로 감지하여 브라우저를 자동 새로고침(Hot Reload)하는\n초고속 로컬 개발 서버를 구동합니다.\n\n표준 Server-Sent Events(SSE) 스트리밍을 통해 마크다운 저장 즉시 300ms 이내에 반영되며,\n작업 중이던 슬라이드 위치(인덱스)가 브라우저 해시(#)와 연동되어 안정적으로 보존됩니다.",

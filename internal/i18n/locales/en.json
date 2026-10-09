@@ -1,7 +1,7 @@
 {
   "cli.description": "Goslide is a blazing-fast, single-binary Markdown presentation deck builder.",
   "cli.long": "Goslide 📽️ - A blazing-fast, single-binary Markdown presentation deck builder in Pure Go.\n\nInstantly convert Markdown documents into self-contained interactive web slides (HTML),\n16:9 borderless vector PDFs, and presenter-note-preserving PowerPoint (PPTX) presentations\nwith zero CGO or external runtime dependencies.\n\nFeatures a built-in screencast drawing canvas (D/C keys), dual-screen presenter console (P key),\ndigital laser pointer (L key), and spotlight focus (S key) optimized for tutorials and talks.",
-  "cli.example": "  # 1. Generate standalone interactive HTML slide (inlining images as Base64)\n  goslide build presentation.md -o index.html --standalone\n\n  # 2. Export 16:9 borderless vector PDF\n  goslide build presentation.md -f pdf -o talk.pdf\n\n  # 3. Export 16:9 PowerPoint (PPTX) with speaker notes\n  goslide build presentation.md -f pptx -o talk.pptx\n\n  # 4. Apply clean theme and specify output file path\n  goslide build talk.md -t clean -o dist/talk.html\n\n  # 5. Start live preview server with SSE hot reload and auto-open browser\n  goslide serve presentation.md --port 8080 --open\n\n  # 6. Markdown DSL Specification & AI Prompt Reference:\n  #    https://raw.githubusercontent.com/yundream/goslide/main/examples/example-dsl.md",
+  "cli.example": "  # 1. Unpack demo presentation and themes playground\n  goslide demo\n\n  # 2. Start live preview server with SSE hot reload and auto-open browser\n  goslide serve demo.md --open\n\n  # 3. Build to HTML, vector PDF, and PowerPoint PPTX\n  goslide build demo.md -f all -o dist/\n\n  # 4. Create your own presentation slide\n  goslide init my-slide.md\n\n  # 5. Print AI system prompt for ChatGPT / Claude\n  goslide prompt\n\n  # 6. List built-in themes and export CSS\n  goslide theme list",
   "cli.version": "Goslide version %s",
   "cli.version.flag": "Print version information",
   "cli.lang.flag": "Set language for CLI and presentation UI (auto, en, ko)",
@@ -23,6 +23,19 @@
   "cli.init.flag.theme": "Starter theme name (default, clean, dark)",
   "cli.init.flag.force": "Overwrite existing file without confirmation",
   "cli.init.success": "✓ Created sample presentation to %s\n\n🚀 Next Steps:\n  1. Live preview & presentation:\n     goslide serve %s\n\n  2. Build to HTML, PDF, or PPTX:\n     goslide build %s -f all -o dist/\n\n  3. Explore features & options:\n     goslide --help\n\n📖 Documentation & Source:\n  https://github.com/joincdream/goslide",
+
+  "cli.demo.desc": "Unpack demo presentation into dedicated directory (./demo) and themes into current directory (themes/)",
+  "cli.demo.flag.force": "Overwrite existing demo or theme files without confirmation",
+  "cli.demo.already_exists": "⚠️  Path '%s' already exists. Use --force to overwrite.",
+  "cli.demo.success": "🎉 Goslide demo and theme environment is ready!\n   • Demo Presentation: ./%s/demo.md (14-slide showcase presentation & images)\n   • Project Themes: ./%s/ (clean.css, dark.css, academic.css)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n🚀 Try Goslide with the following quick steps:\n\n1. Launch live preview:\n   $ goslide serve %s/demo.md\n   (Browser will automatically open and presentation mode begins)\n\n2. Experience hot live reload:\n   • Open %s/demo.md in your editor, modify content, and save.\n   • The browser updates instantly without flickering!\n\n3. Change themes:\n   • Change theme: \"clean\" at the top of %s/demo.md to \"dark\" or \"academic\".\n   • Or edit CSS files in the %s/ folder to craft your own style.\n\n4. Convert to multiple formats (HTML, PDF, PPTX):\n   $ goslide build %s/demo.md -f html,pdf,pptx\n   (Generates web slides, vector PDF, and PowerPoint PPTX in one go)\n\n5. Create your own new slide:\n   $ goslide init my-slide.md\n\n💡 See 'goslide --help' for commands, or refer to 'QUICKSTART.md' for the full guide.\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+
+  "cli.prompt.desc": "Print system prompt and official GitHub specification for AI agents (ChatGPT, Claude, Cursor)",
+  "cli.prompt.slide.desc": "Print AI system prompt and official DSL specification URL for slide generation",
+  "cli.prompt.theme.desc": "Print AI system prompt and 4-tier DOM architecture specification URL for custom theme CSS generation",
+  "cli.theme.desc": "Manage built-in themes and export custom stylesheets (CSS)",
+  "cli.theme.list.desc": "List all available built-in themes",
+  "cli.theme.export.desc": "Export built-in theme CSS to a local file for customization",
+  "cli.theme.export.success": "✓ Exported built-in theme '%s' stylesheet: %s",
 
   "cli.serve.desc": "Start local development server with live reload",
   "cli.serve.long": "Starts an ultra-fast local development server that watches the Markdown file for changes\nand automatically refreshes the browser with live hot reload.\n\nPowered by standard Server-Sent Events (SSE), updates render in under 300ms while preserving\nyour active slide position via URL hash sync.",

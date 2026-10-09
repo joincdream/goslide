@@ -64,6 +64,15 @@ func initCLI() {
 	if !hasCommand(rootCmd, initCmd.Name()) {
 		rootCmd.AddCommand(initCmd)
 	}
+	if !hasCommand(rootCmd, demoCmd.Name()) {
+		rootCmd.AddCommand(demoCmd)
+	}
+	if !hasCommand(rootCmd, promptCmd.Name()) {
+		rootCmd.AddCommand(promptCmd)
+	}
+	if !hasCommand(rootCmd, themeCmd.Name()) {
+		rootCmd.AddCommand(themeCmd)
+	}
 }
 
 func hasCommand(root *cobra.Command, name string) bool {
@@ -91,6 +100,12 @@ func refreshCLITexts() {
 	initCmd.Short = i18n.T("cli.init.desc")
 	initCmd.Long = i18n.T("cli.init.long")
 	initCmd.Example = i18n.T("cli.init.example")
+
+	demoCmd.Short = i18n.T("cli.demo.desc")
+	promptCmd.Short = i18n.T("cli.prompt.desc")
+	themeCmd.Short = i18n.T("cli.theme.desc")
+	themeListCmd.Short = i18n.T("cli.theme.list.desc")
+	themeExportCmd.Short = i18n.T("cli.theme.export.desc")
 
 	updateFlagDescriptions()
 }
@@ -120,6 +135,7 @@ func updateFlagDescriptions() {
 		{serveCmd, "debounce", "cli.serve.flag.debounce"},
 		{initCmd, "theme", "cli.init.flag.theme"},
 		{initCmd, "force", "cli.init.flag.force"},
+		{demoCmd, "force", "cli.demo.flag.force"},
 	}
 
 	for _, s := range specs {
