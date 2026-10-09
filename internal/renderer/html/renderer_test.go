@@ -393,3 +393,69 @@ func TestRenderSlide(t *testing.T) {
 		}
 	})
 }
+
+func TestHTMLRenderer_I18n(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name       string
+		deckLang   string
+		renderLang string
+		wantHTML   string
+		wantLocale string
+		wantPen    string
+	}{
+		{
+			name:       "render with lang en",
+			renderLang: "en",
+			wantHTML:   `<html lang="en">`,
+			wantLocale: `"locale": "en"`,
+			wantPen:    `"ui.toolbar.pen":"Pen"`,
+		},
+		{
+			name:       "render with lang ko",
+			renderLang: "ko",
+			wantHTML:   `<html lang="ko">`,
+			wantLocale: `"locale": "ko"`,
+			wantPen:    `"ui.toolbar.pen":"펜"`,
+		},
+		{
+			name:       "render with frontmatter lang fallback",
+			deckLang:   "ko",
+			renderLang: "",
+			wantHTML:   `<html lang="ko">`,
+			wantLocale: `"locale": "ko"`,
+			wantPen:    `"ui.toolbar.pen":"펜"`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			deck := sampleDeck()
+			deck.GlobalAttrs.Lang = tt.deckLang
+
+			var opts []htmlrenderer.Option
+			if tt.renderLang != "" {
+				opts = append(opts, htmlrenderer.WithLang(tt.renderLang))
+			}
+			r := htmlrenderer.NewRenderer(opts...)
+
+			var buf bytes.Buffer
+			if err := r.Render(ctx, deck, &buf); err != nil {
+				t.Fatalf("unexpected render error: %v", err)
+			}
+
+			out := buf.String()
+			assertContains(t, out, tt.wantHTML, "html lang tag")
+			assertContains(t, out, tt.wantLocale, "locale in i18n data")
+			assertContains(t, out, tt.wantPen, "pen translation")
+		})
+	}
+}
+
+func assertContains(t *testing.T, s, substr, label string) {
+	t.Helper()
+	if !strings.Contains(s, substr) {
+		t.Errorf("expected %s (%q) in output", label, substr)
+	}
+}

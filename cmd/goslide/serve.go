@@ -66,6 +66,7 @@ func runServe(cmd *cobra.Command, args []string) error {
 		MarkdownPath: absFile,
 		Theme:        serveThemeFlag,
 		ThemePath:    serveThemePathFlag,
+		Lang:         langFlag,
 		OpenBrowser:  serveOpenFlag,
 		Debounce:     serveDebounceFlag,
 	}

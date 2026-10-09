@@ -85,3 +85,20 @@ func TestGlobalI18nHelpers(t *testing.T) {
 		t.Errorf("global T() for ko = %q; want %q", got, "경과 시간")
 	}
 }
+
+func TestGetCatalog(t *testing.T) {
+	koCat := i18n.GetCatalog("ko")
+	if koCat["ui.toolbar.pen"] != "펜" {
+		t.Errorf("ko catalog ui.toolbar.pen = %q; want %q", koCat["ui.toolbar.pen"], "펜")
+	}
+
+	enCat := i18n.GetCatalog("en")
+	if enCat["ui.toolbar.pen"] != "Pen" {
+		t.Errorf("en catalog ui.toolbar.pen = %q; want %q", enCat["ui.toolbar.pen"], "Pen")
+	}
+
+	koJSON := i18n.GetCatalogJSON("ko")
+	if len(koJSON) < 10 {
+		t.Errorf("ko JSON string too short: %q", koJSON)
+	}
+}

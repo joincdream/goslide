@@ -12,6 +12,7 @@ type frontmatterData struct {
 	Title     string `yaml:"title"`
 	Author    string `yaml:"author"`
 	Theme     string `yaml:"theme"`
+	Lang      string `yaml:"lang"`
 	Layout    string `yaml:"layout"`
 	Size      string `yaml:"size"`
 	Paginate  *bool  `yaml:"paginate"`
@@ -90,6 +91,7 @@ func extractFrontmatter(content string) (*FrontmatterResult, error) {
 		Author: data.Author,
 		GlobalAttrs: model.GlobalDirectives{
 			Theme:    resolveTheme(data.Theme),
+			Lang:     strings.TrimSpace(data.Lang),
 			Layout:   resolveLayout(data.Layout),
 			Size:     resolveSize(data.Size),
 			Paginate: data.Paginate != nil && *data.Paginate,

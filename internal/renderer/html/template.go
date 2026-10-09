@@ -7,6 +7,8 @@ import (
 type documentTemplateData struct {
 	Title       string
 	Theme       string
+	Lang        string
+	I18nJSON    template.JS
 	ComposedCSS template.CSS
 	CoreJS      template.JS
 	Slides      []slideTemplateData
@@ -34,7 +36,7 @@ type slideTemplateData struct {
 }
 
 const masterHTMLTemplate = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="{{ if .Lang }}{{ .Lang }}{{ else }}en{{ end }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -134,6 +136,14 @@ const masterHTMLTemplate = `<!DOCTYPE html>
         window.addEventListener('load', renderMath);
       }
     });
+  </script>
+
+  <!-- Goslide i18n Data Injection -->
+  <script id="goslide-i18n-data">
+    window.__GOSLIDE_I18N__ = {
+      "locale": "{{ if .Lang }}{{ .Lang }}{{ else }}en{{ end }}",
+      "messages": {{ if .I18nJSON }}{{ .I18nJSON }}{{ else }}{}{{ end }}
+    };
   </script>
 
   <!-- Svelte 5 Application Mount Point -->

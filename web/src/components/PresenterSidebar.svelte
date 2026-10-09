@@ -1,10 +1,11 @@
 <script>
   import { deck } from '../stores/deck.svelte.js';
+  import { t, getLocale } from '../stores/i18n.svelte.js';
 
   export function openPopout() {
     const popoutWin = window.open('', 'goslide-presenter-' + window.location.pathname, 'width=1100,height=750');
     if (!popoutWin) {
-      alert('팝업 차단을 해제해주세요.');
+      alert(t('ui.presenter.popup_blocked', '팝업 차단을 해제해주세요.'));
       return;
     }
 
@@ -14,10 +15,10 @@
     const channelName = 'goslide-sync-' + window.location.pathname;
 
     const presenterHTML = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="${getLocale()}">
 <head>
   <meta charset="utf-8">
-  <title>Goslide Presenter Console</title>
+  <title>${t('ui.presenter.title', 'Goslide Presenter Console')}</title>
   <style id="goslide-theme-styles">
 ${themeStylesCSS}
   </style>
@@ -89,7 +90,7 @@ ${themeStylesCSS}
       word-break: keep-all;
       letter-spacing: 0.01em;
     }
-    .notes-box:empty::before { content: "작성된 발표자 메모가 없습니다."; color: #64748b; font-style: italic; }
+    .notes-box:empty::before { content: "${t('ui.presenter.no_notes', '작성된 발표자 메모가 없습니다.')}"; color: #64748b; font-style: italic; }
 
     footer { background: #1e293b; border-top: 1px solid #334155; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 12px; }
     .btn { background: #334155; color: #fff; border: 1px solid #475569; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
@@ -108,21 +109,21 @@ ${themeStylesCSS}
 </head>
 <body>
   <header>
-    <div style="font-weight:700;color:#38bdf8;">🖥️ Goslide Presenter Console</div>
+    <div style="font-weight:700;color:#38bdf8;">🖥️ ${t('ui.presenter.title', 'Goslide 발표자 콘솔')}</div>
     <div class="timer-box" id="p-timer">00:00:00</div>
   </header>
   <main>
     <div class="slides-col">
       <div class="card cur-slide-card">
         <div class="card-hdr">
-          <span style="display:flex;align-items:center;"><span class="live-indicator"></span>현재 슬라이드 (Live)</span>
+          <span style="display:flex;align-items:center;"><span class="live-indicator"></span>${t('ui.presenter.live_slide', '현재 슬라이드 (Live)')}</span>
           <span id="p-cur-num" style="color:#38bdf8;">Slide 1</span>
         </div>
         <div class="frame-box" id="p-cur-frame"></div>
       </div>
       <div class="card next-slide-card">
         <div class="card-hdr">
-          <span>다음 슬라이드 (Next)</span>
+          <span>${t('ui.presenter.next_slide', '다음 슬라이드 (Next)')}</span>
           <span id="p-next-num">Slide 2</span>
         </div>
         <div class="frame-box" id="p-next-frame"></div>
@@ -130,11 +131,11 @@ ${themeStylesCSS}
     </div>
     <div class="card notes-card">
       <div class="card-hdr">
-        <span style="font-weight:700;color:#f8fafc;">📝 발표자 대본 / 메모 (Notes)</span>
+        <span style="font-weight:700;color:#f8fafc;">📝 ${t('ui.presenter.notes', '발표자 대본 / 메모 (Notes)')}</span>
         <div class="font-controls">
-          <button class="font-btn" id="p-font-dec" title="글자 축소">A-</button>
+          <button class="font-btn" id="p-font-dec" title="${t('ui.presenter.font_dec', '글자 축소')}">A-</button>
           <span class="font-val" id="p-font-val">18px</span>
-          <button class="font-btn" id="p-font-inc" title="글자 확대">A+</button>
+          <button class="font-btn" id="p-font-inc" title="${t('ui.presenter.font_inc', '글자 확대')}">A+</button>
         </div>
       </div>
       <div class="notes-box" id="p-notes"></div>
@@ -146,32 +147,32 @@ ${themeStylesCSS}
     <!-- Presentation Toolbar in Pop-out Window -->
     <div class="pop-toolbar">
       <div style="display:flex;gap:4px;">
-        <button class="tool-btn" id="p-tool-pen" title="펜 판서 토글 (D)">🖊️ 펜</button>
-        <button class="tool-btn" id="p-tool-laser" title="레이저 포인터 토글 (L)">🔴 포인터</button>
-        <button class="tool-btn" id="p-tool-clear" title="판서 지우기 (C)">🗑️ 지우기</button>
+        <button class="tool-btn" id="p-tool-pen" title="${t('ui.toolbar.pen_tip', '펜 판서 토글 (D)')}">🖊️ ${t('ui.toolbar.pen', '펜')}</button>
+        <button class="tool-btn" id="p-tool-laser" title="${t('ui.toolbar.pointer_tip', '레이저 포인터 토글 (L)')}">🔴 ${t('ui.toolbar.pointer', '포인터')}</button>
+        <button class="tool-btn" id="p-tool-clear" title="${t('ui.toolbar.clear_tip', '판서 지우기 (C)')}">🗑️ ${t('ui.toolbar.clear', '지우기')}</button>
       </div>
 
       <div style="width:1px;height:18px;background:#334155;"></div>
 
       <div style="display:flex;gap:6px;" id="p-colors">
-        <button class="color-btn active" data-color="#ef4444" style="background:#ef4444;" title="레드 (1)"></button>
-        <button class="color-btn" data-color="#3b82f6" style="background:#3b82f6;" title="블루 (2)"></button>
-        <button class="color-btn" data-color="#22c55e" style="background:#22c55e;" title="그린 (3)"></button>
-        <button class="color-btn" data-color="#eab308" style="background:#eab308;" title="옐로 (4)"></button>
+        <button class="color-btn active" data-color="#ef4444" style="background:#ef4444;" title="${t('ui.toolbar.color_red', '레드')} (1)"></button>
+        <button class="color-btn" data-color="#3b82f6" style="background:#3b82f6;" title="${t('ui.toolbar.color_blue', '블루')} (2)"></button>
+        <button class="color-btn" data-color="#22c55e" style="background:#22c55e;" title="${t('ui.toolbar.color_green', '그린')} (3)"></button>
+        <button class="color-btn" data-color="#eab308" style="background:#eab308;" title="${t('ui.toolbar.color_yellow', '옐로')} (4)"></button>
       </div>
 
       <div style="width:1px;height:18px;background:#334155;"></div>
 
       <div style="display:flex;gap:4px;" id="p-widths">
-        <button class="width-btn" data-width="thin" title="얇게 (-)">얇게</button>
-        <button class="width-btn active" data-width="medium" title="보통">보통</button>
-        <button class="width-btn" data-width="thick" title="굵게 (+)">굵게</button>
+        <button class="width-btn" data-width="thin" title="${t('ui.toolbar.width_thin_tip', '얇게 (-)')}">${t('ui.toolbar.width_thin', '얇게')}</button>
+        <button class="width-btn active" data-width="medium" title="${t('ui.toolbar.width_medium_tip', '보통')}">${t('ui.toolbar.width_medium', '보통')}</button>
+        <button class="width-btn" data-width="thick" title="${t('ui.toolbar.width_thick_tip', '굵게 (+)')}">${t('ui.toolbar.width_thick', '굵게')}</button>
       </div>
     </div>
 
     <div>
-      <button class="btn" id="p-prev">이전 (←)</button>
-      <button class="btn" id="p-next">다음 (→)</button>
+      <button class="btn" id="p-prev">${t('ui.presenter.prev_arrow', '이전 (←)')}</button>
+      <button class="btn" id="p-next">${t('ui.presenter.next_arrow', '다음 (→)')}</button>
     </div>
   </footer>
   <script>
@@ -340,8 +341,8 @@ ${themeStylesCSS}
         document.getElementById('p-next-num').textContent = 'Slide ' + (curIdx + 2);
         document.getElementById('p-next-frame').innerHTML = sData[curIdx + 1].html;
       } else {
-        document.getElementById('p-next-num').textContent = '마지막 장';
-        document.getElementById('p-next-frame').innerHTML = '<div style="color:#64748b;font-size:1.1rem;display:flex;height:100%;align-items:center;justify-content:center;">다음 슬라이드가 없습니다.</div>';
+        document.getElementById('p-next-num').textContent = '${t('ui.presenter.last_slide', '마지막 장')}';
+        document.getElementById('p-next-frame').innerHTML = '<div style="color:#64748b;font-size:1.1rem;display:flex;height:100%;align-items:center;justify-content:center;">${t('ui.presenter.no_next_slide', '다음 슬라이드가 없습니다.')}</div>';
       }
       requestAnimationFrame(scaleFrames);
     }
@@ -398,14 +399,14 @@ ${themeStylesCSS}
       <button
         onclick={openPopout}
         class="bg-slate-700 hover:bg-sky-600 text-slate-100 p-1.5 rounded-md transition-colors flex items-center justify-center"
-        title="새 창으로 분리 (P)"
+        title={t('ui.presenter.popout_tip', '새 창으로 분리 (P)')}
       >
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
       </button>
       <button
         onclick={() => deck.toggleSidebar(false)}
         class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs px-2 py-1.5 rounded-md font-bold transition-colors"
-        title="사이드바 닫기 (N)"
+        title={t('ui.presenter.close_sidebar_tip', '사이드바 닫기 (N)')}
       >
         ✕
       </button>
@@ -417,16 +418,16 @@ ${themeStylesCSS}
     <button
       onclick={() => deck.setScreencastMode('fit')}
       class="flex-1 py-1.5 px-3 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1.5 {!deck.isLock1080p ? 'bg-slate-700 text-sky-400 shadow-md' : 'text-slate-400 hover:text-slate-200'}"
-      title="가용 화면에 맞게 자동 리사이즈"
+      title={t('ui.presenter.mode_fit_tip', '가용 화면에 맞게 자동 리사이즈')}
     >
-      ↔ 화면 맞춤
+      ↔ {t('ui.presenter.mode_fit', '화면 맞춤')}
     </button>
     <button
       onclick={() => deck.setScreencastMode('1080p')}
       class="flex-1 py-1.5 px-3 text-xs font-bold rounded-md transition-all flex items-center justify-center gap-1.5 {deck.isLock1080p ? 'bg-slate-700 text-sky-400 shadow-md' : 'text-slate-400 hover:text-slate-200'}"
-      title="1920×1080 고정 (스크린캐스트 녹화용)"
+      title={t('ui.presenter.mode_1080p_tip', '1920×1080 고정 (스크린캐스트 녹화용)')}
     >
-      🔒 1080p 고정
+      🔒 {t('ui.presenter.mode_1080p', '1080p 고정')}
     </button>
   </div>
 
@@ -441,14 +442,14 @@ ${themeStylesCSS}
         onclick={() => deck.toggleTimer()}
         class="flex-1 max-w-[130px] bg-slate-700 hover:bg-sky-400 hover:text-slate-950 text-slate-100 font-bold py-1.5 text-xs rounded transition-colors text-center"
       >
-        {deck.isTimerRunning ? '일시정지' : (deck.timerSeconds > 0 ? '재개' : '시작')}
+        {deck.isTimerRunning ? t('ui.presenter.timer_pause', '일시정지') : (deck.timerSeconds > 0 ? t('ui.presenter.timer_resume', '재개') : t('ui.presenter.timer_start', '시작'))}
       </button>
       <button
         type="button"
         onclick={() => deck.resetTimer()}
         class="flex-1 max-w-[90px] bg-slate-700 hover:bg-rose-500 hover:text-white text-slate-300 font-bold py-1.5 text-xs rounded transition-colors text-center"
       >
-        리셋
+        {t('ui.presenter.timer_reset', '리셋')}
       </button>
     </div>
   </div>
@@ -467,7 +468,7 @@ ${themeStylesCSS}
           {@html deck.getNextSlideHTML()}
         </div>
       {:else}
-        <div class="text-slate-500 text-sm font-medium">다음 슬라이드가 없습니다.</div>
+        <div class="text-slate-500 text-sm font-medium">{t('ui.presenter.no_next_slide', '다음 슬라이드가 없습니다.')}</div>
       {/if}
     </div>
   </div>
@@ -482,7 +483,7 @@ ${themeStylesCSS}
         <button
           onclick={() => deck.decreaseNotesFontSize()}
           class="px-1.5 py-0.5 text-xs font-mono font-bold text-slate-300 hover:text-white"
-          title="메모 글자 축소"
+          title={t('ui.presenter.font_dec', '메모 글자 축소')}
         >
           A-
         </button>
@@ -490,7 +491,7 @@ ${themeStylesCSS}
         <button
           onclick={() => deck.increaseNotesFontSize()}
           class="px-1.5 py-0.5 text-xs font-mono font-bold text-slate-300 hover:text-white"
-          title="메모 글자 확대"
+          title={t('ui.presenter.font_inc', '메모 글자 확대')}
         >
           A+
         </button>
@@ -503,7 +504,7 @@ ${themeStylesCSS}
       {#if deck.getCurrentNotes()}
         {deck.getCurrentNotes()}
       {:else}
-        <span class="text-slate-500 italic">작성된 발표자 메모가 없습니다.</span>
+        <span class="text-slate-500 italic">{t('ui.presenter.no_notes', '작성된 발표자 메모가 없습니다.')}</span>
       {/if}
     </div>
   </div>
@@ -517,7 +518,7 @@ ${themeStylesCSS}
         </span>
         {#if deck.totalFragments > 0}
           <span class="text-[11px] bg-sky-950 text-sky-400 border border-sky-800/60 px-1.5 py-0.5 rounded font-mono font-semibold">
-            Step {deck.currentFragmentIndex}/{deck.totalFragments}
+            {t('ui.presenter.step_indicator', 'Step %d/%d', deck.currentFragmentIndex, deck.totalFragments)}
           </span>
         {/if}
       </div>
@@ -526,17 +527,17 @@ ${themeStylesCSS}
           onclick={() => deck.prevStep()}
           disabled={deck.currentIndex === 0 && deck.currentFragmentIndex === 0}
           class="bg-slate-700 hover:bg-slate-600 disabled:opacity-40 disabled:hover:bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded font-semibold transition-colors"
-          title="이전 단계 / 슬라이드 (PageUp / ←)"
+          title={t('ui.presenter.prev_tip', '이전 단계 / 슬라이드 (PageUp / ←)')}
         >
-          ← 이전
+          ← {t('ui.presenter.prev', '이전')}
         </button>
         <button
           onclick={() => deck.nextStep()}
           disabled={deck.currentIndex >= deck.totalSlides - 1 && deck.currentFragmentIndex >= deck.totalFragments}
           class="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:hover:bg-sky-600 text-white text-xs px-2.5 py-1 rounded font-semibold transition-colors"
-          title="다음 단계 / 슬라이드 (PageDown / → / Space)"
+          title={t('ui.presenter.next_tip', '다음 단계 / 슬라이드 (PageDown / → / Space)')}
         >
-          다음 →
+          {t('ui.presenter.next', '다음')} →
         </button>
       </div>
     </div>

@@ -216,6 +216,7 @@ type Config struct {
 	MarkdownPath string
 	Theme        string
 	ThemePath    string
+	Lang         string
 	OpenBrowser  bool
 	Debounce     time.Duration
 }
@@ -276,6 +277,9 @@ func NewServer(cfg Config) (*Server, error) {
 	}
 	if cfg.ThemePath != "" {
 		opts = append(opts, htmlrenderer.WithCustomCSS(cfg.ThemePath))
+	}
+	if cfg.Lang != "" {
+		opts = append(opts, htmlrenderer.WithLang(cfg.Lang))
 	}
 	opts = append(opts, htmlrenderer.WithBaseDir(baseDir))
 

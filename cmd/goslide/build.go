@@ -157,6 +157,7 @@ func renderAndWriteHTML(cmd *cobra.Command, deck *model.Deck, inputPath, outputP
 	renderer := htmlrenderer.NewRenderer(
 		htmlrenderer.WithTheme(chosenTheme),
 		htmlrenderer.WithCustomCSS(themePathFlag),
+		htmlrenderer.WithLang(langFlag),
 		htmlrenderer.WithStandalone(standaloneFlag),
 		htmlrenderer.WithBaseDir(baseDir),
 	)

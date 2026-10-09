@@ -10,12 +10,20 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/yundream/goslide/internal/i18n"
 	"github.com/yundream/goslide/internal/model"
 	"github.com/yundream/goslide/internal/theme"
 )
 
 // Option configures an HTMLRenderer.
 type Option func(*HTMLRenderer)
+
+// WithLang sets the language for slide HTML and presentation UI.
+func WithLang(lang string) Option {
+	return func(r *HTMLRenderer) {
+		r.lang = lang
+	}
+}
 
 // WithTheme sets the theme name to use (overrides frontmatter theme).
 func WithTheme(name string) Option {
@@ -64,6 +72,7 @@ type HTMLRenderer struct {
 	themeMgr   *theme.Manager
 	themeName  string
 	themePath  string
+	lang       string
 	standalone bool
 	baseDir    string
 	bundler    *AssetBundler
@@ -129,9 +138,14 @@ func (r *HTMLRenderer) Render(ctx context.Context, deck *model.Deck, w io.Writer
 		title = "Goslide Presentation"
 	}
 
+	lang := r.resolveLang(deck)
+	i18nJSON := i18n.GetCatalogJSON(lang)
+
 	data := documentTemplateData{
 		Title:       title,
 		Theme:       chosenTheme,
+		Lang:        lang,
+		I18nJSON:    template.JS(i18nJSON),     // nolint:gosec
 		ComposedCSS: template.CSS(composedCSS), // nolint:gosec
 		CoreJS:      template.JS(coreJS),       // nolint:gosec
 		Slides:      slideViews,
@@ -182,6 +196,16 @@ func (r *HTMLRenderer) resolveTheme(deck *model.Deck) string {
 		return deck.GlobalAttrs.Theme
 	}
 	return theme.DefaultTheme
+}
+
+func (r *HTMLRenderer) resolveLang(deck *model.Deck) string {
+	if r.lang != "" && r.lang != "auto" {
+		return r.lang
+	}
+	if deck != nil && deck.GlobalAttrs.Lang != "" {
+		return deck.GlobalAttrs.Lang
+	}
+	return i18n.DetectLocale()
 }
 
 func (r *HTMLRenderer) bundleSlide(s *model.Slide) (string, string, string, error) {

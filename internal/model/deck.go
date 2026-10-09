@@ -36,6 +36,7 @@ type Deck struct {
 // GlobalDirectives holds deck-level global attributes defined in Frontmatter.
 type GlobalDirectives struct {
 	Theme    string     `json:"theme" yaml:"theme"`
+	Lang     string     `json:"lang,omitempty" yaml:"lang"`
 	Layout   LayoutType `json:"layout" yaml:"layout"`
 	Size     SizeRatio  `json:"size" yaml:"size"`
 	Paginate bool       `json:"paginate" yaml:"paginate"`

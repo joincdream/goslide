@@ -154,3 +154,59 @@ func SetLocale(lang string) {
 		b.SetLocale(lang)
 	}
 }
+
+// GetCatalog returns a copy of message catalog for the given language, falling back to English.
+func (b *Bundle) GetCatalog(lang string) map[string]string {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+
+	lang = strings.ToLower(strings.TrimSpace(lang))
+	if lang == "auto" || lang == "" {
+		lang = DetectLocale()
+	}
+
+	result := make(map[string]string)
+	// Base with English
+	if enCatalog, ok := b.messages["en"]; ok {
+		for k, v := range enCatalog {
+			result[k] = v
+		}
+	}
+	// Overlay with target lang if different
+	if lang != "en" {
+		if targetCatalog, ok := b.messages[lang]; ok {
+			for k, v := range targetCatalog {
+				result[k] = v
+			}
+		}
+	}
+	return result
+}
+
+// GetCatalogJSON returns the JSON serialized catalog for the given language.
+func (b *Bundle) GetCatalogJSON(lang string) string {
+	cat := b.GetCatalog(lang)
+	bytes, err := json.Marshal(cat)
+	if err != nil {
+		return "{}"
+	}
+	return string(bytes)
+}
+
+// GetCatalog returns a copy of message catalog using the default bundle.
+func GetCatalog(lang string) map[string]string {
+	b, err := GetDefaultBundle()
+	if err != nil {
+		return make(map[string]string)
+	}
+	return b.GetCatalog(lang)
+}
+
+// GetCatalogJSON returns the JSON serialized catalog using the default bundle.
+func GetCatalogJSON(lang string) string {
+	b, err := GetDefaultBundle()
+	if err != nil {
+		return "{}"
+	}
+	return b.GetCatalogJSON(lang)
+}

@@ -1,5 +1,6 @@
 <script>
   import { deck } from '../stores/deck.svelte.js';
+  import { t } from '../stores/i18n.svelte.js';
 
   function handleSelect(index) {
     deck.goToSlide(index);
@@ -43,17 +44,17 @@
     >
       <div class="flex items-center gap-2">
         <span class="text-xl">🗂️</span>
-        <span class="font-bold text-slate-100 text-lg">슬라이드 개요 (Overview)</span>
+        <span class="font-bold text-slate-100 text-lg">{t('ui.overview.title', '슬라이드 개요 (Overview)')}</span>
         <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono font-medium">
-          {deck.totalSlides} Slides
+          {t('ui.overview.slides_count', '%d Slides', deck.totalSlides)}
         </span>
       </div>
       <div class="flex items-center gap-3 text-xs text-slate-400">
-        <span>단축키 <kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded font-mono border border-slate-700">ESC</kbd> 또는 <kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded font-mono border border-slate-700">O</kbd> 발표 복귀</span>
+        <span>{t('ui.overview.back_hint', '단축키 ESC 또는 O 발표 복귀')}</span>
         <button
           onclick={() => deck.toggleOverview(false)}
           class="p-1 hover:bg-slate-800 hover:text-white rounded-md transition-colors font-bold text-sm"
-          title="닫기 (ESC)"
+          title={t('ui.overview.close', '닫기 (ESC)')}
         >
           ✕
         </button>
