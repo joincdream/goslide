@@ -1,6 +1,6 @@
 <div align="center">
 
-# Goslide 📽️
+# Goslide
 
 **A blazing-fast, single-binary Markdown presentation deck builder written in Pure Go.**
 
@@ -13,29 +13,54 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 
 ---
 
-## ✨ Features
+## Features
 
-- **🚀 Single Binary & Pure Go**: Zero CGO runtime dependencies. Cross-platform executable (`Linux`, `macOS`, `Windows`) with embedded themes via `embed.FS`.
-- **🎨 Multi-Format Export**:
+- **Single Binary & Pure Go**: Zero CGO runtime dependencies. Cross-platform executable (`Linux`, `macOS`, `Windows`) with embedded themes via `embed.FS`.
+- **Multi-Format Export**:
   - **Interactive HTML**: Self-contained, responsive web slides with offline support.
   - **Vector PDF**: Crisp, print-ready 16:9 borderless vector PDF powered by headless Chrome.
   - **High-Fidelity PPTX**: Pixel-perfect PowerPoint conversion preserving presenter speaker notes.
-- **🖍️ Screencast & Live Annotation**: Built-in lightweight transparent canvas overlay designed for YouTube tutorial recording (`D` to toggle pen, `C` to clear).
-- **🎯 Deterministic & Explicit Layouts**: Predictable layout rendering with explicit directives (`cover`, `two-cols`, `section`, `blank`, `default`). Zero guesswork or accidental layout shifts.
-- **⚡ Real-Time Live Preview**: Ultra-light local dev server (`goslide serve`) using standard Server-Sent Events (SSE) hot reload, keeping your current slide position.
-- **🖥️ Dual-Screen Presenter Console**: Synchronized dual-window presenter view (`P`), digital laser pointer (`L`), and spotlight focus (`S`).
-- **💻 Rich Content Ready**: Native syntax highlighting via Chroma, KaTeX math formulas (`$...$`, `$$...$$`), and GitHub Flavored Markdown (GFM) tables.
+- **Real-Time Live Preview**: Ultra-light local dev server (`goslide serve`) using standard Server-Sent Events (SSE) hot reload, keeping your current slide position.
+- **Dual-Screen Presenter Console**: Synchronized dual-window presenter view (`P`), digital laser pointer (`L`), and spotlight focus (`S`).
+- **Screencast & Live Annotation**: Built-in lightweight transparent canvas overlay designed for YouTube tutorial recording (`D` to toggle pen, `C` to clear).
+- **Rich Content Ready**: Native syntax highlighting via Chroma, KaTeX math formulas (`$...$`, `$$...$$`), and GitHub Flavored Markdown (GFM) tables.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-> 💡 For a complete step-by-step walkthrough, see the **[3-Minute Quickstart Guide](QUICKSTART.md)**.
+> Note: For a complete step-by-step walkthrough, see the **[3-Minute Quickstart Guide](QUICKSTART.md)**.
 
 ### 1. Installation
 
 #### Download Binary (Recommended)
-Download the pre-compiled archive for your OS (Linux, macOS, Windows) from [GitHub Releases](https://github.com/joincdream/goslide/releases) and extract the binary.
+Goslide is distributed as a single static binary with zero CGO runtime dependencies. Download the appropriate pre-compiled archive for your OS and CPU architecture from [GitHub Releases](https://github.com/joincdream/goslide/releases):
+
+| Operating System | CPU Architecture / Target Device | Recommended Artifact |
+| :--- | :--- | :--- |
+| **macOS** | **Apple Silicon (M1 / M2 / M3 / M4)** | `goslide_darwin_arm64.tar.gz` |
+| **macOS** | Intel Processor | `goslide_darwin_amd64.tar.gz` |
+| **Linux** | 64-bit Intel / AMD (x86_64) | `goslide_linux_amd64.tar.gz` |
+| **Linux** | 64-bit ARM (aarch64 / Raspberry Pi 4, 5) | `goslide_linux_arm64.tar.gz` |
+| **Windows** | 64-bit Intel / AMD (x64) | `goslide_windows_amd64.zip` |
+| **Windows** | 64-bit ARM (Snapdragon X Elite, etc.) | `goslide_windows_arm64.zip` |
+
+**Linux & macOS One-Liner Setup:**
+```bash
+# Extract and install into user PATH
+tar -xzf goslide_linux_amd64.tar.gz    # macOS: goslide_darwin_arm64.tar.gz, etc.
+chmod +x goslide
+mkdir -p ~/.local/bin && cp goslide ~/.local/bin/
+
+# Verify installation
+goslide --help
+```
+
+> Note (macOS): If blocked by macOS Gatekeeper ("unidentified developer"), run:  
+> `xattr -d com.apple.quarantine goslide`
+
+**Windows Setup:**
+- Extract the downloaded `.zip` file, move `goslide.exe` to your preferred folder, and add it to your system's `Path` environment variable.
 
 #### Install via Go (Go 1.22+)
 ```bash
@@ -81,7 +106,8 @@ Leverage AI agents (ChatGPT, Claude, Cursor) to generate slide decks or design c
 goslide prompt
 ```
 Paste the output into ChatGPT or Claude with your topic (e.g. *"Create an 8-slide presentation on cloud-native microservices architecture"*). The AI will generate production-ready Goslide Markdown DSL instantly.  
-👉 [Official Goslide Markdown DSL Specification (docs/dsl-guide.md)](docs/dsl-guide.md)
+
+> Note: For full syntax and directives, see the [Official Goslide Markdown DSL Specification](docs/dsl-guide.md).
 
 #### 2) Custom Theme CSS Generation
 ```bash
@@ -89,11 +115,12 @@ Paste the output into ChatGPT or Claude with your topic (e.g. *"Create an 8-slid
 goslide prompt theme
 ```
 Paste the output into your AI tool with your branding requirements (e.g. *"Modern corporate theme with navy blue accent, Inter typography, and light gray cards"*). The AI will craft a self-contained CSS stylesheet tailored for 1920×1080 fixed viewports.  
-👉 [Official Goslide Theme CSS Architecture Specification (docs/theme-guide.md)](docs/theme-guide.md)
+
+> Note: For full theme architecture guidelines, see the [Official Goslide Theme CSS Architecture Specification](docs/theme-guide.md).
 
 ---
 
-## ⌨️ Keyboard Shortcuts (Presentation & Screencast)
+## Keyboard Shortcuts (Presentation & Screencast)
 
 | Key | Description | Context |
 | :---: | :--- | :--- |
@@ -114,7 +141,7 @@ Paste the output into your AI tool with your branding requirements (e.g. *"Moder
 
 ---
 
-## 📐 Directives & Layout Usage
+## Directives & Layout Usage
 
 ### Frontmatter (Global Directives)
 
@@ -146,7 +173,7 @@ Control per-slide layout and styling using HTML comments:
 
 ---
 
-## 🎨 Theme Management & Custom Themes
+## Theme Management & Custom Themes
 
 Goslide is 100% CSS-driven, allowing you to craft custom branded themes with complete layout control.
 
@@ -179,11 +206,11 @@ theme: my-company      # Automatically discovers themes/my-company.css
 | `.slide-card.layout-cover` | Cover title layout override | Centered H1 |
 | `.slide-card.layout-two-cols` | 2-column grid layout | `.col-left`, `.col-right` |
 
-👉 For full 4-tier DOM architecture and strict layout guidelines, see the **[Goslide Theme CSS Specification (docs/theme-guide.md)](docs/theme-guide.md)**.
+> Note: For full 4-tier DOM architecture and strict layout guidelines, see the **[Goslide Theme CSS Specification](docs/theme-guide.md)**.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 Goslide strictly adheres to a unidirectional, decoupled pipeline architecture:
 
@@ -210,7 +237,7 @@ Detailed specifications:
 
 ---
 
-## 🛠️ Development & Contributing
+## Development & Contributing
 
 ```bash
 # Run all quality checks (formatting, linter, complexity, race tests)
@@ -228,17 +255,17 @@ make bench
 
 ---
 
-## 👤 Author & Contact
+## Author & Contact
 
 **yundream (Joinc)**
 
-- 🌐 **Website**: [https://www.joinc.co.kr](https://www.joinc.co.kr)
-- 💼 **LinkedIn**: [linkedin.com/in/yundream](https://www.linkedin.com/in/yundream/)
-- ✉️ **Email**: [yundream@gmail.com](mailto:yundream@gmail.com)
-- 🐙 **GitHub**: [@joincdream](https://github.com/joincdream)
+- **Website**: [https://www.joinc.co.kr](https://www.joinc.co.kr)
+- **LinkedIn**: [linkedin.com/in/yundream](https://www.linkedin.com/in/yundream/)
+- **Email**: [yundream@gmail.com](mailto:yundream@gmail.com)
+- **GitHub**: [@joincdream](https://github.com/joincdream)
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [Apache 2.0 License](LICENSE).

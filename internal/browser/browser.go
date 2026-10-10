@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/yundream/goslide/internal/model"
 )
@@ -80,7 +81,62 @@ func FindChrome(customPath string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("%w: could not locate Google Chrome or Chromium in PATH or default locations. Please install Chrome or set GOSLIDE_CHROME_BIN", model.ErrChromeNotFound)
+	guide := FormatChromeInstallGuide(detectSystemLocale())
+	return "", fmt.Errorf("%w: %s", model.ErrChromeNotFound, guide)
+}
+
+// FormatChromeInstallGuide returns platform-specific, copy-pasteable installation instructions.
+func FormatChromeInstallGuide(lang string) string {
+	isKorean := strings.HasPrefix(strings.ToLower(lang), "ko")
+
+	if isKorean {
+		var installCmd string
+		switch runtime.GOOS {
+		case "darwin":
+			installCmd = "  • macOS: brew install --cask google-chrome"
+		case "windows":
+			installCmd = "  • Windows: Google Chrome을 설치하거나 Microsoft Edge(msedge.exe) 경로를 확인하세요."
+		default: // linux / others
+			installCmd = "  • Ubuntu / Debian: sudo apt update && sudo apt install -y chromium-browser\n" +
+				"  • Fedora / RHEL:   sudo dnf install -y chromium\n" +
+				"  • Arch Linux:      sudo pacman -S chromium"
+		}
+
+		return fmt.Sprintf("PDF 및 PPTX 생성을 위해 Google Chrome 또는 Chromium 브라우저가 필요합니다.\n\n"+
+			"설치 방법:\n%s\n\n"+
+			"임의 경로 지정:\n"+
+			"  환경 변수 GOSLIDE_CHROME_BIN=<경로> 또는 --chrome-path 플래그를 설정하세요.", installCmd)
+	}
+
+	var installCmd string
+	switch runtime.GOOS {
+	case "darwin":
+		installCmd = "  • macOS: brew install --cask google-chrome"
+	case "windows":
+		installCmd = "  • Windows: Install Google Chrome or verify Microsoft Edge (msedge.exe) path."
+	default: // linux / others
+		installCmd = "  • Ubuntu / Debian: sudo apt update && sudo apt install -y chromium-browser\n" +
+			"  • Fedora / RHEL:   sudo dnf install -y chromium\n" +
+			"  • Arch Linux:      sudo pacman -S chromium"
+	}
+
+	return fmt.Sprintf("Google Chrome or Chromium is required for PDF and PPTX export.\n\n"+
+		"Installation:\n%s\n\n"+
+		"Custom Path:\n"+
+		"  Set environment variable GOSLIDE_CHROME_BIN=<path> or use --chrome-path flag.", installCmd)
+}
+
+func detectSystemLocale() string {
+	for _, env := range []string{"LC_ALL", "LC_MESSAGES", "LANG"} {
+		val := strings.ToLower(os.Getenv(env))
+		if strings.HasPrefix(val, "ko") {
+			return "ko"
+		}
+		if strings.HasPrefix(val, "en") {
+			return "en"
+		}
+	}
+	return "en"
 }
 
 func verifyExecutable(path string) (string, error) {

@@ -1,6 +1,6 @@
 <div align="center">
 
-# Goslide 📽️
+# Goslide
 
 **순수 Go(Pure Go)로 구현된 초고속 단일 바이너리 마크다운 슬라이드 데크 빌더**
 
@@ -13,29 +13,54 @@
 
 ---
 
-## ✨ 핵심 기능
+## 핵심 기능
 
-- **🚀 단일 바이너리 & 순수 Go (Pure Go)**: CGO 의존성 0%. `embed.FS`를 통해 테마와 런타임이 바이너리 안에 내장되어 단일 실행 파일 하나로 크로스 플랫폼(`Linux`, `macOS`, `Windows`) 배포 가능.
-- **🎨 다중 포맷 일괄 변환 (Multi-Format Export)**:
+- **단일 바이너리 & 순수 Go (Pure Go)**: CGO 의존성 0%. `embed.FS`를 통해 테마와 런타임이 바이너리 안에 내장되어 단일 실행 파일 하나로 크로스 플랫폼(`Linux`, `macOS`, `Windows`) 배포 가능.
+- **다중 포맷 일괄 변환 (Multi-Format Export)**:
   - **인터랙티브 HTML**: 외부 네트워크 없이 오프라인 구동되는 반응형 웹 슬라이드.
   - **고해상도 벡터 PDF**: Headless Chrome 기반 16:9 무마진 벡터 PDF 완벽 출력.
   - **고화질 PPTX**: HTML 시각 효과를 100% 보존하고 발표자 노트를 유지하는 파워포인트 생성.
-- **🖍️ 유튜브 스크린캐스트 판서 오버레이**: 강의 녹화 중 슬라이드 위 자유 필기를 지원하는 경량 투명 캔버스 내장 (`D` 키로 펜 켜기/끄기, `C` 키로 전체 지우기).
-- **🎯 결정론적 명시적 레이아웃 (Deterministic Layout)**: 어설픈 AI 추측을 배제하고 지시어(`cover`, `two-cols`, `default`)에 따라 100% 예측 가능한 레이아웃 렌더링.
-- **⚡ 실시간 Live Preview 개발 서버**: Go 표준 라이브러리 기반 SSE (Server-Sent Events) 핫 리로드 지원 (`goslide serve`). 편집 중 슬라이드 위치 유지.
-- **🖥️ 듀얼 스크린 발표자 콘솔**: 듀얼 모니터 발표자 전용 뷰(`P` 키), 레이저 포인터(`L` 키), 스포트라이트 집중 모드(`S` 키).
-- **💻 풍부한 기술 콘텐츠 지원**: Chroma 기반 순수 Go 구문 강조, KaTeX 인라인/블록 수식(`$...$`, `$$...$$`), GitHub Flavored Markdown (GFM) 표 완벽 렌더링.
+- **실시간 Live Preview 개발 서버**: Go 표준 라이브러리 기반 SSE (Server-Sent Events) 핫 리로드 지원 (`goslide serve`). 편집 중 슬라이드 위치 유지.
+- **듀얼 스크린 발표자 콘솔**: 듀얼 모니터 발표자 전용 뷰(`P` 키), 레이저 포인터(`L` 키), 스포트라이트 집중 모드(`S` 키).
+- **유튜브 스크린캐스트 판서 오버레이**: 강의 녹화 중 슬라이드 위 자유 필기를 지원하는 경량 투명 캔버스 내장 (`D` 키로 펜 켜기/끄기, `C` 키로 전체 지우기).
+- **풍부한 기술 콘텐츠 지원**: Chroma 기반 순수 Go 구문 강조, KaTeX 인라인/블록 수식(`$...$`, `$$...$$`), GitHub Flavored Markdown (GFM) 표 완벽 렌더링.
 
 ---
 
-## 🚀 빠른 시작 (Quick Start)
+## 빠른 시작 (Quick Start)
 
-> 💡 3분 안에 첫 슬라이드를 완성하는 전체 가이드는 **[3분 퀵스타트 가이드](QUICKSTART.ko.md)**를 참고하세요.
+> 참고: 3분 안에 첫 슬라이드를 완성하는 전체 가이드는 **[3분 퀵스타트 가이드](QUICKSTART.ko.md)**를 참고하세요.
 
 ### 1. 설치 방법
 
 #### 바이너리 다운로드 (권장)
-[GitHub Releases](https://github.com/joincdream/goslide/releases)에서 운영체제(Linux, macOS, Windows)에 맞는 압축 파일을 다운로드하여 압축을 풀면 바로 실행할 수 있습니다.
+Goslide는 CGO 의존성이 전혀 없는 단일 정적 바이너리로 배포됩니다. [GitHub Releases](https://github.com/joincdream/goslide/releases)에서 운영체제와 CPU 아키텍처에 맞는 파일을 다운로드합니다:
+
+| 운영체제 (OS) | CPU 아키텍처 / 대상 기기 | 권장 다운로드 아티팩트 |
+| :--- | :--- | :--- |
+| **macOS** | **Apple Silicon (M1 / M2 / M3 / M4)** | `goslide_darwin_arm64.tar.gz` |
+| **macOS** | Intel 프로세서 | `goslide_darwin_amd64.tar.gz` |
+| **Linux** | 64-bit Intel / AMD (x86_64) | `goslide_linux_amd64.tar.gz` |
+| **Linux** | 64-bit ARM (aarch64 / 라즈베리파이 4, 5) | `goslide_linux_arm64.tar.gz` |
+| **Windows** | 64-bit Intel / AMD (x64) | `goslide_windows_amd64.zip` |
+| **Windows** | 64-bit ARM (Snapdragon X Elite 등) | `goslide_windows_arm64.zip` |
+
+**Linux & macOS 설치 원라이너:**
+```bash
+# 압축 해제 후 사용자 PATH 경로로 이동
+tar -xzf goslide_linux_amd64.tar.gz    # macOS: goslide_darwin_arm64.tar.gz 등
+chmod +x goslide
+mkdir -p ~/.local/bin && cp goslide ~/.local/bin/
+
+# 설치 확인
+goslide --help
+```
+
+> 참고 (macOS): 실행 시 "확인되지 않은 개발자" 보안 경고가 발생하는 경우 다음 명령으로 격리 속성을 해제하세요:  
+> `xattr -d com.apple.quarantine goslide`
+
+**Windows 설치:**
+- `.zip` 압축 해제 후 `goslide.exe`를 원하는 폴더로 이동하고 시스템 환경 변수 `Path`에 해당 경로를 추가합니다.
 
 #### Go 도구로 설치 (Go 1.22+)
 ```bash
@@ -81,7 +106,8 @@ ChatGPT, Claude, Cursor 등의 AI 에이전트에게 슬라이드 작성이나 �
 goslide prompt
 ```
 출력된 프롬프트를 복사하여 AI 도구에 붙여넣고 원하는 발표 주제(예: *"클라우드 네이티브 마이크로서비스 설계 8장 작성해 줘"*)를 입력하면, 완벽한 Goslide 마크다운 코드가 생성됩니다.  
-👉 [공식 Goslide Markdown DSL 규격서 (docs/dsl-guide.md)](docs/dsl-guide.md)
+
+> 참고: 자세한 문법은 [공식 Goslide Markdown DSL 규격서](docs/dsl-guide.md)를 참고하세요.
 
 #### 2) 커스텀 테마 CSS 생성
 ```bash
@@ -89,11 +115,12 @@ goslide prompt
 goslide prompt theme
 ```
 출력된 프롬프트를 AI 도구에 붙여넣고 원하는 브랜드 색상과 스타일을 요청하면, 1920×1080 뷰포트에 완벽히 최적화된 독립형 커스텀 테마 CSS가 생성됩니다.  
-👉 [공식 Goslide 테마 CSS 아키텍처 규격서 (docs/theme-guide.md)](docs/theme-guide.md)
+
+> 참고: 자세한 테마 구조는 [공식 Goslide 테마 CSS 아키텍처 규격서](docs/theme-guide.md)를 참고하세요.
 
 ---
 
-## ⌨️ 단축키 안내 (프레젠테이션 & 스크린캐스트)
+## 단축키 안내 (프레젠테이션 & 스크린캐스트)
 
 | 단축키 | 동작 설명 | 활용 상황 |
 | :---: | :--- | :--- |
@@ -114,7 +141,7 @@ goslide prompt theme
 
 ---
 
-## 📐 지시어 및 레이아웃 사용법
+## 지시어 및 레이아웃 사용법
 
 ### Frontmatter (전역 지시어)
 
@@ -146,7 +173,7 @@ HTML 주석을 사용하여 개별 슬라이드의 레이아웃과 스타일을 
 
 ---
 
-## 🎨 테마 관리 및 커스텀 테마 제작
+## 테마 관리 및 커스텀 테마 제작
 
 Goslide는 100% CSS 기반으로 동작하므로 나만의 브랜드 스타일 테마를 손쉽게 제작하고 적용할 수 있습니다.
 
@@ -179,11 +206,11 @@ theme: my-company      # themes/my-company.css 자동 탐색
 | `.slide-card.layout-cover` | 표지 슬라이드 전용 스타일 | 중앙 정렬 H1 |
 | `.slide-card.layout-two-cols` | 2단 컬럼 분할 그리드 | `.col-left`, `.col-right` |
 
-👉 더 자세한 테마 DOM 아키텍처 및 하드 가이드라인은 **[Goslide 테마 CSS 아키텍처 규격서 (docs/theme-guide.md)](docs/theme-guide.md)**를 참조하세요.
+> 참고: 더 자세한 테마 DOM 아키텍처 및 가이드라인은 **[Goslide 테마 CSS 아키텍처 규격서](docs/theme-guide.md)**를 참조하세요.
 
 ---
 
-## 🏗️ 시스템 아키텍처
+## 시스템 아키텍처
 
 Goslide는 결합도가 낮은 단방향 파이프라인 아키텍처를 준수합니다:
 
@@ -210,7 +237,7 @@ Goslide는 결합도가 낮은 단방향 파이프라인 아키텍처를 준수�
 
 ---
 
-## 🛠️ 개발 및 기여 가이드
+## 개발 및 기여 가이드
 
 ```bash
 # 전체 품질 검증 (포맷, 린트, 복잡도, 동시성 레이스 테스트)
@@ -228,17 +255,17 @@ make bench
 
 ---
 
-## 👤 제작자 및 문의 (Author & Contact)
+## 제작자 및 문의 (Author & Contact)
 
 **yundream (조인씨 / Joinc)**
 
-- 🌐 **웹사이트**: [https://www.joinc.co.kr](https://www.joinc.co.kr)
-- 💼 **LinkedIn**: [linkedin.com/in/yundream](https://www.linkedin.com/in/yundream/)
-- ✉️ **이메일**: [yundream@gmail.com](mailto:yundream@gmail.com)
-- 🐙 **GitHub**: [@joincdream](https://github.com/joincdream)
+- **웹사이트**: [https://www.joinc.co.kr](https://www.joinc.co.kr)
+- **LinkedIn**: [linkedin.com/in/yundream](https://www.linkedin.com/in/yundream/)
+- **이메일**: [yundream@gmail.com](mailto:yundream@gmail.com)
+- **GitHub**: [@joincdream](https://github.com/joincdream)
 
 ---
 
-## 📄 라이선스
+## 라이선스
 
 본 프로젝트는 [Apache 2.0 라이선스](LICENSE)를 따릅니다.

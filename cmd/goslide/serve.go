@@ -7,10 +7,12 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/yundream/goslide/internal/i18n"
 	"github.com/yundream/goslide/internal/model"
 	"github.com/yundream/goslide/internal/server"
 )
@@ -84,14 +86,77 @@ func runServe(cmd *cobra.Command, args []string) error {
 		themeName = serveThemeFlag
 	}
 
-	fmt.Printf("🚀 Goslide Live Server running at http://%s:%d\n", serveBindFlag, servePortFlag)
-	fmt.Printf("📂 Watching: %s (Theme: %s)\n", filepath.Base(inputFile), themeName)
-	fmt.Printf("💡 Press Ctrl+C to stop\n\n")
+	printServeBanner(serveBindFlag, servePortFlag, inputFile, themeName)
 
 	if err := srv.Start(ctx); err != nil && !errors.Is(err, context.Canceled) {
+		if isPortInUseError(err) {
+			return newCLIError(model.ExitGeneralError, formatPortInUseError(servePortFlag, inputFile))
+		}
 		return newCLIError(model.ExitGeneralError, fmt.Errorf("server error: %w", err))
 	}
 
-	fmt.Println("\n👋 Goslide Live Server stopped gracefully.")
+	fmt.Println("\nGoslide Live Server stopped gracefully.")
 	return nil
+}
+
+func printServeBanner(bind string, port int, inputFile, theme string) {
+	lang := i18n.DetectLocale()
+	isKorean := strings.HasPrefix(strings.ToLower(lang), "ko")
+
+	url := fmt.Sprintf("http://%s:%d", bind, port)
+	fileInfo := fmt.Sprintf("%s (Theme: %s)", filepath.Base(inputFile), theme)
+
+	if isKorean {
+		fmt.Println("┌─────────────────────────────────────────────────────────────┐")
+		fmt.Printf("│  Goslide 실시간 개발 서버                                    │\n")
+		fmt.Printf("│  주소:     %-48s │\n", url)
+		fmt.Printf("│  감시 중:  %-48s │\n", truncateBannerText(fileInfo, 48))
+		fmt.Printf("│  단축키:   [?] 도움말  [P] 발표자 콘솔  [D] 판서  [F] 전체화면  │\n")
+		fmt.Println("└─────────────────────────────────────────────────────────────┘")
+		fmt.Printf("종료하려면 Ctrl+C를 누르세요\n\n")
+		return
+	}
+
+	fmt.Println("┌─────────────────────────────────────────────────────────────┐")
+	fmt.Printf("│  Goslide Live Server                                        │\n")
+	fmt.Printf("│  URL:      %-48s │\n", url)
+	fmt.Printf("│  Watching: %-48s │\n", truncateBannerText(fileInfo, 48))
+	fmt.Printf("│  Hotkeys:  [?] Help  [P] Presenter  [D] Pen  [F] Fullscreen │\n")
+	fmt.Println("└─────────────────────────────────────────────────────────────┘")
+	fmt.Printf("Press Ctrl+C to stop\n\n")
+}
+
+func truncateBannerText(text string, maxLen int) string {
+	if len(text) <= maxLen {
+		return text
+	}
+	return text[:maxLen-3] + "..."
+}
+
+func isPortInUseError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "address already in use") ||
+		strings.Contains(msg, "eaddrinuse") ||
+		strings.Contains(msg, "bind: address already in use")
+}
+
+func formatPortInUseError(port int, inputFile string) error {
+	lang := i18n.DetectLocale()
+	isKorean := strings.HasPrefix(strings.ToLower(lang), "ko")
+
+	altPort := port + 1
+	if port == 8080 {
+		altPort = 8081
+	}
+
+	if isKorean {
+		return fmt.Errorf("포트 %d이(가) 이미 다른 프로세스에서 사용 중입니다.\n해결 방법: --port 플래그로 다른 포트를 지정해 보세요 (예: goslide serve %s --port %d)",
+			port, filepath.Base(inputFile), altPort)
+	}
+
+	return fmt.Errorf("port %d is already in use by another process.\nSolution: specify a different port using --port (e.g. goslide serve %s --port %d)",
+		port, filepath.Base(inputFile), altPort)
 }
