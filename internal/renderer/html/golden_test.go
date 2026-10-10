@@ -46,7 +46,7 @@ func TestGoldenRenderer(t *testing.T) {
 	}
 
 	p := parser.NewParser()
-	r := htmlrenderer.NewRenderer()
+	r := htmlrenderer.NewRenderer(htmlrenderer.WithLang("ko"))
 	ctx := context.Background()
 
 	slidesDir := filepath.Join("testdata", "slides")
