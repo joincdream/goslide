@@ -150,6 +150,10 @@ func truncateDisplayString(s string, maxWidth int) string {
 	return b.String()
 }
 
+func truncateBannerText(text string, maxLen int) string {
+	return truncateDisplayString(text, maxLen)
+}
+
 func formatBannerRow(content string) string {
 	const leftPad = 2
 	w := stringDisplayWidth(content)
