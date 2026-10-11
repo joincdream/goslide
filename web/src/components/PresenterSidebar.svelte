@@ -2,12 +2,28 @@
   import { deck } from '../stores/deck.svelte.js';
   import { t, getLocale } from '../stores/i18n.svelte.js';
 
+  let popoutWindow = null;
+
+  export function closePopout() {
+    if (popoutWindow && !popoutWindow.closed) {
+      popoutWindow.close();
+      popoutWindow = null;
+    }
+  }
+
   export function openPopout() {
+    if (popoutWindow && !popoutWindow.closed) {
+      popoutWindow.focus();
+      deck.toggleSidebar(false);
+      return;
+    }
+
     const popoutWin = window.open('', 'goslide-presenter-' + window.location.pathname, 'width=1100,height=750');
     if (!popoutWin) {
       alert(t('ui.presenter.popup_blocked', '팝업 차단을 해제해주세요.'));
       return;
     }
+    popoutWindow = popoutWin;
 
     const themeStylesEl = document.getElementById('goslide-theme-styles');
     const themeStylesCSS = themeStylesEl ? themeStylesEl.innerHTML : '';
@@ -384,6 +400,11 @@ ${themeStylesCSS}
     popoutWin.document.open();
     popoutWin.document.write(presenterHTML);
     popoutWin.document.close();
+
+    popoutWin.addEventListener('beforeunload', () => {
+      popoutWindow = null;
+    });
+    deck.toggleSidebar(false);
   }
 </script>
 

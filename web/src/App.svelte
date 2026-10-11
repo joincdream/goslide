@@ -40,6 +40,10 @@
       if (sidebarComponent) sidebarComponent.openPopout();
     };
 
+    const handleClosePopout = () => {
+      if (sidebarComponent) sidebarComponent.closePopout();
+    };
+
     const handleSlidePatched = (e) => {
       if (e.detail) {
         deck.patchSlide(e.detail.index, e.detail.element);
@@ -48,12 +52,14 @@
 
     window.addEventListener('goslide:clear-canvas', handleClearCanvas);
     window.addEventListener('goslide:open-popout', handleOpenPopout);
+    window.addEventListener('goslide:close-popout', handleClosePopout);
     window.addEventListener('goslide:slide-patched', handleSlidePatched);
 
     return () => {
       if (cleanupHMR) cleanupHMR();
       window.removeEventListener('goslide:clear-canvas', handleClearCanvas);
       window.removeEventListener('goslide:open-popout', handleOpenPopout);
+      window.removeEventListener('goslide:close-popout', handleClosePopout);
       window.removeEventListener('goslide:slide-patched', handleSlidePatched);
     };
   });

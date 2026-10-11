@@ -113,6 +113,7 @@
       case 'n':
       case 'N':
         e.preventDefault();
+        window.dispatchEvent(new CustomEvent('goslide:close-popout'));
         deck.toggleSidebar();
         break;
       case 'p':
