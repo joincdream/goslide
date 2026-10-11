@@ -118,5 +118,25 @@
   "ui.overview.title": "Slide Overview",
   "ui.overview.slides_count": "%d Slides",
   "ui.overview.back_hint": "Press ESC or O to return",
-  "ui.overview.close": "Close (ESC)"
+  "ui.overview.close": "Close (ESC)",
+
+  "cli.update.desc": "Automatically update Goslide binary to the latest version",
+  "cli.update.long": "Checks for the latest release from official GitHub Releases, verifies integrity, and self-updates the binary.",
+  "cli.update.example": "  # Update to latest version\n  goslide update\n\n  # Check for updates without installing\n  goslide update --check\n\n  # Simulate update without modifying binary\n  goslide update --dry-run",
+  "cli.update.flag.check": "Check for updates without installing",
+  "cli.update.flag.dry_run": "Simulate update without downloading or replacing binary",
+  "cli.update.flag.force": "Force reinstall even if already on the latest version",
+
+  "update.checking": "Checking for latest release...",
+  "update.current_and_latest": "Current version: %s, latest release: %s",
+  "update.already_latest": "You are already using the latest version of Goslide (%s).",
+  "update.found_new": "A new version of Goslide is available: %s",
+  "update.downloading": "Downloading latest release artifact (%s)...",
+  "update.verifying": "Verifying SHA-256 checksum integrity...",
+  "update.replacing": "Replacing binary (%s)...",
+  "update.success": "Goslide has been successfully updated to %s!",
+  "update.whats_new": "📋 What's New in %s:",
+  "update.release_notes_link": "👉 View full release notes at:\n   %s",
+  "update.tip": "💡 A new version of Goslide is available: %s (current: %s)\n   - Release notes: %s\n   - Run 'goslide update' to upgrade automatically.",
+  "update.err_permission": "Permission denied while replacing binary. Please run with 'sudo goslide update'."
 }

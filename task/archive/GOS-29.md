@@ -6,12 +6,12 @@
 > **상태**: 완료 (Done)  
 > **담당 패키지**: [`internal/theme/`](../internal/theme/), [`cmd/goslide/`](../cmd/goslide/)  
 > **연관 문서**:  
-> - [`docs/planning/competitive-analysis-and-strategy.md`](../docs/planning/competitive-analysis-and-strategy.md)  
-> - [`docs/okf/decisions-simplification.md`](../docs/okf/decisions-simplification.md) *(ADR-001: 단순성 및 단일 바이너리 원칙)*  
+> - [`docs/planning/competitive-analysis-and-strategy.md`](competitive-analysis-and-strategy.md)  
+> - [`docs/okf/decisions-simplification.md`](decisions-simplification.md) *(ADR-001: 단순성 및 단일 바이너리 원칙)*  
 > **연관 소스 파일**:  
-> - [`internal/theme/theme.go`](../internal/theme/theme.go)  
+> - [`internal/theme/theme.go`](internal/theme/theme.go)  
 > - [`internal/theme/assets/css/`](../internal/theme/assets/css/)  
-> - [`cmd/goslide/init.go`](../cmd/goslide/init.go)  
+> - [`cmd/goslide/init.go`](init.go)  
 
 ---
 
@@ -62,10 +62,10 @@ Goslide의 기술적 완성도(CGO 0% 단일 정적 바이너리, < 50ms 초고�
 
 | 단계 | 작업 내용 | 타겟 소스 파일 |
 | :---: | :--- | :--- |
-| **Step 1** | **신규 3종 테마 CSS 제작**<br>- `corporate.css`: 비즈니스 딥네이비 테마<br>- `academic.css`: 교육/강의용 아이보리 페이퍼 테마<br>- `cyber-dark.css`: 테크 컨퍼런스용 네온 다크 테마 | [`internal/theme/assets/css/corporate.css`](../internal/theme/assets/css/corporate.css)<br>[`internal/theme/assets/css/academic.css`](../internal/theme/assets/css/academic.css)<br>[`internal/theme/assets/css/cyber-dark.css`](../internal/theme/assets/css/cyber-dark.css) |
-| **Step 2** | **내장 테마 레지스트리 등록 및 유효성 검증**<br>- `theme.go`의 지원 테마 목록(`defaultThemes`)에 신규 3종 추가<br>- `GetThemeCSS()` 매핑 및 단위 테스트 갱신 | [`internal/theme/theme.go`](../internal/theme/theme.go)<br>[`internal/theme/theme_test.go`](../internal/theme/theme_test.go) |
+| **Step 1** | **신규 3종 테마 CSS 제작**<br>- `corporate.css`: 비즈니스 딥네이비 테마<br>- `academic.css`: 교육/강의용 아이보리 페이퍼 테마<br>- `cyber-dark.css`: 테크 컨퍼런스용 네온 다크 테마 | [`internal/theme/assets/css/corporate.css`](internal/theme/assets/css/corporate.css)<br>[`internal/theme/assets/css/academic.css`](internal/theme/assets/css/academic.css)<br>[`internal/theme/assets/css/cyber-dark.css`](internal/theme/assets/css/cyber-dark.css) |
+| **Step 2** | **내장 테마 레지스트리 등록 및 유효성 검증**<br>- `theme.go`의 지원 테마 목록(`defaultThemes`)에 신규 3종 추가<br>- `GetThemeCSS()` 매핑 및 단위 테스트 갱신 | [`internal/theme/theme.go`](internal/theme/theme.go)<br>[`internal/theme/theme_test.go`](theme_test.go) |
 | **Step 3** | **외부 커스텀용 독립 CSS 번들 배포**<br>- 사용자가 다운로드하여 수정할 수 있도록 루트 `themes/` 디렉토리에 CSS 원본 배치 | `themes/*.css` |
-| **Step 4** | **`goslide init` 및 예제 슬라이드 템플릿 연동**<br>- `goslide init talk.md --theme corporate` 등 옵션 지원<br>- `examples/` 디렉토리에 테마별 데모 마크다운 슬라이드 제작 | [`cmd/goslide/init.go`](../cmd/goslide/init.go)<br>`examples/themes/*.md` |
+| **Step 4** | **`goslide init` 및 예제 슬라이드 템플릿 연동**<br>- `goslide init talk.md --theme corporate` 등 옵션 지원<br>- `examples/` 디렉토리에 테마별 데모 마크다운 슬라이드 제작 | [`cmd/goslide/init.go`](init.go)<br>`examples/themes/*.md` |
 | **Step 5** | **포맷별 무결성 검증**<br>- HTML, 16:9 무마진 PDF, 1080p PPTX 익스포트 시 서식/레이아웃 일치성 검증 | 전체 테스트 스위트 |
 
 ---

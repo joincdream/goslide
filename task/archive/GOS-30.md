@@ -6,13 +6,13 @@
 > **상태**: 완료 (Done)  
 > **담당 패키지**: [`internal/parser/`](../internal/parser/)  
 > **연관 문서**:  
-> - [`docs/dsl-guide.md`](../docs/dsl-guide.md) *(Section 4: Incremental Reveal & Animation)*  
-> - [`docs/theme-guide.md`](../docs/theme-guide.md) *(Section 4: Component Selectors Specification)*  
-> - [`docs/okf/decisions-simplification.md`](../docs/okf/decisions-simplification.md) *(ADR-001: 단순성 및 무상태 변환 원칙)*  
+> - [`docs/dsl-guide.md`](dsl-guide.md) *(Section 4: Incremental Reveal & Animation)*  
+> - [`docs/theme-guide.md`](theme-guide.md) *(Section 4: Component Selectors Specification)*  
+> - [`docs/okf/decisions-simplification.md`](decisions-simplification.md) *(ADR-001: 단순성 및 무상태 변환 원칙)*  
 > **연관 소스 파일**:  
-> - [`internal/parser/fragment.go`](../internal/parser/fragment.go)  
-> - [`internal/parser/fragment_test.go`](../internal/parser/fragment_test.go)  
-> - [`internal/parser/postprocess.go`](../internal/parser/postprocess.go)  
+> - [`internal/parser/fragment.go`](fragment.go)  
+> - [`internal/parser/fragment_test.go`](fragment_test.go)  
+> - [`internal/parser/postprocess.go`](postprocess.go)  
 
 ---
 
@@ -61,7 +61,7 @@ Reveal.js, Slidev, Marp 등 업계 표준 웹 프레젠테이션 엔진과 일�
 ```
 
 ### 2.2 무상태(Stateless) 리스트 병합 원칙 (ADR-001 준수)
-복잡한 상태 머신(State Machine)이나 런타임 추적 없이, 파서 후처리 단계([`internal/parser/fragment.go`](../internal/parser/fragment.go))에서 순수 함수(Pure Function) 기반으로 닫힌 `</ul>`와 바로 이어지는 `<ul class="fragment">`의 껍데기만 안전하게 벗겨내는 **무상태 DOM/HTML 정규화**를 수행합니다.
+복잡한 상태 머신(State Machine)이나 런타임 추적 없이, 파서 후처리 단계([`internal/parser/fragment.go`](fragment.go))에서 순수 함수(Pure Function) 기반으로 닫힌 `</ul>`와 바로 이어지는 `<ul class="fragment">`의 껍데기만 안전하게 벗겨내는 **무상태 DOM/HTML 정규화**를 수행합니다.
 
 ```
 [ 파서 원시 HTML ]
@@ -82,11 +82,11 @@ Reveal.js, Slidev, Marp 등 업계 표준 웹 프레젠테이션 엔진과 일�
 
 |     단계     | 작업 내용                                                                                                                                                                                                                                                                                                                       | 타겟 소스 파일                                                                  |
 | :--------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------ |
-| **Step 1** | **인접 리스트 병합 및 `<li>` fragment 이전 로직 구현**<br>- `internal/parser/fragment.go`에 `normalizeListFragments(html string) string` 함수 구현<br>- `</ul>\s*<ul([^>]*)>\s*<li` 패턴 감지 시 앞선 `ul`로 병합<br>- 부모 `ul`에 있던 `class="...fragment..."` 및 `data-fragment-index="..."` 속성을 자식 `<li`에 안전하게 병합·주입<br>- `ol`(순서 있는 목록)에 대해서도 동일 병합 규칙 적용 | [`internal/parser/fragment.go`](../internal/parser/fragment.go)           |
-| **Step 2** | **파이프라인 연동**<br>- `postProcessHTML(html)`의 `transformFragments(html)` 호출 직후 `normalizeListFragments(html)` 파이프라인 연결                                                                                                                                                                                                         | [`internal/parser/postprocess.go`](../internal/parser/postprocess.go)     |
-| **Step 3** | **단위 테스트(Unit Tests) 및 엣지 케이스 검증**<br>- `fragment_test.go`에 테이블 기반 테스트 추가:<br>  1. `ul` 내 3단 pause 항목 병합 및 li fragment 속성 검증<br>  2. `ol` 순서 목록의 pause 병합 및 번호 연속성 유지 검증<br>  3. 리스트 외 일반 단락(`<p>`), 헤딩, 코드 블록 간 pause 동작 보존 검증<br>  4. 중첩 서브리스트(`li > ul`)가 포함된 복합 리스트 내 pause 회귀 검증                                       | [`internal/parser/fragment_test.go`](../internal/parser/fragment_test.go) |
-| **Step 4** | **실제 데모 슬라이드 검증**<br>- `examples/demo/demo.md` 16번 슬라이드(`<!-- _layout: section -->`) 렌더링 확인<br>- 불릿 시작선 정렬(Left Alignment) 및 스텝별 Reveal 동작 확인                                                                                                                                                                               | [`examples/demo/demo.md`](../examples/demo/demo.md)                       |
-| **Step 5** | **사양 문서 동기화**<br>- `docs/dsl-guide.md`의 Incremental Reveal 항목에 리스트 아이템 단위 pause 표준 동작 명시                                                                                                                                                                                                                                    | [`docs/dsl-guide.md`](../docs/dsl-guide.md)                               |
+| **Step 1** | **인접 리스트 병합 및 `<li>` fragment 이전 로직 구현**<br>- `internal/parser/fragment.go`에 `normalizeListFragments(html string) string` 함수 구현<br>- `</ul>\s*<ul([^>]*)>\s*<li` 패턴 감지 시 앞선 `ul`로 병합<br>- 부모 `ul`에 있던 `class="...fragment..."` 및 `data-fragment-index="..."` 속성을 자식 `<li`에 안전하게 병합·주입<br>- `ol`(순서 있는 목록)에 대해서도 동일 병합 규칙 적용 | [`internal/parser/fragment.go`](fragment.go)           |
+| **Step 2** | **파이프라인 연동**<br>- `postProcessHTML(html)`의 `transformFragments(html)` 호출 직후 `normalizeListFragments(html)` 파이프라인 연결                                                                                                                                                                                                         | [`internal/parser/postprocess.go`](postprocess.go)     |
+| **Step 3** | **단위 테스트(Unit Tests) 및 엣지 케이스 검증**<br>- `fragment_test.go`에 테이블 기반 테스트 추가:<br>  1. `ul` 내 3단 pause 항목 병합 및 li fragment 속성 검증<br>  2. `ol` 순서 목록의 pause 병합 및 번호 연속성 유지 검증<br>  3. 리스트 외 일반 단락(`<p>`), 헤딩, 코드 블록 간 pause 동작 보존 검증<br>  4. 중첩 서브리스트(`li > ul`)가 포함된 복합 리스트 내 pause 회귀 검증                                       | [`internal/parser/fragment_test.go`](fragment_test.go) |
+| **Step 4** | **실제 데모 슬라이드 검증**<br>- `examples/demo/demo.md` 16번 슬라이드(`<!-- _layout: section -->`) 렌더링 확인<br>- 불릿 시작선 정렬(Left Alignment) 및 스텝별 Reveal 동작 확인                                                                                                                                                                               | [`examples/demo/demo.md`](examples/demo/demo.md)                       |
+| **Step 5** | **사양 문서 동기화**<br>- `docs/dsl-guide.md`의 Incremental Reveal 항목에 리스트 아이템 단위 pause 표준 동작 명시                                                                                                                                                                                                                                    | [`docs/dsl-guide.md`](dsl-guide.md)                               |
 
 ---
 

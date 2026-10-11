@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/yundream/goslide/internal/i18n"
 	"github.com/yundream/goslide/internal/model"
+	"github.com/yundream/goslide/internal/updater"
 	"github.com/yundream/goslide/pkg/goslide"
 )
 
@@ -55,6 +58,8 @@ func initCLI() {
 		rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, i18n.T("cli.version.flag"))
 	}
 
+	initUpdateFlags()
+
 	if !hasCommand(rootCmd, buildCmd.Name()) {
 		rootCmd.AddCommand(buildCmd)
 	}
@@ -72,6 +77,9 @@ func initCLI() {
 	}
 	if !hasCommand(rootCmd, themeCmd.Name()) {
 		rootCmd.AddCommand(themeCmd)
+	}
+	if !hasCommand(rootCmd, updateCmd.Name()) {
+		rootCmd.AddCommand(updateCmd)
 	}
 }
 
@@ -107,6 +115,10 @@ func refreshCLITexts() {
 	themeListCmd.Short = i18n.T("cli.theme.list.desc")
 	themeExportCmd.Short = i18n.T("cli.theme.export.desc")
 
+	updateCmd.Short = i18n.T("cli.update.desc")
+	updateCmd.Long = i18n.T("cli.update.long")
+	updateCmd.Example = i18n.T("cli.update.example")
+
 	updateFlagDescriptions()
 }
 
@@ -136,6 +148,9 @@ func updateFlagDescriptions() {
 		{initCmd, "theme", "cli.init.flag.theme"},
 		{initCmd, "force", "cli.init.flag.force"},
 		{demoCmd, "force", "cli.demo.flag.force"},
+		{updateCmd, "check", "cli.update.flag.check"},
+		{updateCmd, "dry-run", "cli.update.flag.dry_run"},
+		{updateCmd, "force", "cli.update.flag.force"},
 	}
 
 	for _, s := range specs {
@@ -186,6 +201,31 @@ func determineExitCode(err error) int {
 	return model.ExitGeneralError
 }
 
+// checkAndNotifyUpdate prints a non-intrusive tip if a newer version of Goslide is available.
+func checkAndNotifyUpdate() {
+	if os.Getenv("CI") != "" || os.Getenv("GOSLIDE_NO_UPDATE_NOTIFIER") != "" {
+		return
+	}
+
+	for _, arg := range os.Args[1:] {
+		if arg == "update" || arg == "-v" || arg == "--version" || arg == "-h" || arg == "--help" || arg == "--quiet" || arg == "-q" {
+			return
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	checker := updater.NewChecker(nil, nil)
+	result, err := checker.CheckUpdate(ctx, goslide.Version)
+	if err != nil || result == nil || !result.HasUpdate {
+		return
+	}
+
+	fmt.Println()
+	fmt.Printf(i18n.T("update.tip")+"\n", result.LatestVersion, result.CurrentVersion, result.ReleaseURL)
+}
+
 // Execute runs the root CLI command and terminates with standard exit codes.
 func Execute() {
 	initCLI()
@@ -193,4 +233,5 @@ func Execute() {
 		code := determineExitCode(err)
 		os.Exit(code)
 	}
+	checkAndNotifyUpdate()
 }

@@ -118,5 +118,25 @@
   "ui.overview.title": "슬라이드 개요 (Overview)",
   "ui.overview.slides_count": "%d Slides",
   "ui.overview.back_hint": "단축키 ESC 또는 O 발표 복귀",
-  "ui.overview.close": "닫기 (ESC)"
+  "ui.overview.close": "닫기 (ESC)",
+
+  "cli.update.desc": "Goslide 바이너리를 최신 버전으로 자동 업데이트합니다",
+  "cli.update.long": "공식 GitHub Releases에서 최신 버전을 확인하고 무결성을 검증한 뒤 자체 바이너리를 교체합니다.",
+  "cli.update.example": "  # 최신 버전으로 자동 업데이트\n  goslide update\n\n  # 업데이트 설치 없이 최신 버전 존재 여부만 확인\n  goslide update --check\n\n  # 실제 설치 없이 모의 시뮬레이션 실행\n  goslide update --dry-run",
+  "cli.update.flag.check": "업데이트 설치 없이 최신 버전 존재 여부만 확인합니다",
+  "cli.update.flag.dry_run": "실제 다운로드 및 교체 없이 시뮬레이션만 수행합니다",
+  "cli.update.flag.force": "이미 최신 버전이더라도 강제로 재설치합니다",
+
+  "update.checking": "최신 릴리즈 버전을 확인하는 중...",
+  "update.current_and_latest": "현재 버전: %s, 최신 릴리즈: %s",
+  "update.already_latest": "현재 최신 버전(%s)을 사용 중입니다.",
+  "update.found_new": "새로운 버전(%s)이 발견되었습니다.",
+  "update.downloading": "최신 아티팩트 다운로드 중 (%s)...",
+  "update.verifying": "SHA-256 체크섬 무결성 검증 중...",
+  "update.replacing": "바이너리 교체 중 (%s)...",
+  "update.success": "Goslide가 성공적으로 %s 버전으로 업데이트되었습니다!",
+  "update.whats_new": "📋 %s 주요 변경 사항:",
+  "update.release_notes_link": "👉 상세한 릴리즈 노트는 아래 링크에서 확인하세요:\n   %s",
+  "update.tip": "💡 새로운 Goslide 버전(%s)이 출시되었습니다. (현재: %s)\n   - 릴리즈 노트: %s\n   - 'goslide update' 명령어로 업데이트할 수 있습니다.",
+  "update.err_permission": "바이너리 파일 교체 권한이 없습니다. 'sudo goslide update'로 다시 실행해 주세요."
 }

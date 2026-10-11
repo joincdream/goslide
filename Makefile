@@ -37,7 +37,7 @@ build-web:
 build: build-web
 	@echo "==> Building $(BINARY_NAME)$(BIN_EXT) (CGO_ENABLED=0)..."
 	@mkdir -p $(BIN_DIR)
-	CGO_ENABLED=0 $(GO) build -trimpath -ldflags="-s -w -X 'main.version=$(VERSION)'" -o $(BIN_DIR)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
+	CGO_ENABLED=0 $(GO) build -trimpath -ldflags="-s -w -X 'github.com/yundream/goslide/pkg/goslide.Version=$(VERSION)'" -o $(BIN_DIR)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
 
 ## package: Compile and package binary for specified GOOS, GOARCH, ARTIFACT_NAME
 package: build-web
@@ -47,7 +47,7 @@ package: build-web
 	fi
 	@echo "==> Packaging $(ARTIFACT_NAME) ($(GOOS)/$(GOARCH), version: $(VERSION))..."
 	@mkdir -p $(DIST_DIR)/$(ARTIFACT_NAME)
-	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -trimpath -ldflags="-s -w -X 'main.version=$(VERSION)'" -o $(DIST_DIR)/$(ARTIFACT_NAME)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -trimpath -ldflags="-s -w -X 'github.com/yundream/goslide/pkg/goslide.Version=$(VERSION)'" -o $(DIST_DIR)/$(ARTIFACT_NAME)/$(BINARY_NAME)$(BIN_EXT) ./cmd/goslide
 	@cp README*.md QUICKSTART*.md LICENSE* $(DIST_DIR)/$(ARTIFACT_NAME)/ 2>/dev/null || true
 	@mkdir -p $(DIST_DIR)/$(ARTIFACT_NAME)/prompts && cp prompts/* $(DIST_DIR)/$(ARTIFACT_NAME)/prompts/ 2>/dev/null || true
 	@if [ "$(GOOS)" = "windows" ]; then \
