@@ -219,6 +219,7 @@ type Config struct {
 	Lang         string
 	OpenBrowser  bool
 	Debounce     time.Duration
+	OnReady      func()
 }
 
 // Server provides local HTTP hosting, asset serving, and SSE live reload broadcasting.
@@ -518,6 +519,9 @@ func (s *Server) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to bind address %s: %w", addr, err)
 	}
 	s.listener = ln
+	if s.cfg.OnReady != nil {
+		s.cfg.OnReady()
+	}
 
 	s.httpServer = &http.Server{
 		Handler: s.Handler(),

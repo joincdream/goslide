@@ -15,7 +15,18 @@
 
 ## 0단계. 바이너리 다운로드 및 설치 (30초)
 
-Goslide는 CGO 및 외부 런타임 의존성이 없는 단일 정적 바이너리입니다. [GitHub Releases](https://github.com/joincdream/goslide/releases)에서 운영체제에 맞는 아티팩트를 다운로드합니다:
+### 가장 빠른 원라이너 설치 (Linux & macOS)
+터미널에서 자동 설치 스크립트를 실행합니다:
+```bash
+curl -fsSL https://raw.githubusercontent.com/joincdream/goslide/main/install.sh | bash
+```
+
+이미 설치되어 있다면 언제든 최신 버전으로 업데이트: `goslide update`
+
+---
+
+### 수동 설치 (모든 플랫폼)
+[GitHub Releases](https://github.com/joincdream/goslide/releases)에서 운영체제에 맞는 아티팩트를 다운로드합니다:
 
 | 운영체제 (OS) | CPU 아키텍처 / 대상 기기 | 권장 다운로드 아티팩트 |
 | :--- | :--- | :--- |
@@ -26,7 +37,7 @@ Goslide는 CGO 및 외부 런타임 의존성이 없는 단일 정적 바이너�
 | **Windows** | 64-bit Intel / AMD (x64) | `goslide_windows_amd64.zip` |
 | **Windows** | 64-bit ARM (Snapdragon X Elite 등) | `goslide_windows_arm64.zip` |
 
-### Linux & macOS 설치 원라이너
+**Linux & macOS 수동 설치:**
 ```bash
 # 1. 아카이브 압축 해제 (예: Linux amd64 기준)
 tar -xzf goslide_linux_amd64.tar.gz
@@ -42,8 +53,11 @@ goslide --help
 > 참고 (macOS 사용자): 미확인 개발자 보안 알림으로 실행이 차단되는 경우 터미널에서 다음 명령을 실행하세요:  
 > `xattr -d com.apple.quarantine goslide`
 
-### Windows 설치
+**Windows 설치:**
 - 다운로드한 `.zip` 압축을 해제한 후 `goslide.exe`를 원하는 경로(예: `C:\bin`)로 이동하고 시스템 환경 변수 `Path`에 해당 경로를 추가합니다.
+
+> [!NOTE]
+> 인터랙티브 HTML 슬라이드 및 실시간 프리뷰(`goslide serve`)는 **외부 런타임 의존성이 0%**입니다. 고해상도 벡터 **PDF** 및 파워포인트 **PPTX** 변환 시에는 시스템에 **Google Chrome 또는 Chromium** 브라우저가 필요합니다.
 
 ---
 

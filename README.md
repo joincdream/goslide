@@ -23,7 +23,12 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 - **Real-Time Live Preview**: Ultra-light local dev server (`goslide serve`) using standard Server-Sent Events (SSE) hot reload, keeping your current slide position.
 - **Dual-Screen Presenter Console**: Synchronized dual-window presenter view (`P`), digital laser pointer (`L`), and spotlight focus (`S`).
 - **Screencast & Live Annotation**: Built-in lightweight transparent canvas overlay designed for YouTube tutorial recording (`D` to toggle pen, `C` to clear).
+- **In-App Self-Update**: One-command atomic self-update (`goslide update`) with SHA-256 verification and non-intrusive notification.
+- **Multilingual Support**: Native Korean and English localization across CLI (`--lang=ko|en`), presenter console, and drawing UI.
 - **Rich Content Ready**: Native syntax highlighting via Chroma, KaTeX math formulas (`$...$`, `$$...$$`), and GitHub Flavored Markdown (GFM) tables.
+
+> [!NOTE]
+> HTML presentations and local live server (`goslide serve`) have **zero external runtime dependencies**. Generating vector **PDF** and editable **PPTX** requires **Google Chrome / Chromium** installed on your host system.
 
 ---
 
@@ -33,7 +38,19 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 
 ### 1. Installation
 
-#### Download Binary (Recommended)
+#### Automated One-Liner (Linux & macOS - Recommended)
+```bash
+curl -fsSL https://raw.githubusercontent.com/joincdream/goslide/main/install.sh | bash
+```
+
+#### In-App Self-Update
+Already have Goslide installed? Update in-place to the latest release with one command:
+```bash
+goslide update          # Upgrade in-place to the latest release
+goslide update --check  # Check for updates without modifying binary
+```
+
+#### Manual Binary Download
 Goslide is distributed as a single static binary with zero CGO runtime dependencies. Download the appropriate pre-compiled archive for your OS and CPU architecture from [GitHub Releases](https://github.com/joincdream/goslide/releases):
 
 | Operating System | CPU Architecture / Target Device | Recommended Artifact |
@@ -45,7 +62,7 @@ Goslide is distributed as a single static binary with zero CGO runtime dependenc
 | **Windows** | 64-bit Intel / AMD (x64) | `goslide_windows_amd64.zip` |
 | **Windows** | 64-bit ARM (Snapdragon X Elite, etc.) | `goslide_windows_arm64.zip` |
 
-**Linux & macOS One-Liner Setup:**
+**Linux & macOS Manual Setup:**
 ```bash
 # Extract and install into user PATH
 tar -xzf goslide_linux_amd64.tar.gz    # macOS: goslide_darwin_arm64.tar.gz, etc.

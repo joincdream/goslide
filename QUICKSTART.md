@@ -15,7 +15,18 @@ Follow these steps to create your first presentation and export to PDF/PPTX in *
 
 ## Step 0. Download & Install Binary (30 sec)
 
-Goslide is a single static binary with zero CGO or external runtime dependencies. Download the appropriate pre-compiled artifact for your system from [GitHub Releases](https://github.com/joincdream/goslide/releases):
+### Quickest Install (Linux & macOS)
+Run the automated installation script:
+```bash
+curl -fsSL https://raw.githubusercontent.com/joincdream/goslide/main/install.sh | bash
+```
+
+Already installed? Update anytime with: `goslide update`
+
+---
+
+### Manual Installation (All Platforms)
+Download the appropriate pre-compiled artifact for your system from [GitHub Releases](https://github.com/joincdream/goslide/releases):
 
 | Operating System | CPU Architecture / Target Device | Recommended Artifact |
 | :--- | :--- | :--- |
@@ -26,7 +37,7 @@ Goslide is a single static binary with zero CGO or external runtime dependencies
 | **Windows** | 64-bit Intel / AMD (x64) | `goslide_windows_amd64.zip` |
 | **Windows** | 64-bit ARM (Snapdragon X Elite, etc.) | `goslide_windows_arm64.zip` |
 
-### Linux & macOS One-Liner Setup
+**Linux & macOS Manual Setup:**
 ```bash
 # 1. Extract the downloaded archive (e.g., Linux amd64)
 tar -xzf goslide_linux_amd64.tar.gz
@@ -42,8 +53,11 @@ goslide --help
 > Note (macOS users): If blocked by macOS Gatekeeper ("unidentified developer"), run:  
 > `xattr -d com.apple.quarantine goslide`
 
-### Windows Setup
+**Windows Setup:**
 - Extract the downloaded `.zip` file, move `goslide.exe` to a preferred directory (e.g., `C:\bin`), and add that path to your system's `Path` environment variable.
+
+> [!NOTE]
+> HTML presentations and local live preview (`goslide serve`) have **zero external runtime dependencies**. Exporting to vector **PDF** and editable **PPTX** requires **Google Chrome / Chromium** installed on your system.
 
 ---
 

@@ -23,7 +23,12 @@
 - **실시간 Live Preview 개발 서버**: Go 표준 라이브러리 기반 SSE (Server-Sent Events) 핫 리로드 지원 (`goslide serve`). 편집 중 슬라이드 위치 유지.
 - **듀얼 스크린 발표자 콘솔**: 듀얼 모니터 발표자 전용 뷰(`P` 키), 레이저 포인터(`L` 키), 스포트라이트 집중 모드(`S` 키).
 - **유튜브 스크린캐스트 판서 오버레이**: 강의 녹화 중 슬라이드 위 자유 필기를 지원하는 경량 투명 캔버스 내장 (`D` 키로 펜 켜기/끄기, `C` 키로 전체 지우기).
+- **인앱 자체 업데이트 (`goslide update`)**: 명령어 한 줄로 최신 릴리즈 자동 감지, SHA-256 무결성 검증 및 원자적 바이너리 제자리 교체.
+- **다국어(한/영) 100% 지원**: CLI(`--lang=ko|en`), 웹 프레젠테이션, 판서 툴바, 발표자 콘솔 전 영역 완벽 로컬라이즈.
 - **풍부한 기술 콘텐츠 지원**: Chroma 기반 순수 Go 구문 강조, KaTeX 인라인/블록 수식(`$...$`, `$$...$$`), GitHub Flavored Markdown (GFM) 표 완벽 렌더링.
+
+> [!NOTE]
+> 인터랙티브 HTML 슬라이드 생성 및 로컬 라이브 서버(`goslide serve`)는 **외부 런타임 의존성이 0%**입니다. 고해상도 벡터 **PDF** 및 편집 가능한 **PPTX** 변환 시에는 시스템에 **Google Chrome 또는 Chromium** 브라우저가 설치되어 있어야 합니다.
 
 ---
 
@@ -33,7 +38,19 @@
 
 ### 1. 설치 방법
 
-#### 바이너리 다운로드 (권장)
+#### 자동 원라이너 설치 (Linux & macOS - 권장)
+```bash
+curl -fsSL https://raw.githubusercontent.com/joincdream/goslide/main/install.sh | bash
+```
+
+#### 인앱 자체 업데이트 (Self-Update)
+이미 Goslide가 설치되어 있다면 명령어 한 줄로 언제든 최신 버전으로 업데이트할 수 있습니다:
+```bash
+goslide update          # 최신 버전으로 자체 업데이트
+goslide update --check  # 바이너리 변경 없이 새 버전 존재 여부만 확인
+```
+
+#### 수동 바이너리 다운로드
 Goslide는 CGO 의존성이 전혀 없는 단일 정적 바이너리로 배포됩니다. [GitHub Releases](https://github.com/joincdream/goslide/releases)에서 운영체제와 CPU 아키텍처에 맞는 파일을 다운로드합니다:
 
 | 운영체제 (OS) | CPU 아키텍처 / 대상 기기 | 권장 다운로드 아티팩트 |
@@ -45,7 +62,7 @@ Goslide는 CGO 의존성이 전혀 없는 단일 정적 바이너리로 배포�
 | **Windows** | 64-bit Intel / AMD (x64) | `goslide_windows_amd64.zip` |
 | **Windows** | 64-bit ARM (Snapdragon X Elite 등) | `goslide_windows_arm64.zip` |
 
-**Linux & macOS 설치 원라이너:**
+**Linux & macOS 수동 설치:**
 ```bash
 # 압축 해제 후 사용자 PATH 경로로 이동
 tar -xzf goslide_linux_amd64.tar.gz    # macOS: goslide_darwin_arm64.tar.gz 등
