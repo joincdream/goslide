@@ -9,6 +9,8 @@
   import PresenterToolbar from './components/PresenterToolbar.svelte';
   import OverviewGrid from './components/OverviewGrid.svelte';
   import KeyboardHandler from './components/KeyboardHandler.svelte';
+  import ErrorOverlay from './components/ErrorOverlay.svelte';
+  import { initHMR } from './lib/hmr.js';
 
   let canvasComponent;
   let sidebarComponent;
@@ -16,6 +18,9 @@
   onMount(() => {
     const slideElements = document.querySelectorAll('.slide-card');
     deck.init(slideElements);
+
+    // Initialize HMR client when connected to Goslide live development server
+    const cleanupHMR = initHMR();
 
     // Overview slide click listeners
     slideElements.forEach((slide, idx) => {
@@ -46,6 +51,7 @@
     window.addEventListener('goslide:slide-patched', handleSlidePatched);
 
     return () => {
+      if (cleanupHMR) cleanupHMR();
       window.removeEventListener('goslide:clear-canvas', handleClearCanvas);
       window.removeEventListener('goslide:open-popout', handleOpenPopout);
       window.removeEventListener('goslide:slide-patched', handleSlidePatched);
@@ -61,3 +67,4 @@
 <PresenterSidebar bind:this={sidebarComponent} />
 <PresenterToolbar />
 <OverviewGrid />
+<ErrorOverlay />

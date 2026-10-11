@@ -100,72 +100,11 @@ func runServe(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-const bannerInnerWidth = 61
-
-func isFullWidth(r rune) bool {
-	return (r >= 0x1100 && r <= 0x115F) || // Hangul Jamo
-		(r >= 0x2E80 && r <= 0xA4CF && r != 0x303F) || // CJK Radicals, Symbols, Ideographs
-		(r >= 0xAC00 && r <= 0xD7A3) || // Hangul Syllables
-		(r >= 0xF900 && r <= 0xFAFF) || // CJK Compatibility Ideographs
-		(r >= 0xFE10 && r <= 0xFE19) || // Vertical forms
-		(r >= 0xFE30 && r <= 0xFE6F) || // CJK Compatibility Forms
-		(r >= 0xFF00 && r <= 0xFF60) || // Fullwidth Forms
-		(r >= 0xFFE0 && r <= 0xFFE6)
-}
-
-func stringDisplayWidth(s string) int {
-	w := 0
-	for _, r := range s {
-		if isFullWidth(r) {
-			w += 2
-		} else {
-			w += 1
-		}
-	}
-	return w
-}
-
-func truncateDisplayString(s string, maxWidth int) string {
-	if stringDisplayWidth(s) <= maxWidth {
-		return s
-	}
-	var b strings.Builder
-	curWidth := 0
-	target := maxWidth - 3
-	if target < 0 {
-		target = 0
-	}
-	for _, r := range s {
-		rw := 1
-		if isFullWidth(r) {
-			rw = 2
-		}
-		if curWidth+rw > target {
-			break
-		}
-		b.WriteRune(r)
-		curWidth += rw
-	}
-	b.WriteString("...")
-	return b.String()
-}
-
 func truncateBannerText(text string, maxLen int) string {
-	return truncateDisplayString(text, maxLen)
-}
-
-func formatBannerRow(content string) string {
-	const leftPad = 2
-	w := stringDisplayWidth(content)
-	if leftPad+w > bannerInnerWidth {
-		content = truncateDisplayString(content, bannerInnerWidth-leftPad)
-		w = stringDisplayWidth(content)
+	if len(text) <= maxLen {
+		return text
 	}
-	rightPad := bannerInnerWidth - (leftPad + w)
-	if rightPad < 0 {
-		rightPad = 0
-	}
-	return fmt.Sprintf("│%s%s%s│", strings.Repeat(" ", leftPad), content, strings.Repeat(" ", rightPad))
+	return text[:maxLen-3] + "..."
 }
 
 func printServeBanner(bind string, port int, inputFile, theme string) {
@@ -175,25 +114,19 @@ func printServeBanner(bind string, port int, inputFile, theme string) {
 	url := fmt.Sprintf("http://%s:%d", bind, port)
 	fileInfo := fmt.Sprintf("%s (Theme: %s)", filepath.Base(inputFile), theme)
 
-	borderTop := "┌" + strings.Repeat("─", bannerInnerWidth) + "┐"
-	borderBottom := "└" + strings.Repeat("─", bannerInnerWidth) + "┘"
-
-	fmt.Println(borderTop)
 	if isKorean {
-		fmt.Println(formatBannerRow("Goslide 실시간 개발 서버"))
-		fmt.Println(formatBannerRow(fmt.Sprintf("주소:     %s", url)))
-		fmt.Println(formatBannerRow(fmt.Sprintf("감시 중:  %s", fileInfo)))
-		fmt.Println(formatBannerRow("단축키:   [?] 도움말  [P] 발표자 콘솔  [D] 판서  [F] 전체화면"))
-		fmt.Println(borderBottom)
+		fmt.Println("[goslide] 🚀 Goslide 실시간 개발 서버")
+		fmt.Printf("  • 주소:     %s\n", url)
+		fmt.Printf("  • 감시 중:  %s\n", fileInfo)
+		fmt.Println("  • 단축키:   [?] 도움말  [P] 발표자 콘솔  [D] 판서  [F] 전체화면")
 		fmt.Printf("종료하려면 Ctrl+C를 누르세요\n\n")
 		return
 	}
 
-	fmt.Println(formatBannerRow("Goslide Live Server"))
-	fmt.Println(formatBannerRow(fmt.Sprintf("URL:      %s", url)))
-	fmt.Println(formatBannerRow(fmt.Sprintf("Watching: %s", fileInfo)))
-	fmt.Println(formatBannerRow("Hotkeys:  [?] Help  [P] Presenter  [D] Pen  [F] Fullscreen"))
-	fmt.Println(borderBottom)
+	fmt.Println("[goslide] 🚀 Goslide Live Server")
+	fmt.Printf("  • URL:      %s\n", url)
+	fmt.Printf("  • Watching: %s\n", fileInfo)
+	fmt.Println("  • Hotkeys:  [?] Help  [P] Presenter  [D] Pen  [F] Fullscreen")
 	fmt.Printf("Press Ctrl+C to stop\n\n")
 }
 
