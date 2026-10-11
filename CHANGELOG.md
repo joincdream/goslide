@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.1.2-test] - 2026-10-11
+
+### Added
+- **Automated GitHub Actions Release Pipeline (GOS-42)**:
+  - Automated cross-platform compilation and packaging for Linux, macOS, and Windows triggered by `v*` tag pushes (`.github/workflows/release.yml`).
+  - Automatic release note extraction from `CHANGELOG.md` with SHA256 checksums generation.
+- **Cross-Platform One-Liner Installer (`install.sh`) (GOS-42)**:
+  - Automated OS and CPU architecture detection for Linux (`amd64`, `arm64`) and macOS (`amd64`, `arm64`).
+  - Safe binary placement into `~/.local/bin` with macOS Gatekeeper quarantine removal.
+- **Onboarding & Docs Synchronization**:
+  - Updated `README` and `QUICKSTART` with one-liner installer, `goslide update` lifecycle, and Google Chrome dependency requirements.
+
+### Refactored
+- **Frontend Architecture & Clean Engine (GOS-43)**:
+  - Migrated 165 lines of raw string JavaScript/DOM overlay from Go backend into Svelte 5 frontend (`web/src/lib/hmr.js`, `ErrorOverlay.svelte`).
+  - Modularized `internal/server/server.go` into single-responsibility components (`server.go`, `handler.go`, `sse.go`, `watcher_loop.go`), reducing `server.go` by 75% (718 to 177 lines).
+  - Simplified live server terminal banner to clean bullet-point layout, resolving character display-width issues.
+
+---
+
 ## [v0.1.1-test] - 2026-10-11
 
 ### Added
