@@ -66,14 +66,17 @@ fi
 echo "📂 Extracting archive..."
 tar -xzf "$TMP_DIR/$ARTIFACT" -C "$TMP_DIR"
 
-if [ ! -f "$TMP_DIR/goslide" ]; then
+# Locate binary whether it is at archive root or inside a subfolder
+BINARY_PATH="$(find "$TMP_DIR" -type f -name "goslide" 2>/dev/null | head -n 1)"
+
+if [ -z "$BINARY_PATH" ] || [ ! -f "$BINARY_PATH" ]; then
   echo "❌ Binary 'goslide' not found inside archive"
   exit 1
 fi
 
 # 5. Install to Target Directory
 mkdir -p "$INSTALL_DIR"
-cp "$TMP_DIR/goslide" "$INSTALL_DIR/goslide"
+cp "$BINARY_PATH" "$INSTALL_DIR/goslide"
 chmod 755 "$INSTALL_DIR/goslide"
 
 # 6. macOS Gatekeeper Quarantine Removal
