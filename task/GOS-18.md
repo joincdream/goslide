@@ -21,20 +21,23 @@ Goslide는 Go 언어의 크로스 컴파일 기능 덕분에 단일 코드베이
 
 ```
 [Phase 1: 기능 완성 & CI 자동화 통과]
-  - GOS-12 (init 커맨드, 다중 빌드, GoReleaser 파이프라인) 완료
+  - GOS-42, GOS-43, GOS-44, GOS-45 완료 및 단일 바이너리 안정화
   - GitHub Actions 멀티 OS 매트릭스 (Linux, macOS, Windows) 자동 빌드 성공
          │
          ▼
 [Phase 2: 릴리즈 후보(RC) 태그 발행: v1.0.0-rc.1]
   - git tag -a v1.0.0-rc.1 -m "Release Candidate 1" && git push origin v1.0.0-rc.1
-  - GitHub Releases에 5대 타겟 바이너리 및 아카이브 자동 업로드 확인
+  - GitHub Releases에 6종 크로스 바이너리 및 아카이브 자동 업로드 확인
          │
          ▼
-[Phase 3: 3대 운영체제 실기기 E2E 검증 (Visual & Functional QA)]
-  - Linux (Ubuntu/WSL2)
-  - macOS (Apple Silicon / Intel)
-  - Windows (Windows 10/11)
-  - 발견된 버그가 있을 경우 핫픽스 후 v1.0.0-rc.2 발행
+[Phase 3: GitHub Actions VM 자동 변환 & 하이브리드 육안 검증 (Cloud VM + Local QA)]
+  - GitHub Actions `macos-latest` & `windows-latest` 가상 머신에서 각각 슬라이드 변환 실행:
+    * `goslide build demo/demo.md -f html,pdf,pptx -o dist/`
+    * 각 OS에서 생성된 산출물 3종을 GitHub Actions 아티팩트(`macos-slides.zip`, `windows-slides.zip`)로 자동 업로드
+  - 개발자가 산출물 zip을 로컬로 다운로드하여 육안 및 호환성 점검:
+    * Windows PC: 실제 Windows 환경에서 PowerPoint 정품 앱 및 PDF 뷰어로 서식/도형 무결성 확인
+    * macOS 결과물: 다운로드한 PPTX를 맥북 보유 동료에게 전달하여 Keynote 1회 열기 스모크 확인
+  - 결함 발견 시 핫픽스 후 v1.0.0-rc.2 발행
          │
          ▼
 [Phase 4: 공식 v1.0.0 정식 릴리즈]
@@ -46,51 +49,53 @@ Goslide는 Go 언어의 크로스 컴파일 기능 덕분에 단일 코드베이
 
 ## 3. 크로스 플랫폼 E2E 검증 매트릭스 및 시나리오 (Verification Scenarios)
 
-### 3.1 공통 CLI 실행 및 산출물 생성 시나리오
-모든 타겟 OS에서 동일한 표준 슬라이드(`examples/example-dsl.md`)를 기반으로 테스트합니다:
+### 3.1 하이브리드 검증 워크플로우 (Cloud VM 자동 변환 ➔ 로컬 다운로드 육안 검수)
 
-1. **단일 바이너리 직접 실행**:
-   * 터미널에서 `goslide --version` 실행 시 버전, 커밋 해시, 빌드 일시, OS/Arch 정확히 출력되는지 확인.
-2. **스타터 슬라이드 생성 (`goslide init`)**:
-   * 임의의 빈 폴더에서 `goslide init my-talk.md` 실행 ➔ 표준 마크다운 생성 확인.
-3. **다중 포맷 일괄 빌드 (`goslide build`)**:
-   * `goslide build my-talk.md -f html,pdf,pptx -o dist/`
-   * 산출물 3종(`dist/my-talk.html`, `dist/my-talk.pdf`, `dist/my-talk.pptx`) 생성 확인.
+```mermaid
+flowchart TD
+    subgraph GitHub_Cloud ["GitHub Actions Cloud Runners (e2e-matrix.yml)"]
+        A["macOS VM (macos-latest)"] -->|goslide build| B["macOS 산출물\n(HTML, PDF, PPTX)"]
+        C["Windows VM (windows-latest)"] -->|goslide.exe build| D["Windows 산출물\n(HTML, PDF, PPTX)"]
+        B --> E["Artifacts 자동 업로드\n(macos-slides.zip)"]
+        D --> F["Artifacts 자동 업로드\n(windows-slides.zip)"]
+    end
 
----
+    subgraph Local_QA ["로컬 PC 육안 검수 (Visual & App QA)"]
+        E -->|다운로드| G["macOS 생성 산출물 검수"]
+        F -->|다운로드| H["Windows 생성 산출물 검수"]
+        G --> I["맥북 동료 Keynote 열기 1회 확인"]
+        H --> J["보유 중인 Windows PC에서\nPowerPoint 365 정식 앱 열기 & 편집 테스트"]
+    end
+```
 
-### 3.2 운영체제별 특화 검증 시나리오
+### 3.2 운영체제별 세부 검증 계획
 
-#### 🐧 1) Linux 환경 (Ubuntu / Debian / WSL2)
+#### 🍏 1) macOS 환경 검증 계획 (클라우드 VM 변환 + 다운로드 검수)
+* **1단계: GitHub Actions `macos-latest` (Apple Silicon M-시리즈 VM) 기계적 검증**:
+  - `goslide_darwin_arm64` 바이너리가 macOS 환경에서 크래시 없이 정상 기동되는지 확인 (`goslide --version`).
+  - macOS 헤드리스 Chrome이 기동되어 `demo.md`를 16:9 무마진 벡터 PDF 및 PPTX로 성공적으로 렌더링하는지 확인.
+  - 생성된 산출물(`dist/`)을 `macos-slides.zip` 아티팩트로 패키징 업로드.
+* **2단계: 다운로드 및 호환성 육안 점검**:
+  - 개발자가 `macos-slides.zip`을 다운로드하여 폰트 깨짐 및 KaTeX 수식 무결성 확인.
+  - 생성된 `demo.pptx`를 맥북을 사용하는 지인/동료 1명에게 공유하여 **Apple Keynote**에서 열기 및 슬라이드 쇼 1회 점검 요청.
+
+#### 🪟 2) Windows 환경 검증 계획 (클라우드 VM 변환 + 실기기 직접 검수)
+* **1단계: GitHub Actions `windows-latest` VM 자동 검증**:
+  - Windows Server 환경에서 `goslide.exe build demo\demo.md -f html,pdf,pptx` 실행.
+  - Windows 특유의 역슬래시(`\`) 파일 경로 처리 및 Windows Chrome Headless 프로세스 연동 무결성 확인.
+  - 생성된 산출물을 `windows-slides.zip` 아티팩트로 업로드.
+* **2단계: 보유 중인 실제 Windows 10/11 PC에서 직접 검수**:
+  - 개발자가 직접 Windows PC에서 `goslide.exe`를 실행하여 PowerShell/CMD 환경 인터랙션 확인.
+  - 생성된 `demo.pptx`를 **실제 Microsoft PowerPoint 정품 앱**에서 열어:
+    * "파일 복구/손상" 경고 없이 즉시 로드되는지 확인.
+    * 슬라이드 내 코드 박스, 텍스트 상자, 제목이 개별 도형(Shape)으로 분리되어 편집 가능한지 확인.
+  - Windows 기본 브라우저(Edge/Chrome)에서 `demo.html` 오프라인 구동 및 단축키(`F`, `D`, `P`) 반응 확인.
+
+#### 🐧 3) Linux 환경 검증 계획 (Ubuntu 로컬 개발 환경)
 * **단일 바이너리 무의존성 검증**:
-  * `ldd bin/goslide` 실행 시 `not a dynamic executable` (Statically linked) 확인.
+  - `ldd bin/goslide` 실행 시 `not a dynamic executable` (Statically linked) 확인.
 * **헤드리스 크롬 연동**:
-  * 시스템에 설치된 Google Chrome 또는 Chromium을 자동 감지하여 PDF가 정상 벡터로 렌더링되는지 확인.
-* **웹 서버 모드**:
-  * `goslide serve my-talk.md -p 8080` 실행 후 브라우저 핫리로드 동작 확인.
-
-#### 🍏 2) macOS 환경 (Apple Silicon M-시리즈 / Intel)
-* **Apple Silicon 네이티브 실행**:
-  * `goslide-darwin-arm64`가 Rosetta 에뮬레이션 없이 네이티브 Mach-O 64-bit ARM 바이너리로 구동되는지 확인.
-* **Apple Keynote 호환성**:
-  * 생성된 `my-talk.pptx`를 Mac의 **Apple Keynote** 앱에서 열었을 때:
-    * 16:9 슬라이드 비율 유지 여부
-    * 한글 폰트(San Francisco, Apple SD 산돌고딕) 텍스트 줄바꿈 자연스러움 여부
-    * 배경 그라데이션 및 코드 블록 가독성 점검
-* **macOS 단축키 충돌 여부**:
-  * 브라우저 프레젠테이션 모드에서 `Cmd + F`(전체화면), `P`(발표자 콘솔), `B`(블랙아웃) 동작 확인.
-
-#### 🪟 3) Windows 환경 (Windows 10 / 11 64-bit)
-* **실행 파일(`goslide.exe`) 및 보안 경고 점검**:
-  * Windows Defender / SmartScreen 실행 시 차단 여부 및 경고 문구 확인 (코드 사이닝 미적용 시 "추가 정보 ➔ 실행" 가이드 제공 여부).
-* **Microsoft PowerPoint (MS Office 365) 정식 호환성**:
-  * 생성된 `my-talk.pptx`를 실제 **PowerPoint 정품 데스크톱 앱**에서 열었을 때:
-    * "파일이 손상되었습니다" 경고창 없이 즉시 열리는지 확인.
-    * 텍스트 박스, 제목, 본문, 코드 영역이 개별 도형(Shape)으로 정상 분리되어 직접 편집(Edit) 가능한지 확인.
-* **Windows 파일 경로 및 URL 정규화 검증**:
-  * `C:\Users\...` 드라이브 문자 경로 및 역슬래시(`\`)가 포함된 마크다운에서 배경 이미지/로컬 에셋이 깨지지 않고 렌더링되는지 확인.
-* **Chrome DevTools 연동**:
-  * `file:///C:/...` 형식으로 헤드리스 크롬이 에러 없이 인쇄/캡처를 완료하는지 확인.
+  - Linux Chromium 기반 PDF 벡터 렌더링 및 `goslide serve` SSE 핫리로드 기능 검증.
 
 ---
 
@@ -125,8 +130,8 @@ Goslide는 Go 언어의 크로스 컴파일 기능 덕분에 단일 코드베이
 
 | 단계 | 작업 내용 | 담당자 / 환경 | 상태 |
 | :---: | :--- | :--- | :---: |
-| **Step 1** | **GOS-12 크로스 컴파일 파이프라인 완성** (Makefile, .goreleaser.yaml, CI) | 개발팀 | 진행 예정 |
-| **Step 2** | **v1.0.0-rc.1 태그 발행** 및 GitHub Actions 자동 빌드 산출물 확인 | 배포 담당 | 대기 |
-| **Step 3** | **Linux / macOS / Windows 3대 OS 실기기 스모크 E2E 테스트 수행** | QA / 개발팀 | 대기 |
-| **Step 4** | **결함 수정 (필요 시 v1.0.0-rc.2) 및 최종 DoD 검증** | 개발팀 | 대기 |
-| **Step 5** | **공식 v1.0.0 태그 발행** 및 릴리즈 노트 공지 | 배포 담당 | 대기 |
+| **Step 1** | **핵심 태스크 완료 및 기능 안정화** (GOS-42, GOS-43, GOS-44, GOS-45 완료) | 개발팀 | **완료** |
+| **Step 2** | **GitHub Actions 3대 OS E2E 매트릭스 워크플로우 구성** (`macos-latest`, `windows-latest` 변환 및 아티팩트 업로드) | CI / 개발팀 | **대기** |
+| **Step 3** | **macOS / Windows 산출물 로컬 다운로드 및 육안/호환성 검수** (Windows PowerPoint 365, Mac Keynote 1회 점검) | QA / 개발팀 | **대기** |
+| **Step 4** | **v1.0.0-rc.1 태그 발행** 및 GitHub Releases 6종 바이너리 배포 확인 | 배포 담당 | **대기** |
+| **Step 5** | **공식 v1.0.0 정식 릴리즈** 및 최종 릴리즈 노트 공지 | 배포 담당 | **대기** |
