@@ -6,13 +6,13 @@
 > **상태**: 완료 (Done)  
 > **담당 패키지**: [`internal/parser/`](../internal/parser/), [`internal/model/`](../internal/model/), [`internal/server/`](../internal/server/)  
 > **아키텍처 상세 설계서**:  
-> 👉 **[`docs/architecture/10-dsl-diagnostic-and-guiding-engine.md`](../docs/architecture/10-dsl-diagnostic-and-guiding-engine.md)**  
+> 👉 **[`docs/architecture/10-dsl-diagnostic-and-guiding-engine.md`](10-dsl-diagnostic-and-guiding-engine.md)**  
 > *(상세 컴포넌트 구조, 슬라이드 블록 검사 파이프라인, LSP/VS Code 연계 메커니즘 등 세부 구현 명세는 위 아키텍처 문서를 단일 진실 공급원(SSOT)으로 참조합니다.)*  
 > **연관 소스 파일**:  
-> - [`internal/model/diagnostic.go`](../internal/model/diagnostic.go) *(신규)*  
-> - [`internal/parser/directive.go`](../internal/parser/directive.go)  
-> - [`internal/parser/parser.go`](../internal/parser/parser.go)  
-> - [`internal/server/server.go`](../internal/server/server.go)  
+> - [`internal/model/diagnostic.go`](internal/model/diagnostic.go) *(신규)*  
+> - [`internal/parser/directive.go`](directive.go)  
+> - [`internal/parser/parser.go`](parser.go)  
+> - [`internal/server/server.go`](server.go)  
 
 ---
 
@@ -30,9 +30,9 @@ Goslide의 확장 DSL(지시어, 레이아웃, 마커)은 HTML 주석(`<!-- ... 
 
 ---
 
-## 2. 도메인 모델 요약 ([`internal/model/diagnostic.go`](../internal/model/diagnostic.go))
+## 2. 도메인 모델 요약 ([`internal/model/diagnostic.go`](internal/model/diagnostic.go))
 
-*상세 아키텍처 및 파이프라인 다이어그램은 [`docs/architecture/10-dsl-diagnostic-and-guiding-engine.md`](../docs/architecture/10-dsl-diagnostic-and-guiding-engine.md)를 참조하십시오.*
+*상세 아키텍처 및 파이프라인 다이어그램은 [`docs/architecture/10-dsl-diagnostic-and-guiding-engine.md`](10-dsl-diagnostic-and-guiding-engine.md)를 참조하십시오.*
 
 ```go
 package model
@@ -62,12 +62,12 @@ type Diagnostic struct {
 
 | 단계 | 작업 내용 | 타겟 소스 파일 |
 | :---: | :--- | :--- |
-| **Step 1** | **진단 도메인 모델 정의**<br>- `model.Diagnostic` 구조체 및 `DiagnosticSeverity` 선언 | [`internal/model/diagnostic.go`](../internal/model/diagnostic.go) |
-| **Step 2** | **표준 카탈로그 및 검사기(Catalog Matcher) 구현**<br>- `LayoutCatalog` (표준 레이아웃 슬라이스 관리)<br>- `DirectiveCatalog` (표준 전역/로컬 지시어 관리)<br>- 접두사 검사 기반 언더스코어 누락 진단 (`layout` $\rightarrow$ `_layout`) | [`internal/parser/catalog.go`](../internal/parser/catalog.go)<br>[`internal/parser/diagnostic.go`](../internal/parser/diagnostic.go) |
-| **Step 3** | **주석 구분자 정제 및 코드 블록 AST 격리**<br>- `--->` 자동 정제 및 미종료 주석 본문 삼킴(Swallowing) 방지<br>- Goldmark AST 순회 시 코드 블록 내부 주석 스킵 | [`internal/parser/directive.go`](../internal/parser/directive.go) |
-| **Step 4** | **슬라이드 블록 단위 진단 수집 파이프라인 결합**<br>- `splitSlides()` 후 각 슬라이드 블록별로 진단 수집<br>- 슬라이드 내 상대 라인 번호(`Line`) 및 `SlideIndex` 바인딩 | [`internal/parser/parser.go`](../internal/parser/parser.go) |
-| **Step 5** | **CLI 및 개발 서버(`goslide serve`) 출력 연동**<br>- 터미널 경고 시 원문(`RawSnippet`)과 `Available: [...]` 후보군 출력<br>- SSE 이벤트 파이프라인을 통한 웹 브라우저 경고 전달 | [`internal/server/server.go`](../internal/server/server.go)<br>[`cmd/goslide/`](../cmd/goslide/) |
-| **Step 6** | **단위 테스트 및 무결성 검증**<br>- 슬라이드 블록 검사, 후보군 리스트 정합성, 코드블록 오탐 방지 테스트 | [`internal/parser/diagnostic_test.go`](../internal/parser/diagnostic_test.go) |
+| **Step 1** | **진단 도메인 모델 정의**<br>- `model.Diagnostic` 구조체 및 `DiagnosticSeverity` 선언 | [`internal/model/diagnostic.go`](internal/model/diagnostic.go) |
+| **Step 2** | **표준 카탈로그 및 검사기(Catalog Matcher) 구현**<br>- `LayoutCatalog` (표준 레이아웃 슬라이스 관리)<br>- `DirectiveCatalog` (표준 전역/로컬 지시어 관리)<br>- 접두사 검사 기반 언더스코어 누락 진단 (`layout` $\rightarrow$ `_layout`) | [`internal/parser/catalog.go`](catalog.go)<br>[`internal/parser/diagnostic.go`](internal/parser/diagnostic.go) |
+| **Step 3** | **주석 구분자 정제 및 코드 블록 AST 격리**<br>- `--->` 자동 정제 및 미종료 주석 본문 삼킴(Swallowing) 방지<br>- Goldmark AST 순회 시 코드 블록 내부 주석 스킵 | [`internal/parser/directive.go`](directive.go) |
+| **Step 4** | **슬라이드 블록 단위 진단 수집 파이프라인 결합**<br>- `splitSlides()` 후 각 슬라이드 블록별로 진단 수집<br>- 슬라이드 내 상대 라인 번호(`Line`) 및 `SlideIndex` 바인딩 | [`internal/parser/parser.go`](parser.go) |
+| **Step 5** | **CLI 및 개발 서버(`goslide serve`) 출력 연동**<br>- 터미널 경고 시 원문(`RawSnippet`)과 `Available: [...]` 후보군 출력<br>- SSE 이벤트 파이프라인을 통한 웹 브라우저 경고 전달 | [`internal/server/server.go`](server.go)<br>[`cmd/goslide/`](../cmd/goslide/) |
+| **Step 6** | **단위 테스트 및 무결성 검증**<br>- 슬라이드 블록 검사, 후보군 리스트 정합성, 코드블록 오탐 방지 테스트 | [`internal/parser/diagnostic_test.go`](diagnostic_test.go) |
 
 ---
 
