@@ -9,6 +9,17 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 
 [English](README.md) | [한국어](README.ko.md) · [3-Min Quickstart](QUICKSTART.md)
 
+<br/>
+<br/>
+
+<a href="#quick-start">
+  <img src="docs/assets/images/hero-showcase.webp" alt="Goslide Demo Showcase" width="880" style="border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
+</a>
+
+<p align="center">
+  <sub>⚡ <b>Quick Tour</b>: Instant Launch → Rich Markdown & Code Highlighting → Screencast Canvas (<code>D</code>) → Dual Presenter Console (<code>P</code>)</sub>
+</p>
+
 </div>
 
 ---
@@ -29,6 +40,29 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 
 > [!NOTE]
 > HTML presentations and local live server (`goslide serve`) have **zero external runtime dependencies**. Generating vector **PDF** and editable **PPTX** requires **Google Chrome / Chromium** installed on your host system.
+
+---
+
+### Visual Highlights
+
+<p align="center">
+  <img src="docs/assets/images/presenter-view.png" alt="Dual-Screen Presenter Console" width="880" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+<p align="center"><sub>🖥️ <b>Dual-Screen Presenter Console (<code>P</code>)</b>: Synchronized live slide, next slide preview, stopwatch timer, and speaker notes.</sub></p>
+
+<br/>
+
+<p align="center">
+  <img src="docs/assets/images/canvas-drawing.png" alt="Transparent Screencast Canvas" width="880" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+<p align="center"><sub>🖊️ <b>Transparent Screencast Canvas (<code>D</code>, <code>L</code>)</b>: Real-time neon pen drawing and digital laser pointer for video tutorials and lecture recordings.</sub></p>
+
+<br/>
+
+<p align="center">
+  <img src="docs/assets/images/multi-export.png" alt="Multi-Format Export Showcase" width="880" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+<p align="center"><sub>📦 <b>One Source, Multi-Format Output</b>: Single Markdown source exported simultaneously to interactive HTML, vector PDF, and editable PPTX.</sub></p>
 
 ---
 

@@ -9,6 +9,17 @@
 
 [English](README.md) | [한국어](README.ko.md) · [3분 퀵스타트](QUICKSTART.ko.md)
 
+<br/>
+<br/>
+
+<a href="#빠른-시작-quick-start">
+  <img src="docs/assets/images/hero-showcase.webp" alt="Goslide 시연 쇼케이스" width="880" style="border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
+</a>
+
+<p align="center">
+  <sub>⚡ <b>주요 시연 흐름</b>: 초고속 기동 → 마크다운 슬라이드 및 코드 하이라이트 → 실시간 스크린캐스트 판서 (<code>D</code>) → 듀얼 발표자 콘솔 (<code>P</code>)</sub>
+</p>
+
 </div>
 
 ---
@@ -29,6 +40,29 @@
 
 > [!NOTE]
 > 인터랙티브 HTML 슬라이드 생성 및 로컬 라이브 서버(`goslide serve`)는 **외부 런타임 의존성이 0%**입니다. 고해상도 벡터 **PDF** 및 편집 가능한 **PPTX** 변환 시에는 시스템에 **Google Chrome 또는 Chromium** 브라우저가 설치되어 있어야 합니다.
+
+---
+
+### 주요 기능 비주얼 하이라이트 (Feature Showcase)
+
+<p align="center">
+  <img src="docs/assets/images/presenter-view.png" alt="듀얼 스크린 발표자 콘솔" width="880" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+<p align="center"><sub>🖥️ <b>듀얼 스크린 발표자 콘솔 (<code>P</code>)</b>: 현재 슬라이드, 다음 슬라이드 미리보기, 스톱워치 타이머 및 발표자 노트를 실시간 동기화.</sub></p>
+
+<br/>
+
+<p align="center">
+  <img src="docs/assets/images/canvas-drawing.png" alt="스크린캐스트 판서 캔버스" width="880" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+<p align="center"><sub>🖊️ <b>유튜브 스크린캐스트 투명 판서 (<code>D</code>, <code>L</code>)</b>: 강의 녹화 및 기술 발표를 위한 실시간 네온 펜 판서와 디지털 레이저 포인터.</sub></p>
+
+<br/>
+
+<p align="center">
+  <img src="docs/assets/images/multi-export.png" alt="다중 포맷 일괄 변환 쇼케이스" width="880" style="border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+<p align="center"><sub>📦 <b>원소스 멀티포맷 일괄 변환</b>: 단일 마크다운 소스에서 독립형 웹 HTML, 인쇄 품질의 벡터 PDF, 파워포인트(PPTX)를 동시 생성.</sub></p>
 
 ---
 

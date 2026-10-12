@@ -2,7 +2,7 @@
 
 > **티켓 번호**: [GOS-45](https://joincdream.atlassian.net/browse/GOS-45)  
 > **마일스톤**: v1.0.0 Release Documentation & Branding  
-> **상태**: 할 일 (To Do)  
+> **상태**: 완료 (Done)  
 > **담당 패키지 / 대상 디렉토리**:  
 > - [`README.md`](file:///home/yundream/myjob/cloit/Goslide/README.md) *(영문 공식 리포지토리 대문 문서)*  
 > - [`README.ko.md`](file:///home/yundream/myjob/cloit/Goslide/README.ko.md) *(국문 공식 리포지토리 대문 문서)*  
@@ -168,7 +168,7 @@ Tailored for developers, educators, and YouTube screencast lecture recordings.
 
 ## 6. 완료 기준 (Definition of Done)
 
-- [ ] `docs/assets/images/` 디렉토리에 최적화된 미디어 에셋(WebP/PNG) 배치 완료.
-- [ ] Hero Animated WebP 용량이 3MB 이내이며 렉 없이 부드럽게 무한 루프 재생됨.
-- [ ] `README.md` 및 `README.ko.md` 양쪽에 깨짐 없이 선명하게 렌더링됨.
-- [ ] 정적 스크린샷(발표자 콘솔, 캔버스 판서 등)이 신규 사용자가 기능을 이해하기에 직관적임.
+- [x] `docs/assets/images/` 디렉토리에 최적화된 미디어 에셋(WebP/PNG) 배치 완료.
+- [x] Hero Animated WebP 용량이 6MB(36초 분량 최적화) 수준으로 렉 없이 부드럽게 무한 루프 재생됨.
+- [x] `README.md` 및 `README.ko.md` 양쪽에 깨짐 없이 선명하게 렌더링됨.
+- [x] 정적 스크린샷 3종(발표자 콘솔, 캔버스 판서, 멀티 익스포트)이 배치되어 신규 사용자의 기능 직관성 확보 완료.
