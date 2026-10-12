@@ -99,6 +99,32 @@ func parseAndValidateFormats(raw string) ([]string, error) {
 	return formats, nil
 }
 
+func validateOutputDir(outputFlag string, formats []string) error {
+	if outputFlag == "" {
+		return nil
+	}
+
+	isExplicitDir := strings.HasSuffix(outputFlag, "/") || strings.HasSuffix(outputFlag, "\\")
+	if isExplicitDir {
+		cleanPath := filepath.Clean(outputFlag)
+		info, err := os.Stat(cleanPath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				return newCLIError(model.ExitFileNotFound, fmt.Errorf("output directory %q does not exist: please create it first", outputFlag))
+			}
+			return newCLIError(model.ExitGeneralError, fmt.Errorf("failed to access output directory %q: %w", outputFlag, err))
+		}
+		if !info.IsDir() {
+			return newCLIError(model.ExitInvalidUsage, fmt.Errorf("output path %q is not a directory", outputFlag))
+		}
+	} else if info, err := os.Stat(outputFlag); err == nil {
+		if !info.IsDir() && len(formats) > 1 {
+			return newCLIError(model.ExitInvalidUsage, fmt.Errorf("output path %q is a file, but multiple formats were requested", outputFlag))
+		}
+	}
+	return nil
+}
+
 func validateBuildOptions(args []string) ([]string, error) {
 	if len(args) < 1 {
 		return nil, newCLIError(model.ExitInvalidUsage, errors.New("input markdown file is required: goslide build <input.md>"))
@@ -109,6 +135,11 @@ func validateBuildOptions(args []string) ([]string, error) {
 	formats, err := parseAndValidateFormats(formatFlag)
 	if err != nil {
 		return nil, err
+	}
+	if outputPathFlag != "" {
+		if err := validateOutputDir(outputPathFlag, formats); err != nil {
+			return nil, err
+		}
 	}
 	if themePathFlag != "" {
 		if _, err := os.Stat(themePathFlag); err != nil {

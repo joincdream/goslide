@@ -535,6 +535,10 @@ theme: "clean"
 		t.Fatalf("failed to write test md: %v", err)
 	}
 
+	if err := os.MkdirAll(distDir, 0755); err != nil {
+		t.Fatalf("failed to create distDir: %v", err)
+	}
+
 	// Test -f all with directory output
 	buildCmd.SetArgs([]string{sampleMD, "-f", "all", "-o", distDir + "/"})
 	if err := buildCmd.Execute(); err != nil {
@@ -558,6 +562,9 @@ theme: "clean"
 	// Test subset -f html,pdf
 	resetFlags()
 	subsetDir := filepath.Join(tempDir, "subset")
+	if err := os.MkdirAll(subsetDir, 0755); err != nil {
+		t.Fatalf("failed to create subsetDir: %v", err)
+	}
 	buildCmd.SetArgs([]string{sampleMD, "-f", "html,pdf", "-o", subsetDir + "/"})
 	if err := buildCmd.Execute(); err != nil {
 		t.Fatalf("build command with -f html,pdf failed: %v", err)
@@ -571,5 +578,36 @@ theme: "clean"
 	}
 	if _, err := os.Stat(filepath.Join(subsetDir, "talk.pptx")); err == nil {
 		t.Errorf("talk.pptx should NOT be created when only html,pdf requested")
+	}
+}
+
+func TestBuildCommand_OutputDirNotExist(t *testing.T) {
+	defer resetFlags()
+	resetFlags()
+
+	tempDir := t.TempDir()
+	sampleMD := filepath.Join(tempDir, "talk.md")
+	if err := os.WriteFile(sampleMD, []byte("# Test Slide\n"), 0600); err != nil {
+		t.Fatalf("failed to write test md: %v", err)
+	}
+
+	nonExistentDir := filepath.Join(tempDir, "does_not_exist")
+
+	// Test with trailing slash: directory must exist, fail-fast if not
+	buildCmd.SetArgs([]string{sampleMD, "-o", nonExistentDir + "/"})
+	err := buildCmd.Execute()
+	if err == nil {
+		t.Fatalf("expected error for non-existent output directory, got nil")
+	}
+	if code := determineExitCode(err); code != model.ExitFileNotFound {
+		t.Errorf("expected ExitFileNotFound (%d), got %d (err: %v)", model.ExitFileNotFound, code, err)
+	}
+	if !strings.Contains(err.Error(), "does not exist: please create it first") {
+		t.Errorf("unexpected error message: %v", err)
+	}
+
+	// Verify directory was not silently created
+	if _, err := os.Stat(nonExistentDir); err == nil {
+		t.Errorf("directory %q should not have been created", nonExistentDir)
 	}
 }
