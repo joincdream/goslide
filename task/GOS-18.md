@@ -32,7 +32,7 @@ Goslide는 Go 언어의 크로스 컴파일 기능 덕분에 단일 코드베이
          ▼
 [Phase 3: GitHub Actions VM 자동 변환 & 하이브리드 육안 검증 (Cloud VM + Local QA)]
   - GitHub Actions `macos-latest` & `windows-latest` 가상 머신에서 각각 슬라이드 변환 실행:
-    * `goslide build demo/demo.md -f html,pdf,pptx -o dist/`
+    * `goslide build examples/demo/demo.md -f html,pdf,pptx -o dist/`
     * 각 OS에서 생성된 산출물 3종을 GitHub Actions 아티팩트(`macos-slides.zip`, `windows-slides.zip`)로 자동 업로드
   - 개발자가 산출물 zip을 로컬로 다운로드하여 육안 및 호환성 점검:
     * Windows PC: 실제 Windows 환경에서 PowerPoint 정품 앱 및 PDF 뷰어로 서식/도형 무결성 확인
@@ -72,18 +72,25 @@ flowchart TD
 
 #### 🍏 1) macOS 환경 검증 계획 (클라우드 VM 변환 + 다운로드 검수)
 * **1단계: GitHub Actions `macos-latest` (Apple Silicon M-시리즈 VM) 기계적 검증**:
-  - `goslide_darwin_arm64` 바이너리가 macOS 환경에서 크래시 없이 정상 기동되는지 확인 (`goslide --version`).
-  - macOS 헤드리스 Chrome이 기동되어 `demo.md`를 16:9 무마진 벡터 PDF 및 PPTX로 성공적으로 렌더링하는지 확인.
-  - 생성된 산출물(`dist/`)을 `macos-slides.zip` 아티팩트로 패키징 업로드.
+  - **CI 매트릭스 및 실행 환경**: `macos-latest` 러너에서 Go 툴체인(`actions/setup-go@v5`) 및 시스템 내장 Chrome 환경 셋업.
+  - **바이너리 기동 점검**: `go build -o bin/goslide ./cmd/goslide` 컴파일 후 `goslide --version` 실행으로 Apple Silicon(darwin/arm64) ABI 호환성 및 크래시(SIGSEGV 등) 무결성 확인.
+  - **3종 포맷 일괄 변환**: `./bin/goslide build examples/demo/demo.md -f html,pdf,pptx -o dist/macos/` 실행.
+    * macOS 기본 설치 Chrome(`/Applications/Google Chrome.app/...`) 자동 탐색 및 DevTools Protocol(CDP) 통신 무결성 검증.
+    * 16:9 무마진 벡터 PDF 및 OpenXML PPTX 정상 렌더링 검증.
+  - **산출물 보관**: `actions/upload-artifact@v4`를 통해 `dist/macos/` 결과물을 `macos-slides` 아티팩트로 자동 업로드.
 * **2단계: 다운로드 및 호환성 육안 점검**:
   - 개발자가 `macos-slides.zip`을 다운로드하여 폰트 깨짐 및 KaTeX 수식 무결성 확인.
   - 생성된 `demo.pptx`를 맥북을 사용하는 지인/동료 1명에게 공유하여 **Apple Keynote**에서 열기 및 슬라이드 쇼 1회 점검 요청.
 
 #### 🪟 2) Windows 환경 검증 계획 (클라우드 VM 변환 + 실기기 직접 검수)
 * **1단계: GitHub Actions `windows-latest` VM 자동 검증**:
-  - Windows Server 환경에서 `goslide.exe build demo\demo.md -f html,pdf,pptx` 실행.
-  - Windows 특유의 역슬래시(`\`) 파일 경로 처리 및 Windows Chrome Headless 프로세스 연동 무결성 확인.
-  - 생성된 산출물을 `windows-slides.zip` 아티팩트로 업로드.
+  - **CI 매트릭스 및 실행 환경**: `windows-latest` (Windows Server) 러너에서 Go 툴체인 및 Windows Chrome 연동 환경 셋업.
+  - **바이너리 기동 점검**: `go build -o bin/goslide.exe .\cmd\goslide` 컴파일 후 `goslide.exe --version` 실행으로 windows/amd64 정적 바이너리 기동 무결성 확인.
+  - **3종 포맷 일괄 변환**: `.\bin\goslide.exe build examples\demo\demo.md -f html,pdf,pptx -o dist\windows\` 실행.
+    * Windows 특유의 역슬래시(`\`) 파일 경로 처리, CRLF 개행, 공백 처리 무결성 확인.
+    * Windows 환경 Chrome Headless 프로세스 fork/exec 및 CDP PDF 인쇄 정상 동작 검증.
+    * 순수 Go ZIP 컨테이너 기반 OpenXML PPTX 파일 생성 무결성 검증.
+  - **산출물 보관**: `actions/upload-artifact@v4`를 통해 `dist\windows\` 결과물을 `windows-slides` 아티팩트로 자동 업로드.
 * **2단계: 보유 중인 실제 Windows 10/11 PC에서 직접 검수**:
   - 개발자가 직접 Windows PC에서 `goslide.exe`를 실행하여 PowerShell/CMD 환경 인터랙션 확인.
   - 생성된 `demo.pptx`를 **실제 Microsoft PowerPoint 정품 앱**에서 열어:
@@ -131,7 +138,7 @@ flowchart TD
 | 단계 | 작업 내용 | 담당자 / 환경 | 상태 |
 | :---: | :--- | :--- | :---: |
 | **Step 1** | **핵심 태스크 완료 및 기능 안정화** (GOS-42, GOS-43, GOS-44, GOS-45 완료) | 개발팀 | **완료** |
-| **Step 2** | **GitHub Actions 3대 OS E2E 매트릭스 워크플로우 구성** (`macos-latest`, `windows-latest` 변환 및 아티팩트 업로드) | CI / 개발팀 | **대기** |
+| **Step 2** | **GitHub Actions 3대 OS E2E 매트릭스 워크플로우 구성** (`macos-latest`, `windows-latest` 변환 및 아티팩트 업로드) | CI / 개발팀 | **진행 중** |
 | **Step 3** | **macOS / Windows 산출물 로컬 다운로드 및 육안/호환성 검수** (Windows PowerPoint 365, Mac Keynote 1회 점검) | QA / 개발팀 | **대기** |
 | **Step 4** | **v1.0.0-rc.1 태그 발행** 및 GitHub Releases 6종 바이너리 배포 확인 | 배포 담당 | **대기** |
 | **Step 5** | **공식 v1.0.0 정식 릴리즈** 및 최종 릴리즈 노트 공지 | 배포 담당 | **대기** |

@@ -1,0 +1,80 @@
+name: Cross-Platform E2E Verification
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/e2e-matrix.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/e2e-matrix.yml'
+
+jobs:
+  e2e-verification:
+    name: E2E Verification (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            binary_name: goslide
+            binary_path: ./bin/goslide
+            output_dir: dist/macos
+            artifact_name: macos-slides
+          - os: windows-latest
+            binary_name: goslide.exe
+            binary_path: .\bin\goslide.exe
+            output_dir: dist\windows
+            artifact_name: windows-slides
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache: true
+
+      - name: Build Static Binary
+        run: |
+          go build -trimpath -ldflags="-s -w" -o bin/${{ matrix.binary_name }} ./cmd/goslide
+
+      - name: Verify Binary Startup (--version & --help)
+        run: |
+          ${{ matrix.binary_path }} --version
+          ${{ matrix.binary_path }} --help
+
+      - name: Generate Multi-Format Slides (HTML, PDF, PPTX)
+        run: |
+          ${{ matrix.binary_path }} build examples/demo/demo.md -f html,pdf,pptx -o ${{ matrix.output_dir }}
+
+      - name: Verify Generated Artifacts (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          ls -la ${{ matrix.output_dir }}
+          test -s "${{ matrix.output_dir }}/demo.html"
+          test -s "${{ matrix.output_dir }}/demo.pdf"
+          test -s "${{ matrix.output_dir }}/demo.pptx"
+          echo "macOS artifacts verified successfully."
+
+      - name: Verify Generated Artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ matrix.output_dir }}"
+          if (-not (Test-Path "${{ matrix.output_dir }}\demo.html")) { throw "demo.html not found" }
+          if (-not (Test-Path "${{ matrix.output_dir }}\demo.pdf")) { throw "demo.pdf not found" }
+          if (-not (Test-Path "${{ matrix.output_dir }}\demo.pptx")) { throw "demo.pptx not found" }
+          Write-Host "Windows artifacts verified successfully."
+
+      - name: Upload Slide Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.output_dir }}
+          retention-days: 14
